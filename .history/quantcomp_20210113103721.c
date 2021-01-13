@@ -41,6 +41,7 @@ typedef struct{
 int main(){
     int states = (int)pow(2,N);
     double complex wavefunction[states];
-    printf("%d\n", states);
+    printf("states\n");
+
     return 0;
 }
