@@ -28,25 +28,24 @@ License: Public Domain
 #include <limits.h>
 #include <math.h>
 #include <stdbool.h>
+#include <complex.h>
 
-#define N 3 // Number of qubits defined
-#define STATES_MAX 1024 //max of 10 qubits 
+#define N 3
+#define STATES_MAX 1024
 
 typedef struct{
-    double real;
-    double imag;
-}complex;
+    bool normed;
+    double complex wf[];
+} wavefunction;
 
 int main(){
     int states = (int)pow(2,N);
-
-    complex *wavefunction;
-    wavefunction = malloc(states*sizeof(complex));
-    
-    for(int i = 0; i < states; i++){
-        wavefunction[i].real = 1/sqrt(states); //setting equal probability of each state
-        wavefunction[i].imag = 0;
-        printf("%lg+%lgi\n", wavefunction[i].real, wavefunction[i].imag);
+    double complex wavefunction[states];
+    //printf("%d\n", states);
+    for(int i = 0; i< states; i++){
+        //normalising the wavefunction with eqaul probability
+        wavefunction[i] = 1/sqrt(states);
+        printf("%lg\n" wavefunction[i]);
     }
     return 0;
 }

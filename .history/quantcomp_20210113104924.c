@@ -44,7 +44,7 @@ int main(){
     wavefunction = malloc(states*sizeof(complex));
     
     for(int i = 0; i < states; i++){
-        wavefunction[i].real = 1/sqrt(states); //setting equal probability of each state
+        wavefunction[i].real = 1/sqrt(states);
         wavefunction[i].imag = 0;
         printf("%lg+%lgi\n", wavefunction[i].real, wavefunction[i].imag);
     }
