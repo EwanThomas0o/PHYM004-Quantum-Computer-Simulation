@@ -66,12 +66,8 @@ int main(){
 
     gsl_ran_discrete_t* lookup = gsl_ran_discrete_preproc(states, probabilities);
     gsl_rng* r = gsl_rng_alloc(gsl_rng_default);
-    for(int l = 0; l < 20; l++){
-        size_t t = gsl_ran_discrete(r, lookup);
-        printf("%zu\n", t);
-    }
-    double pdf =  gsl_ran_discrete_pdf(7, lookup); //gives normalised probability
-    //printf("%lg\n", pdf);
-    gsl_ran_discrete_free(lookup);
+    size_t t = gsl_ran_discrete(r, lookup);
+    double pdf =  gsl_ran_discrete_pdf(7, lookup);
+    printf("%lg\n", pdf);
 ;    return 0;
 }

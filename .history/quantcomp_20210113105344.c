@@ -28,14 +28,13 @@ License: Public Domain
 #include <limits.h>
 #include <math.h>
 #include <stdbool.h>
-#include <gsl/gsl_randist.h>
 
 #define BASIS 2
 #define N 3 // Number of qubits defined
 #define STATES_MAX 1024 //max of 10 qubits 
 
 typedef struct{
-    double real;  //TODO: Change to gsl complex type
+    double real;
     double imag;
 }complex; //creating homemade complex dtype
 
@@ -48,30 +47,13 @@ complex* init_wavfunction(){
     for(int i = 0; i < states; i++){
         wavefunction[i].real = 1/sqrt(states); //setting equal probability of each state
         wavefunction[i].imag = 0;
-        //printf("%lg+%lgi\n", wavefunction[i].real, wavefunction[i].imag);
+        printf("%lg+%lgi\n", wavefunction[i].real, wavefunction[i].imag);
     }
 
     return wavefunction;
 }
 
-
 int main(){
-    int states = (int)pow(BASIS, N);
-    complex* wavefunction = init_wavfunction();
-    
-    double probabilities[states];
-    for (int j = 0; j < states; j ++){
-        probabilities[j] = wavefunction[j].real*wavefunction[j].real + wavefunction[j].imag*wavefunction[j].imag;
-    }
-
-    gsl_ran_discrete_t* lookup = gsl_ran_discrete_preproc(states, probabilities);
-    gsl_rng* r = gsl_rng_alloc(gsl_rng_default);
-    for(int l = 0; l < 20; l++){
-        size_t t = gsl_ran_discrete(r, lookup);
-        printf("%zu\n", t);
-    }
-    double pdf =  gsl_ran_discrete_pdf(7, lookup); //gives normalised probability
-    //printf("%lg\n", pdf);
-    gsl_ran_discrete_free(lookup);
-;    return 0;
+    wavefunction = init_wavfunction();
+    return 0;
 }

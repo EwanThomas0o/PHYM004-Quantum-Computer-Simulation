@@ -68,7 +68,7 @@ int main(){
     gsl_rng* r = gsl_rng_alloc(gsl_rng_default);
     for(int l = 0; l < 20; l++){
         size_t t = gsl_ran_discrete(r, lookup);
-        printf("%zu\n", t);
+        printf("%zu", t);
     }
     double pdf =  gsl_ran_discrete_pdf(7, lookup); //gives normalised probability
     //printf("%lg\n", pdf);
