@@ -38,38 +38,33 @@ License: Public Domain
 #define STATES_MAX 1024 //max of 10 qubits 
 
 
-gsl_vector_complex* init_wavfunction_sd(int states){ //Initialising wf to all sping down "sd"
+gsl_matrix_complex* init_wavfunction_sd(int states){ //Initialising wf to all sping down "sd"
     //Initialising the wf to |000> 
-    gsl_vector_complex* wavefunction = NULL;
-    wavefunction = gsl_vector_complex_alloc(states);
-    gsl_vector_complex_set(wavefunction, 0, gsl_complex_rect(1,0));
+    gsl_matrix_complex* wavefunction = NULL;
+    wavefunction = gsl_matrix_alloc(1,states);
+    gsl_matrix_complex_set(wavefunction, 1,1, gsl_complex_rect(1,0));
 
     return wavefunction;
-}
-
-void measure_register_gate(gsl_vector_complex* wavefunction){
-    int states = (int) wavefunction->size;
-
-    double probabilities[states];
-    for(int i = 0; i < states; i++){
-        probabilities[i] = GSL_REAL(gsl_vector_complex_get(wavefunction,i))*GSL_REAL(gsl_vector_complex_get(wavefunction,i)) + GSL_IMAG(gsl_vector_complex_get(wavefunction,i))*GSL_IMAG(gsl_vector_complex_get(wavefunction,i));
-    }
-    gsl_ran_discrete_t* lookup = gsl_ran_discrete_preproc(states, probabilities);
-    gsl_rng* r = gsl_rng_alloc(gsl_rng_default);
-    size_t t = gsl_ran_discrete(r, lookup);
-    printf("%zu\n", t);
-    gsl_ran_discrete_free(lookup);
-    
-    
-    
-    return;
 }
 
 
 int main(){
     int states = (int)pow(BASIS, N);
-    gsl_vector_complex* wavefunction = init_wavfunction_sd(states);
-    measure_register_gate(wavefunction);
+    gsl_matrix_complex* wavefunction = init_wavfunction_sd(states);
+    
+    double probabilities[states];
+    for (int j = 0; j < states; j ++){
+        probabilities[j] = wavefunction[j].real*wavefunction[j].real + wavefunction[j].imag*wavefunction[j].imag;
+    }
 
-    return 0;
+    gsl_ran_discrete_t* lookup = gsl_ran_discrete_preproc(states, probabilities);
+    gsl_rng* r = gsl_rng_alloc(gsl_rng_default);
+    for(int l = 0; l < 20; l++){
+        size_t t = gsl_ran_discrete(r, lookup);
+        printf("%zu\n", t);
+    }
+    double pdf =  gsl_ran_discrete_pdf(7, lookup); //gives normalised probability
+    //printf("%lg\n", pdf);
+    gsl_ran_discrete_free(lookup);
+;    return 0;
 }

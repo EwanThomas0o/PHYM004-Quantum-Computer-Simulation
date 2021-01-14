@@ -56,8 +56,10 @@ void measure_register_gate(gsl_vector_complex* wavefunction){
     }
     gsl_ran_discrete_t* lookup = gsl_ran_discrete_preproc(states, probabilities);
     gsl_rng* r = gsl_rng_alloc(gsl_rng_default);
-    size_t t = gsl_ran_discrete(r, lookup);
-    printf("%zu\n", t);
+    for(int l = 0; l < 20; l++){
+        size_t t = gsl_ran_discrete(r, lookup);
+        printf("%zu\n", t);
+    }
     gsl_ran_discrete_free(lookup);
     
     

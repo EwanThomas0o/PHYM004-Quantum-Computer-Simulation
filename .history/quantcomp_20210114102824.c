@@ -38,26 +38,28 @@ License: Public Domain
 #define STATES_MAX 1024 //max of 10 qubits 
 
 
-gsl_vector_complex* init_wavfunction_sd(int states){ //Initialising wf to all sping down "sd"
+gsl_matrix_complex* init_wavfunction_sd(int states){ //Initialising wf to all sping down "sd"
     //Initialising the wf to |000> 
-    gsl_vector_complex* wavefunction = NULL;
-    wavefunction = gsl_vector_complex_alloc(states);
-    gsl_vector_complex_set(wavefunction, 0, gsl_complex_rect(1,0));
+    gsl_matrix_complex* wavefunction = NULL;
+    wavefunction = gsl_matrix_alloc(states, 1);
+    gsl_matrix_complex_set(wavefunction, 1,1, gsl_complex_rect(1,0));
 
     return wavefunction;
 }
 
-void measure_register_gate(gsl_vector_complex* wavefunction){
-    int states = (int) wavefunction->size;
+void measure_register_gate(gsl_matrix_complex* wavefunction){
+    int states = (int) wavefunction->size1;
 
     double probabilities[states];
     for(int i = 0; i < states; i++){
-        probabilities[i] = GSL_REAL(gsl_vector_complex_get(wavefunction,i))*GSL_REAL(gsl_vector_complex_get(wavefunction,i)) + GSL_IMAG(gsl_vector_complex_get(wavefunction,i))*GSL_IMAG(gsl_vector_complex_get(wavefunction,i));
+        probabilities[i] = GSL_REAL(gsl_matrix_complex_get(wavefunction,i,1))*GSL_REAL(gsl_matrix_complex_get(wavefunction,i,1)) + GSL_IMAG(gsl_matrix_complex_get(wavefunction,i,1))*GSL_IMAG(gsl_matrix_complex_get(wavefunction,i,1));
     }
     gsl_ran_discrete_t* lookup = gsl_ran_discrete_preproc(states, probabilities);
     gsl_rng* r = gsl_rng_alloc(gsl_rng_default);
-    size_t t = gsl_ran_discrete(r, lookup);
-    printf("%zu\n", t);
+    for(int l = 0; l < 20; l++){
+        size_t t = gsl_ran_discrete(r, lookup);
+        printf("%zu\n", t);
+    }
     gsl_ran_discrete_free(lookup);
     
     
@@ -68,8 +70,8 @@ void measure_register_gate(gsl_vector_complex* wavefunction){
 
 int main(){
     int states = (int)pow(BASIS, N);
-    gsl_vector_complex* wavefunction = init_wavfunction_sd(states);
+    gsl_matrix_complex* wavefunction = init_wavfunction_sd(states);
     measure_register_gate(wavefunction);
 
-    return 0;
+;    return 0;
 }
