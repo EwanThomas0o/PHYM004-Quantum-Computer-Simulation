@@ -19,6 +19,7 @@ License: Public Domain
  Date         Version  Comments
  ----         -------  --------
  13/01/21       0.0.1  Create file with intention to work on part 1: Building a quantum register
+ 14/01/21       0.0.2  Quantum register of 3 qubits created. Now working on quantum gates for register
 
 */
 
@@ -29,27 +30,19 @@ License: Public Domain
 #include <math.h>
 #include <stdbool.h>
 #include <gsl/gsl_randist.h>
+#include <gsl/gsl_blas.h>
+#include <gsl/gsl_complex_math.h>
 
 #define BASIS 2
 #define N 3 // Number of qubits defined
 #define STATES_MAX 1024 //max of 10 qubits 
 
-typedef struct{
-    double real;  //TODO: Change to gsl complex type
-    double imag;
-}complex; //creating homemade complex dtype
 
-complex* init_wavfunction(){
-    int states = (int)pow(BASIS,N);
-
-    complex *wavefunction;
-    wavefunction = malloc(states*sizeof(complex));
-    
-    for(int i = 0; i < states; i++){
-        wavefunction[i].real = 1/sqrt(states); //setting equal probability of each state
-        wavefunction[i].imag = 0;
-        //printf("%lg+%lgi\n", wavefunction[i].real, wavefunction[i].imag);
-    }
+gsl_matrix_complex* init_wavfunction_sd(int states){ //Initialising wf to all sping down "sd"
+    //Initialising the wf to |000> 
+    gsl_matrix_complex* wavefunction = NULL;
+    wavefunction = gsl_matrix_alloc(1,states);
+    gsl_matrix_complex_set(wavefunction, 1,1, gsl_complex_rect(1,0));
 
     return wavefunction;
 }
@@ -57,7 +50,7 @@ complex* init_wavfunction(){
 
 int main(){
     int states = (int)pow(BASIS, N);
-    complex* wavefunction = init_wavfunction();
+    gsl_matrix_complex* wavefunction = init_wavfunction_sd(states);
     
     double probabilities[states];
     for (int j = 0; j < states; j ++){
