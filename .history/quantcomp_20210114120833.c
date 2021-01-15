@@ -74,15 +74,13 @@ void measure_register_gate(gsl_vector_complex* wavefunction){
         probabilities[i] = GSL_REAL(gsl_vector_complex_get(wavefunction,i))*GSL_REAL(gsl_vector_complex_get(wavefunction,i)) + GSL_IMAG(gsl_vector_complex_get(wavefunction,i))*GSL_IMAG(gsl_vector_complex_get(wavefunction,i));
     }
     gsl_ran_discrete_t* lookup = gsl_ran_discrete_preproc(states, probabilities);
-    gsl_rng* r = gsl_rng_alloc(gsl_rng_taus);
-    for(int l = 0; l < 8; l++){
-        size_t t = gsl_ran_discrete(r, lookup);
-        printf("Wavefunction collapsed into the state:\n|%s>\n", bit_rep[t]);
-    }
-    //gsl_vector_complex_set_all(wavefunction, GSL_COMPLEX_ZERO);
-    //gsl_vector_complex_set(wavefunction, t, GSL_COMPLEX_ONE); // Set that state to probability one so that if we measure again we get the same outcome
-    //double pdf =  gsl_ran_discrete_pdf(1, lookup); //gives normalised probability
-    //printf("%lg\n", pdf);
+    gsl_rng* r = gsl_rng_alloc(gsl_rng_default);
+    size_t t = gsl_ran_discrete(r, lookup);
+    printf("Wavefunction collapsed into the state:\n|%s>\n", bit_rep[t]);
+    gsl_vector_complex_set_all(wavefunction, GSL_COMPLEX_ZERO);
+    gsl_vector_complex_set(wavefunction, t, GSL_COMPLEX_ONE); // Set that state to probability one so that if we measure again we get the same outcome
+    double pdf =  gsl_ran_discrete_pdf(0, lookup); //gives normalised probability
+    printf("%lg\n", pdf);
     gsl_ran_discrete_free(lookup);
     
     
@@ -100,6 +98,11 @@ int main(){
     int states = (int)pow(BASIS, N);
     gsl_vector_complex* wavefunction = init_wavefunction_ep(states);
     measure_register_gate(wavefunction);
+
+    gsl_vector_complex* wavefunction2 = init_wavefunction_ep(states);
+    measure_register_gate(wavefunction2);
+
+
 
     return 0;
 }

@@ -37,14 +37,20 @@ License: Public Domain
 #define N 3 // Number of qubits defined
 #define STATES_MAX 1024 //max of 10 qubits 
 
-// Bit map for 3 qubits and their corresponding states
 const char *bit_rep[16] = {
-    [ 0] = "000", [ 1] = "001", [ 2] = "010", [ 3] = "011",
-    [ 4] = "100", [ 5] = "101", [ 6] = "110", [ 7] = "111",
-}; 
+    [ 0] = "0000", [ 1] = "0001", [ 2] = "0010", [ 3] = "0011",
+    [ 4] = "0100", [ 5] = "0101", [ 6] = "0110", [ 7] = "0111",
+    [ 8] = "1000", [ 9] = "1001", [10] = "1010", [11] = "1011",
+    [12] = "1100", [13] = "1101", [14] = "1110", [15] = "1111",
+};
+
+const char* print_byte(size_t byte)
+{
+    return bit_rep[byte];
+}
 
 
-gsl_vector_complex* init_wavefunction_sd(int states){ //Initialising wf to all "Spin Down" 
+gsl_vector_complex* init_wavfunction_sd(int states){ //Initialising wf to all sping down "sd"
     //Initialising the wf to |000> 
     gsl_vector_complex* wavefunction = NULL;
     wavefunction = gsl_vector_complex_alloc(states);
@@ -53,19 +59,6 @@ gsl_vector_complex* init_wavefunction_sd(int states){ //Initialising wf to all "
     return wavefunction;
 }
 
-gsl_vector_complex* init_wavefunction_ep(int states){ //Initialising wf to "Equal Probability" of all states
-    
-    gsl_vector_complex* wavefunction = NULL;
-    wavefunction = gsl_vector_complex_alloc(states);
-    gsl_vector_complex_set_all(wavefunction, gsl_complex_rect(1/sqrt(8),0));
-
-    return wavefunction;
-}
-
-// To measure the quantum state we must use the discrete probability distribution provided by the 
-// wavefuntion. The measurement function finds the probabilities of each state and observes the wf
-// according to those probabilities. After measurement the wavefunction is "collapsed" and gives the 
-// measurement over and over again.
 void measure_register_gate(gsl_vector_complex* wavefunction){
     int states = (int) wavefunction->size;
 
@@ -74,21 +67,14 @@ void measure_register_gate(gsl_vector_complex* wavefunction){
         probabilities[i] = GSL_REAL(gsl_vector_complex_get(wavefunction,i))*GSL_REAL(gsl_vector_complex_get(wavefunction,i)) + GSL_IMAG(gsl_vector_complex_get(wavefunction,i))*GSL_IMAG(gsl_vector_complex_get(wavefunction,i));
     }
     gsl_ran_discrete_t* lookup = gsl_ran_discrete_preproc(states, probabilities);
-    gsl_rng* r = gsl_rng_alloc(gsl_rng_taus);
-    for(int l = 0; l < 8; l++){
-        size_t t = gsl_ran_discrete(r, lookup);
-        printf("Wavefunction collapsed into the state:\n|%s>\n", bit_rep[t]);
-    }
-    //gsl_vector_complex_set_all(wavefunction, GSL_COMPLEX_ZERO);
-    //gsl_vector_complex_set(wavefunction, t, GSL_COMPLEX_ONE); // Set that state to probability one so that if we measure again we get the same outcome
-    //double pdf =  gsl_ran_discrete_pdf(1, lookup); //gives normalised probability
-    //printf("%lg\n", pdf);
+    gsl_rng* r = gsl_rng_alloc(gsl_rng_default);
+    size_t t = gsl_ran_discrete(r, lookup);
+    printf("Wavefunction collapsed into the state:\n|%s>\n", print_byte(t));
     gsl_ran_discrete_free(lookup);
-    
     
     return;
 }
-// The Hadamard gate sets qubits into a superposition of their basis states. This function does this 
+// hadamard gate sets qubits into a superposition of their basis states. This function does this 
 // by allowing the user to specify which qubit we will be setting to a superposition. This will have 
 // effects when it comes to measuring the whole register as sometimes that qubit will be spin up, 
 // sometimes it will be spin down, which will change the overall state of the register. 
@@ -98,7 +84,7 @@ void hadamard_gate(gsl_vector_complex* wavefunction, int qubit){
 
 int main(){
     int states = (int)pow(BASIS, N);
-    gsl_vector_complex* wavefunction = init_wavefunction_ep(states);
+    gsl_vector_complex* wavefunction = init_wavfunction_sd(states);
     measure_register_gate(wavefunction);
 
     return 0;

@@ -74,8 +74,8 @@ void measure_register_gate(gsl_vector_complex* wavefunction){
         probabilities[i] = GSL_REAL(gsl_vector_complex_get(wavefunction,i))*GSL_REAL(gsl_vector_complex_get(wavefunction,i)) + GSL_IMAG(gsl_vector_complex_get(wavefunction,i))*GSL_IMAG(gsl_vector_complex_get(wavefunction,i));
     }
     gsl_ran_discrete_t* lookup = gsl_ran_discrete_preproc(states, probabilities);
-    gsl_rng* r = gsl_rng_alloc(gsl_rng_taus);
-    for(int l = 0; l < 8; l++){
+    gsl_rng* r = gsl_rng_alloc(gsl_rng_default);
+    for(int l = 0; l < 5; l++){
         size_t t = gsl_ran_discrete(r, lookup);
         printf("Wavefunction collapsed into the state:\n|%s>\n", bit_rep[t]);
     }
@@ -100,6 +100,11 @@ int main(){
     int states = (int)pow(BASIS, N);
     gsl_vector_complex* wavefunction = init_wavefunction_ep(states);
     measure_register_gate(wavefunction);
+
+    gsl_vector_complex* wavefunction2 = init_wavefunction_ep(states);
+    measure_register_gate(wavefunction2);
+
+
 
     return 0;
 }

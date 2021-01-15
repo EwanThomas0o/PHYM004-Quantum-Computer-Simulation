@@ -44,20 +44,12 @@ const char *bit_rep[16] = {
 }; 
 
 
-gsl_vector_complex* init_wavefunction_sd(int states){ //Initialising wf to all "Spin Down" 
+
+gsl_vector_complex* init_wavfunction_sd(int states){ //Initialising wf to all sping down "sd"
     //Initialising the wf to |000> 
     gsl_vector_complex* wavefunction = NULL;
     wavefunction = gsl_vector_complex_alloc(states);
     gsl_vector_complex_set(wavefunction, 0, gsl_complex_rect(1,0));
-
-    return wavefunction;
-}
-
-gsl_vector_complex* init_wavefunction_ep(int states){ //Initialising wf to "Equal Probability" of all states
-    
-    gsl_vector_complex* wavefunction = NULL;
-    wavefunction = gsl_vector_complex_alloc(states);
-    gsl_vector_complex_set_all(wavefunction, gsl_complex_rect(1/sqrt(8),0));
 
     return wavefunction;
 }
@@ -74,17 +66,12 @@ void measure_register_gate(gsl_vector_complex* wavefunction){
         probabilities[i] = GSL_REAL(gsl_vector_complex_get(wavefunction,i))*GSL_REAL(gsl_vector_complex_get(wavefunction,i)) + GSL_IMAG(gsl_vector_complex_get(wavefunction,i))*GSL_IMAG(gsl_vector_complex_get(wavefunction,i));
     }
     gsl_ran_discrete_t* lookup = gsl_ran_discrete_preproc(states, probabilities);
-    gsl_rng* r = gsl_rng_alloc(gsl_rng_taus);
-    for(int l = 0; l < 8; l++){
-        size_t t = gsl_ran_discrete(r, lookup);
-        printf("Wavefunction collapsed into the state:\n|%s>\n", bit_rep[t]);
-    }
-    //gsl_vector_complex_set_all(wavefunction, GSL_COMPLEX_ZERO);
-    //gsl_vector_complex_set(wavefunction, t, GSL_COMPLEX_ONE); // Set that state to probability one so that if we measure again we get the same outcome
-    //double pdf =  gsl_ran_discrete_pdf(1, lookup); //gives normalised probability
-    //printf("%lg\n", pdf);
+    gsl_rng* r = gsl_rng_alloc(gsl_rng_default);
+    size_t t = gsl_ran_discrete(r, lookup);
+    printf("Wavefunction collapsed into the state:\n|%s>\n", bit_rep[t]);
+    gsl_vector_complex_set_all(wavefunction, GSL_COMPLEX_ZERO);
+    gsl_vector_complex_set(wavefunction, t, GSL_COMPLEX_ONE);
     gsl_ran_discrete_free(lookup);
-    
     
     return;
 }
@@ -98,7 +85,7 @@ void hadamard_gate(gsl_vector_complex* wavefunction, int qubit){
 
 int main(){
     int states = (int)pow(BASIS, N);
-    gsl_vector_complex* wavefunction = init_wavefunction_ep(states);
+    gsl_vector_complex* wavefunction = init_wavfunction_sd(states);
     measure_register_gate(wavefunction);
 
     return 0;
