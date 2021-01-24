@@ -29,7 +29,6 @@ License: Public Domain
 #include <limits.h>
 #include <math.h>
 #include <stdbool.h>
-#include <sys/time.h>
 #include <gsl/gsl_randist.h>
 #include <gsl/gsl_blas.h>
 #include <gsl/gsl_complex_math.h>
@@ -45,7 +44,6 @@ const char *bit_rep[16] = {
     [ 4] = "100", [ 5] = "101", [ 6] = "110", [ 7] = "111",
 }; 
 
-struct timeval tv;
 
 gsl_vector_complex* init_wavefunction_sd(int states){ //Initialising wf to all "Spin Down" 
     //Initialising the wf to |000> 
@@ -78,16 +76,15 @@ void measure_register_gate(gsl_vector_complex* wavefunction){
     }
     gsl_ran_discrete_t* lookup = gsl_ran_discrete_preproc(states, probabilities); //preproc normalises the propbabilities
     const gsl_rng* r = gsl_rng_alloc(gsl_rng_mt19937); // Mersene Twister Algorithm is used for high quality random numbers
-    gettimeofday(&tv,NULL); //get time of day in usec so that the seed changes giving a different stream of # each time
-    unsigned long int seed = tv.tv_usec;    
-    gsl_rng_set(r, seed); 
-    size_t t = gsl_ran_discrete(r, lookup); // Choosing from the discrete probability distribution defined by the wavefunction 
-    printf("Wavefunction collapsed into the state:\n|%s>\n", bit_rep[t]);
-    // Wavefunction collapsed so will only find system in the state form now on
-    gsl_vector_complex_set_all(wavefunction, GSL_COMPLEX_ZERO);
-    gsl_vector_complex_set(wavefunction, t, GSL_COMPLEX_ONE); // Set that state to probability one so that if we measure again we get the same outcome
+    for(int l = 0; l < 8; l++){
+        size_t t = gsl_ran_discrete(r, lookup);
+        printf("Wavefunction collapsed into the state:\n|%s>\n", bit_rep[t]);
+    }
+    //gsl_vector_complex_set_all(wavefunction, GSL_COMPLEX_ZERO);
+    //gsl_vector_complex_set(wavefunction, t, GSL_COMPLEX_ONE); // Set that state to probability one so that if we measure again we get the same outcome
+    //double pdf =  gsl_ran_discrete_pdf(1, lookup); //gives normalised probability
+    //printf("%lg\n", pdf);
     gsl_ran_discrete_free(lookup);
-    gsl_rng_free(r);
     return;
 }
 // The Hadamard gate sets qubits into a superposition of their basis states. This function does this 
@@ -100,7 +97,7 @@ void hadamard_gate(gsl_vector_complex* wavefunction, int qubit){
 
 int main(){
     int states = (int)pow(BASIS, N);
-    gsl_vector_complex* wavefunction = init_wavefunction_ep(states);
+    gsl_vector_complex* wavefunction = init_wavefunction_sd(states);
     measure_register_gate(wavefunction);
 
     return 0;
