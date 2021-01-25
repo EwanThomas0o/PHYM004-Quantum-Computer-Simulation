@@ -84,7 +84,7 @@ void measure_register_gate(gsl_vector_complex* wavefunction){
     gsl_rng_set(r, seed); 
     size_t t = gsl_ran_discrete(r, lookup); // Choosing from the discrete probability distribution defined by the wavefunction 
     printf("Wavefunction collapsed into the state:\n|%s>\n", bit_rep[t]);
-    // Wavefunction collapsed so will only find system in the state form now on
+    // Wavefunction collapsed so will only find system in the state form now ons
     gsl_vector_complex_set_all(wavefunction, GSL_COMPLEX_ZERO);
     gsl_vector_complex_set(wavefunction, t, GSL_COMPLEX_ONE); // Set measured state to probability one so that if we measure again we get the same outcome
     // Free memory to avoid bloats

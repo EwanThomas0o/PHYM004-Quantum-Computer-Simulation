@@ -77,17 +77,16 @@ void measure_register_gate(gsl_vector_complex* wavefunction){
     for(int i = 0; i < states; i++){ //creating a list of the probabilities (non-normalised)
         probabilities[i] = GSL_REAL(gsl_vector_complex_get(wavefunction,i))*GSL_REAL(gsl_vector_complex_get(wavefunction,i)) + GSL_IMAG(gsl_vector_complex_get(wavefunction,i))*GSL_IMAG(gsl_vector_complex_get(wavefunction,i));
     }
-    gsl_ran_discrete_t* lookup = gsl_ran_discrete_preproc(states, probabilities); // Preproc normalises the probabilities
+    gsl_ran_discrete_t* lookup = gsl_ran_discrete_preproc(states, probabilities); //preproc normalises the propbabilities
     gsl_rng* r = gsl_rng_alloc(gsl_rng_mt19937); // Mersene Twister Algorithm is used for high quality random numbers
-    gettimeofday(&tv,NULL); // Get time of day in usec so that the seed changes giving a different stream of # each time
+    gettimeofday(&tv,NULL); //get time of day in usec so that the seed changes giving a different stream of # each time
     unsigned long int seed = tv.tv_usec;    
     gsl_rng_set(r, seed); 
     size_t t = gsl_ran_discrete(r, lookup); // Choosing from the discrete probability distribution defined by the wavefunction 
     printf("Wavefunction collapsed into the state:\n|%s>\n", bit_rep[t]);
     // Wavefunction collapsed so will only find system in the state form now on
     gsl_vector_complex_set_all(wavefunction, GSL_COMPLEX_ZERO);
-    gsl_vector_complex_set(wavefunction, t, GSL_COMPLEX_ONE); // Set measured state to probability one so that if we measure again we get the same outcome
-    // Free memory to avoid bloats
+    gsl_vector_complex_set(wavefunction, t, GSL_COMPLEX_ONE); // Set that state to probability one so that if we measure again we get the same outcome
     gsl_ran_discrete_free(lookup);
     gsl_rng_free(r);
     return;
