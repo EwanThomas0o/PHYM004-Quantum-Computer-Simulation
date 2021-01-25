@@ -146,6 +146,7 @@ gsl_vector_complex* hadamard_gate(gsl_vector_complex* wavefunction, int qubit){
         gsl_matrix_complex_set(hadamard, 7,6, gsl_complex_rect(1.0,0));
         gsl_matrix_complex_scale(hadamard, gsl_complex_rect(1/sqrt(BASIS),0));
     }
+    gsl_complex z = gsl_complex_rect(1.0,0.0);
     gsl_vector_complex* h_psi = gsl_vector_complex_alloc(wavefunction->size);
     gsl_vector_complex_set_zero(h_psi);
     gsl_blas_zgemv(CblasNoTrans, GSL_COMPLEX_ONE, hadamard, wavefunction, GSL_COMPLEX_ZERO, h_psi);
@@ -167,7 +168,7 @@ int main(){
     gsl_vector_complex* wavefunction = init_wavefunction_sd(states);
     print_wf(wavefunction);
     measure_register_gate(wavefunction);
-    wavefunction  = hadamard_gate(wavefunction, 1);
+    hadamard_gate(wavefunction, 2);
     print_wf(wavefunction);
     measure_register_gate(wavefunction);
     return 0;

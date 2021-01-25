@@ -167,7 +167,7 @@ int main(){
     gsl_vector_complex* wavefunction = init_wavefunction_sd(states);
     print_wf(wavefunction);
     measure_register_gate(wavefunction);
-    wavefunction  = hadamard_gate(wavefunction, 1);
+    wavefunction  = hadamard_gate(wavefunction, 3);
     print_wf(wavefunction);
     measure_register_gate(wavefunction);
     return 0;

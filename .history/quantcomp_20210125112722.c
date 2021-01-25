@@ -97,7 +97,7 @@ void measure_register_gate(gsl_vector_complex* wavefunction){
 // by allowing the user to specify which qubit we will be setting to a superposition. This will have 
 // effects when it comes to measuring the whole register as sometimes that qubit will be spin up, 
 // sometimes it will be spin down, which will change the overall state of the register. 
-gsl_vector_complex* hadamard_gate(gsl_vector_complex* wavefunction, int qubit){
+void hadamard_gate(gsl_vector_complex* wavefunction, int qubit){
     gsl_matrix_complex *hadamard = gsl_matrix_complex_alloc(wavefunction->size, wavefunction->size);
     gsl_matrix_complex_set_all(hadamard, GSL_COMPLEX_ZERO);
     gsl_matrix_complex_set_identity(hadamard);
@@ -106,14 +106,14 @@ gsl_vector_complex* hadamard_gate(gsl_vector_complex* wavefunction, int qubit){
         gsl_matrix_complex_set(hadamard, 5,5, gsl_complex_rect(-1.0,0));
         gsl_matrix_complex_set(hadamard, 6,6, gsl_complex_rect(-1.0,0));
         gsl_matrix_complex_set(hadamard, 7,7, gsl_complex_rect(-1.0,0));
-        gsl_matrix_complex_set(hadamard, 4,0, gsl_complex_rect(1.0,0));
-        gsl_matrix_complex_set(hadamard, 5,1, gsl_complex_rect(1.0,0));
-        gsl_matrix_complex_set(hadamard, 6,2, gsl_complex_rect(1.0,0));
-        gsl_matrix_complex_set(hadamard, 7,3, gsl_complex_rect(1.0,0));
         gsl_matrix_complex_set(hadamard, 0,4, gsl_complex_rect(1.0,0));
         gsl_matrix_complex_set(hadamard, 1,5, gsl_complex_rect(1.0,0));
         gsl_matrix_complex_set(hadamard, 2,6, gsl_complex_rect(1.0,0));
         gsl_matrix_complex_set(hadamard, 3,7, gsl_complex_rect(1.0,0));
+        gsl_matrix_complex_set(hadamard, 4,0, gsl_complex_rect(1.0,0));
+        gsl_matrix_complex_set(hadamard, 5,1, gsl_complex_rect(1.0,0));
+        gsl_matrix_complex_set(hadamard, 6,2, gsl_complex_rect(1.0,0));
+        gsl_matrix_complex_set(hadamard, 7,3, gsl_complex_rect(1.0,0));
         gsl_matrix_complex_scale(hadamard, gsl_complex_rect(1/sqrt(BASIS),0));
     }
     if (qubit == 2){
@@ -146,29 +146,18 @@ gsl_vector_complex* hadamard_gate(gsl_vector_complex* wavefunction, int qubit){
         gsl_matrix_complex_set(hadamard, 7,6, gsl_complex_rect(1.0,0));
         gsl_matrix_complex_scale(hadamard, gsl_complex_rect(1/sqrt(BASIS),0));
     }
-    gsl_vector_complex* h_psi = gsl_vector_complex_alloc(wavefunction->size);
-    gsl_vector_complex_set_zero(h_psi);
-    gsl_blas_zgemv(CblasNoTrans, GSL_COMPLEX_ONE, hadamard, wavefunction, GSL_COMPLEX_ZERO, h_psi);
-    return h_psi;
+    gsl_complex z = gsl_complex_rect(1.0,0.0);
+    gsl_blas_zgemv(CblasNoTrans, z, hadamard, wavefunction, GSL_COMPLEX_ZERO, wavefunction);
+    return;
 }
 
 void phase_shift_gate(gsl_vector_complex *wavefunction, int qubit){
     return;
 }
 
-void print_wf(gsl_vector_complex* wavefunction){
-    for (int i = 0; i < wavefunction->size; i++){
-        printf("%lg\n", GSL_REAL(gsl_vector_complex_get(wavefunction, i)));
-    }
-}
-
 int main(){
     int states = (int)pow(BASIS, N);
     gsl_vector_complex* wavefunction = init_wavefunction_sd(states);
-    print_wf(wavefunction);
-    measure_register_gate(wavefunction);
-    wavefunction  = hadamard_gate(wavefunction, 1);
-    print_wf(wavefunction);
     measure_register_gate(wavefunction);
     return 0;
 }

@@ -33,7 +33,6 @@ License: Public Domain
 #include <sys/time.h>
 #include <gsl/gsl_randist.h>
 #include <gsl/gsl_blas.h>
-#include <gsl/gsl_complex.h>
 #include <gsl/gsl_complex_math.h>
 #include <gsl/gsl_rng.h>
 
@@ -80,12 +79,12 @@ void measure_register_gate(gsl_vector_complex* wavefunction){
     }
     gsl_ran_discrete_t* lookup = gsl_ran_discrete_preproc(states, probabilities); // Preproc normalises the probabilities
     gsl_rng* r = gsl_rng_alloc(gsl_rng_mt19937); // Mersene Twister Algorithm is used for high quality random numbers
-    gettimeofday(&tv,NULL); // Get time of day in usec so that the seed changes giving a different stream of #'s each time
+    gettimeofday(&tv,NULL); // Get time of day in usec so that the seed changes giving a different stream of # each time
     unsigned long int seed = tv.tv_usec;    
     gsl_rng_set(r, seed); 
     size_t t = gsl_ran_discrete(r, lookup); // Choosing from the discrete probability distribution defined by the wavefunction 
     printf("Wavefunction collapsed into the state:\n|%s>\n", bit_rep[t]);
-    // Wavefunction collapsed so will only find system in the state from now on
+    // Wavefunction collapsed so will only find system in the state form now on
     gsl_vector_complex_set_all(wavefunction, GSL_COMPLEX_ZERO);
     gsl_vector_complex_set(wavefunction, t, GSL_COMPLEX_ONE); // Set measured state to probability one so that if we measure again we get the same outcome
     // Free memory to avoid bloats
@@ -97,78 +96,25 @@ void measure_register_gate(gsl_vector_complex* wavefunction){
 // by allowing the user to specify which qubit we will be setting to a superposition. This will have 
 // effects when it comes to measuring the whole register as sometimes that qubit will be spin up, 
 // sometimes it will be spin down, which will change the overall state of the register. 
-gsl_vector_complex* hadamard_gate(gsl_vector_complex* wavefunction, int qubit){
+void hadamard_gate(gsl_vector_complex* wavefunction, int qubit){
     gsl_matrix_complex *hadamard = gsl_matrix_complex_alloc(wavefunction->size, wavefunction->size);
     gsl_matrix_complex_set_all(hadamard, GSL_COMPLEX_ZERO);
-    gsl_matrix_complex_set_identity(hadamard);
     if (qubit == 1){
-        gsl_matrix_complex_set(hadamard, 4,4, gsl_complex_rect(-1.0,0));
-        gsl_matrix_complex_set(hadamard, 5,5, gsl_complex_rect(-1.0,0));
-        gsl_matrix_complex_set(hadamard, 6,6, gsl_complex_rect(-1.0,0));
-        gsl_matrix_complex_set(hadamard, 7,7, gsl_complex_rect(-1.0,0));
-        gsl_matrix_complex_set(hadamard, 4,0, gsl_complex_rect(1.0,0));
-        gsl_matrix_complex_set(hadamard, 5,1, gsl_complex_rect(1.0,0));
-        gsl_matrix_complex_set(hadamard, 6,2, gsl_complex_rect(1.0,0));
-        gsl_matrix_complex_set(hadamard, 7,3, gsl_complex_rect(1.0,0));
-        gsl_matrix_complex_set(hadamard, 0,4, gsl_complex_rect(1.0,0));
-        gsl_matrix_complex_set(hadamard, 1,5, gsl_complex_rect(1.0,0));
-        gsl_matrix_complex_set(hadamard, 2,6, gsl_complex_rect(1.0,0));
-        gsl_matrix_complex_set(hadamard, 3,7, gsl_complex_rect(1.0,0));
-        gsl_matrix_complex_scale(hadamard, gsl_complex_rect(1/sqrt(BASIS),0));
+
     }
     if (qubit == 2){
-        gsl_matrix_complex_set(hadamard, 2,2, gsl_complex_rect(-1.0,0));
-        gsl_matrix_complex_set(hadamard, 3,3, gsl_complex_rect(-1.0,0));
-        gsl_matrix_complex_set(hadamard, 6,6, gsl_complex_rect(-1.0,0));
-        gsl_matrix_complex_set(hadamard, 7,7, gsl_complex_rect(-1.0,0));
-        gsl_matrix_complex_set(hadamard, 0,2, gsl_complex_rect(1.0,0));
-        gsl_matrix_complex_set(hadamard, 1,3, gsl_complex_rect(1.0,0));
-        gsl_matrix_complex_set(hadamard, 4,6, gsl_complex_rect(1.0,0));
-        gsl_matrix_complex_set(hadamard, 5,7, gsl_complex_rect(1.0,0));
-        gsl_matrix_complex_set(hadamard, 2,0, gsl_complex_rect(1.0,0));
-        gsl_matrix_complex_set(hadamard, 3,1, gsl_complex_rect(1.0,0));
-        gsl_matrix_complex_set(hadamard, 6,4, gsl_complex_rect(1.0,0));
-        gsl_matrix_complex_set(hadamard, 7,5, gsl_complex_rect(1.0,0));
-        gsl_matrix_complex_scale(hadamard, gsl_complex_rect(1/sqrt(BASIS),0));
-    }
-    if (qubit == 3){
-        gsl_matrix_complex_set(hadamard, 1,1, gsl_complex_rect(-1.0,0));
-        gsl_matrix_complex_set(hadamard, 3,3, gsl_complex_rect(1.0,0));
-        gsl_matrix_complex_set(hadamard, 5,5, gsl_complex_rect(-1.0,0));
-        gsl_matrix_complex_set(hadamard, 7,7, gsl_complex_rect(-1.0,0));
-        gsl_matrix_complex_set(hadamard, 1,0, gsl_complex_rect(1.0,0));
-        gsl_matrix_complex_set(hadamard, 0,1, gsl_complex_rect(1.0,0));
-        gsl_matrix_complex_set(hadamard, 2,3, gsl_complex_rect(1.0,0));
-        gsl_matrix_complex_set(hadamard, 3,2, gsl_complex_rect(1.0,0));
-        gsl_matrix_complex_set(hadamard, 4,5, gsl_complex_rect(1.0,0));
-        gsl_matrix_complex_set(hadamard, 5,4, gsl_complex_rect(1.0,0));
-        gsl_matrix_complex_set(hadamard, 6,7, gsl_complex_rect(1.0,0));
-        gsl_matrix_complex_set(hadamard, 7,6, gsl_complex_rect(1.0,0));
-        gsl_matrix_complex_scale(hadamard, gsl_complex_rect(1/sqrt(BASIS),0));
-    }
-    gsl_vector_complex* h_psi = gsl_vector_complex_alloc(wavefunction->size);
-    gsl_vector_complex_set_zero(h_psi);
-    gsl_blas_zgemv(CblasNoTrans, GSL_COMPLEX_ONE, hadamard, wavefunction, GSL_COMPLEX_ZERO, h_psi);
-    return h_psi;
-}
 
-void phase_shift_gate(gsl_vector_complex *wavefunction, int qubit){
+    }
+    if (qubit ==3){
+
+    }
     return;
-}
-
-void print_wf(gsl_vector_complex* wavefunction){
-    for (int i = 0; i < wavefunction->size; i++){
-        printf("%lg\n", GSL_REAL(gsl_vector_complex_get(wavefunction, i)));
-    }
 }
 
 int main(){
     int states = (int)pow(BASIS, N);
-    gsl_vector_complex* wavefunction = init_wavefunction_sd(states);
-    print_wf(wavefunction);
+    gsl_vector_complex* wavefunction = init_wavefunction_ep(states);
     measure_register_gate(wavefunction);
-    wavefunction  = hadamard_gate(wavefunction, 1);
-    print_wf(wavefunction);
-    measure_register_gate(wavefunction);
+
     return 0;
 }
