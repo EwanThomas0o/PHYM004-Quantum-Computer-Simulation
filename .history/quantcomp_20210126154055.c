@@ -117,7 +117,7 @@ long num_to_bin(int number){
     }
     return bin;
 }
-// This function will find the element of the tensor product for a given gate
+
 double findElement(){
     return element;
 }

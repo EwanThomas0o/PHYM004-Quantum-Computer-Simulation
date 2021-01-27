@@ -117,10 +117,6 @@ long num_to_bin(int number){
     }
     return bin;
 }
-// This function will find the element of the tensor product for a given gate
-double findElement(){
-    return element;
-}
 gsl_vector_complex* hadamard_gate(gsl_vector_complex* wavefunction, int qubit){
     // Will beome the NxN matrix for operation on whole register
     gsl_matrix_complex *hadamard = gsl_matrix_complex_alloc(wavefunction->size, wavefunction->size);
@@ -136,8 +132,6 @@ gsl_vector_complex* hadamard_gate(gsl_vector_complex* wavefunction, int qubit){
             for(int j = 0; j < wavefunction->size; j++){
                 long inta = num_to_bin(i);
                 long intb = num_to_bin(j);
-                double val = findElement(inta, intb);
-                gsl_matrix_complex_set(hadamard, i , j, gsl_complex_rect(val,0))
             }
         }
         // gsl_matrix_complex_set(hadamard, 4,4, gsl_complex_rect(-1.0,0));
