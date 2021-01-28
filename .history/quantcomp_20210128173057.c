@@ -239,7 +239,7 @@ gsl_vector_complex* groversBlock(gsl_vector_complex* wavefunction, int answer){
     b_psi = oracle_gate(wavefunction, answer); 
     //Then we apply a hadamard gate to each gate
     for(int i = 0; i < N; i++){
-        b_psi = hadamard_gate(b_psi, i+1); // +1 bc had takes in canonical qubit number.       
+        b_psi = hadamard_gate(b_psi, i+1);        
     }
     // Apply the diffusion gate
     b_psi = diffusion_gate(b_psi);
