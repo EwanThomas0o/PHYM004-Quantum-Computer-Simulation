@@ -211,7 +211,7 @@ gsl_vector_complex* phase_shift_gate(gsl_vector_complex *wavefunction, int qubit
 gsl_vector_complex* oracle_gate(gsl_vector_complex* wavefunction, int answer){
     gsl_matrix_complex* oracle_gate = gsl_matrix_complex_alloc(wavefunction->size, wavefunction->size);
     gsl_matrix_complex_set_identity(oracle_gate);
-    gsl_matrix_complex_set(oracle_gate, answer, answer, gsl_complex_rect(-1,0)); //Minus one as index from 0
+    gsl_matrix_complex_set(oracle_gate, answer-1, answer-1, gsl_complex_rect(-1,0)); //Minus one as index from 0
     
     gsl_vector_complex* o_psi = gsl_vector_complex_alloc(wavefunction->size);
     gsl_vector_complex_set_zero(o_psi);
@@ -239,13 +239,13 @@ gsl_vector_complex* groversBlock(gsl_vector_complex* wavefunction, int answer){
     b_psi = oracle_gate(wavefunction, answer); 
     //Then we apply a hadamard gate to each gate
     for(int i = 0; i < N; i++){
-        b_psi = hadamard_gate(wavefunction, i+1);        
+        b_psi = hadamard_gate(wavefunction, i);        
     }
     // Apply the diffusion gate
     b_psi = diffusion_gate(wavefunction);
     // Finally a hadamard gate on each qubit again
     for(int i = 0; i < N; i++){
-        b_psi = hadamard_gate(wavefunction, i+1);        
+        b_psi = hadamard_gate(wavefunction, i);        
     }
     return b_psi;
 }
@@ -263,8 +263,8 @@ int main(){
     wavefunction = hadamard_gate(wavefunction, 2); 
     wavefunction = hadamard_gate(wavefunction, 3); 
 
-    for(int i = 0; i < 3; i++){
-        wavefunction = groversBlock(wavefunction, 0); // Needs some tweaking.
+    for(int i = 0; i < 4; i++){
+        wavefunction = groversBlock(wavefunction, 7);
     }
     measure_register_gate(wavefunction);
     return 0;

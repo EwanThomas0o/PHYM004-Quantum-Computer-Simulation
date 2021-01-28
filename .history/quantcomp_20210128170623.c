@@ -211,7 +211,7 @@ gsl_vector_complex* phase_shift_gate(gsl_vector_complex *wavefunction, int qubit
 gsl_vector_complex* oracle_gate(gsl_vector_complex* wavefunction, int answer){
     gsl_matrix_complex* oracle_gate = gsl_matrix_complex_alloc(wavefunction->size, wavefunction->size);
     gsl_matrix_complex_set_identity(oracle_gate);
-    gsl_matrix_complex_set(oracle_gate, answer, answer, gsl_complex_rect(-1,0)); //Minus one as index from 0
+    gsl_matrix_complex_set(oracle_gate, answer-1, answer-1, gsl_complex_rect(-1,0)); //Minus one as index from 0
     
     gsl_vector_complex* o_psi = gsl_vector_complex_alloc(wavefunction->size);
     gsl_vector_complex_set_zero(o_psi);
@@ -232,24 +232,6 @@ gsl_vector_complex* diffusion_gate(gsl_vector_complex* wavefunction){
     return j_psi;
 }
 
-gsl_vector_complex* groversBlock(gsl_vector_complex* wavefunction, int answer){
-    gsl_vector_complex* b_psi = gsl_vector_complex_alloc(wavefunction->size);
-    gsl_vector_complex_set_zero(b_psi);
-    //First operation in the block is to apply a quantum oracle gate
-    b_psi = oracle_gate(wavefunction, answer); 
-    //Then we apply a hadamard gate to each gate
-    for(int i = 0; i < N; i++){
-        b_psi = hadamard_gate(wavefunction, i+1);        
-    }
-    // Apply the diffusion gate
-    b_psi = diffusion_gate(wavefunction);
-    // Finally a hadamard gate on each qubit again
-    for(int i = 0; i < N; i++){
-        b_psi = hadamard_gate(wavefunction, i+1);        
-    }
-    return b_psi;
-}
-
 void print_wf(gsl_vector_complex* wavefunction){
     for (int i = 0; i < wavefunction->size; i++){
         printf("%lg\n", GSL_REAL(gsl_vector_complex_get(wavefunction, i)));
@@ -259,13 +241,12 @@ int main(){
     int states = (int)pow(BASIS, N);
     gsl_vector_complex* wavefunction = init_wavefunction_sd(states);
     //Putting system into equal super position of superposition all 2^N basis'
-    wavefunction = hadamard_gate(wavefunction, 1);
-    wavefunction = hadamard_gate(wavefunction, 2); 
-    wavefunction = hadamard_gate(wavefunction, 3); 
+    // wavefunction = hadamard_gate(wavefunction, 1);
+    // wavefunction = hadamard_gate(wavefunction, 2); 
+    wavefunction = hadamard_gate(wavefunction, 1); 
+    wavefunction = phase_shift_gate(wavefunction, 1,  3.14159);
+    wavefunction = hadamard_gate(wavefunction, 1); 
 
-    for(int i = 0; i < 3; i++){
-        wavefunction = groversBlock(wavefunction, 0); // Needs some tweaking.
-    }
     measure_register_gate(wavefunction);
     return 0;
 }

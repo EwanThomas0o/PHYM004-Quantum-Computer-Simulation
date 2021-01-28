@@ -264,7 +264,7 @@ int main(){
     wavefunction = hadamard_gate(wavefunction, 3); 
 
     for(int i = 0; i < 3; i++){
-        wavefunction = groversBlock(wavefunction, 0); // Needs some tweaking.
+        wavefunction = groversBlock(wavefunction, 0);
     }
     measure_register_gate(wavefunction);
     return 0;
