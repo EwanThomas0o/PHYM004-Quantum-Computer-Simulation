@@ -134,7 +134,7 @@ double findElementPhase(char* inta, char* intb, int qubit, double phi){
     // Hadamard gate for single qubit used to calculate tensor product
     gsl_matrix_complex *phase_single = gsl_matrix_complex_alloc(BASIS, BASIS);
     gsl_matrix_complex_set_identity(phase_single);
-    gsl_matrix_complex_set(phase_single,1,1, gsl_complex_polar(1,phi));
+    gsl_matrix_complex_set(phase_single,1,1, gsl_complex_rect(1,phi));
 
     double value = 1.0;
     for(int i = 0; i < N; i++){
@@ -146,6 +146,7 @@ double findElementPhase(char* inta, char* intb, int qubit, double phi){
     }
     return value;
 }
+
 
 char* intToBinary(int a){ // Now works in regards to printing leading zeros
     int bin = 0;
@@ -212,12 +213,14 @@ void print_wf(gsl_vector_complex* wavefunction){
 int main(){
     int states = (int)pow(BASIS, N);
     gsl_vector_complex* wavefunction = init_wavefunction_sd(states);
+    measure_register_gate(wavefunction);
+
     //Putting system into equal super position of superposition all 2^N basis'
     // wavefunction = hadamard_gate(wavefunction, 1);
     // wavefunction = hadamard_gate(wavefunction, 2); 
-    wavefunction = hadamard_gate(wavefunction, 1); 
-    wavefunction = phase_shift_gate(wavefunction, 1,  3.14159);
-    wavefunction = hadamard_gate(wavefunction, 1); 
+    wavefunction = hadamard_gate(wavefunction, 3); 
+    wavefunction = phase_shift_gate(wavefunction, 3,  3.14159);
+    wavefunction = hadamard_gate(wavefunction, 3); 
 
     measure_register_gate(wavefunction);
     return 0;

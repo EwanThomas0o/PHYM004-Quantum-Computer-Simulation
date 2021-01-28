@@ -215,10 +215,8 @@ int main(){
     //Putting system into equal super position of superposition all 2^N basis'
     // wavefunction = hadamard_gate(wavefunction, 1);
     // wavefunction = hadamard_gate(wavefunction, 2); 
-    wavefunction = hadamard_gate(wavefunction, 1); 
-    wavefunction = phase_shift_gate(wavefunction, 1,  3.14159);
-    wavefunction = hadamard_gate(wavefunction, 1); 
-
+    wavefunction = hadamard_gate(wavefunction, 3); 
+    wavefunction = phase_shift_gate(wavefunction, 3,  3.14159);
     measure_register_gate(wavefunction);
     return 0;
 }

@@ -134,7 +134,7 @@ double findElementPhase(char* inta, char* intb, int qubit, double phi){
     // Hadamard gate for single qubit used to calculate tensor product
     gsl_matrix_complex *phase_single = gsl_matrix_complex_alloc(BASIS, BASIS);
     gsl_matrix_complex_set_identity(phase_single);
-    gsl_matrix_complex_set(phase_single,1,1, gsl_complex_polar(1,phi));
+    gsl_matrix_complex_set(phase_single,1,1, gsl_complex_rect(1,phi));
 
     double value = 1.0;
     for(int i = 0; i < N; i++){
@@ -146,6 +146,7 @@ double findElementPhase(char* inta, char* intb, int qubit, double phi){
     }
     return value;
 }
+
 
 char* intToBinary(int a){ // Now works in regards to printing leading zeros
     int bin = 0;
@@ -170,6 +171,7 @@ gsl_vector_complex* hadamard_gate(gsl_vector_complex* wavefunction, int qubit){
     // Will beome the NxN matrix for operation on whole register
     gsl_matrix_complex *hadamard = gsl_matrix_complex_alloc(wavefunction->size, wavefunction->size);
     gsl_matrix_complex_set_all(hadamard, GSL_COMPLEX_ZERO);
+    gsl_matrix_complex_set_identity(hadamard);
 
     for(int i = 0; i < wavefunction->size; i++){
         for(int j = 0; j < wavefunction->size; j++){
@@ -183,25 +185,9 @@ gsl_vector_complex* hadamard_gate(gsl_vector_complex* wavefunction, int qubit){
     return h_psi;
 }
 
-gsl_vector_complex* phase_shift_gate(gsl_vector_complex *wavefunction, int qubit, float phase){
-    if(qubit > N){
-        printf("Please operate the gate on a valid qubit\n");
-        exit(0);
-    }
-    // Will beome the NxN matrix for operation on whole register
-    gsl_matrix_complex *phase_gate = gsl_matrix_complex_alloc(wavefunction->size, wavefunction->size);
-    gsl_matrix_complex_set_all(phase_gate, GSL_COMPLEX_ZERO);
-
-    for(int i = 0; i < wavefunction->size; i++){
-        for(int j = 0; j < wavefunction->size; j++){
-            double val = findElementPhase(intToBinary(i), intToBinary(j), qubit, phase); //This is causing some errors
-            gsl_matrix_complex_set(phase_gate, i , j, gsl_complex_rect(val,0));
-        }
-    }
-    gsl_vector_complex* r_psi = gsl_vector_complex_alloc(wavefunction->size);
-    gsl_vector_complex_set_zero(r_psi);
-    gsl_blas_zgemv(CblasNoTrans, GSL_COMPLEX_ONE, phase_gate, wavefunction, GSL_COMPLEX_ZERO, r_psi);
-    return r_psi;
+void phase_shift_gate(gsl_vector_complex *wavefunction, int qubit, float phase){
+   
+    return;
 }
 
 void print_wf(gsl_vector_complex* wavefunction){
@@ -212,13 +198,12 @@ void print_wf(gsl_vector_complex* wavefunction){
 int main(){
     int states = (int)pow(BASIS, N);
     gsl_vector_complex* wavefunction = init_wavefunction_sd(states);
-    //Putting system into equal super position of superposition all 2^N basis'
-    // wavefunction = hadamard_gate(wavefunction, 1);
-    // wavefunction = hadamard_gate(wavefunction, 2); 
-    wavefunction = hadamard_gate(wavefunction, 1); 
-    wavefunction = phase_shift_gate(wavefunction, 1,  3.14159);
-    wavefunction = hadamard_gate(wavefunction, 1); 
+    measure_register_gate(wavefunction);
 
+    //Putting system into equal super position of superposition all 2^N basis'
+    wavefunction = hadamard_gate(wavefunction, 1);
+    wavefunction = hadamard_gate(wavefunction, 2); 
+    wavefunction = hadamard_gate(wavefunction, 3); 
     measure_register_gate(wavefunction);
     return 0;
 }
