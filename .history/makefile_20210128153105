@@ -1,0 +1,7 @@
+CC = gcc
+
+quant: quantcomp.c
+	$(CC) -o quant quantcomp.c
+
+clean: 
+	rm quant
