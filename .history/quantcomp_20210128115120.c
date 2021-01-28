@@ -143,10 +143,6 @@ char* intToBinary(int a){ // Now works in regards to printing leading zeros
 }
 
 gsl_vector_complex* hadamard_gate(gsl_vector_complex* wavefunction, int qubit){
-    if(qubit > N){
-        printf("Please operate the gate on a valid qubit\n");
-        exit(0);
-    }
     // Will beome the NxN matrix for operation on whole register
     gsl_matrix_complex *hadamard = gsl_matrix_complex_alloc(wavefunction->size, wavefunction->size);
     gsl_matrix_complex_set_all(hadamard, GSL_COMPLEX_ZERO);
@@ -165,7 +161,15 @@ gsl_vector_complex* hadamard_gate(gsl_vector_complex* wavefunction, int qubit){
 }
 
 void phase_shift_gate(gsl_vector_complex *wavefunction, int qubit, float phase){
-   
+    if(qubit == 1){
+    }
+    if(qubit == 2){
+    }
+    if(qubit == 3){
+    }
+    else{
+        //qubit_error();
+    }
     return;
 }
 
@@ -179,8 +183,8 @@ int main(){
     gsl_vector_complex* wavefunction = init_wavefunction_sd(states);
 
     measure_register_gate(wavefunction);
-    //wavefunction  = hadamard_gate(wavefunction, 1);
-    wavefunction = hadamard_gate(wavefunction, 4); 
+    wavefunction  = hadamard_gate(wavefunction, 1);
+    wavefunction = hadamard_gate(wavefunction, 1); 
     measure_register_gate(wavefunction);
     return 0;
 }

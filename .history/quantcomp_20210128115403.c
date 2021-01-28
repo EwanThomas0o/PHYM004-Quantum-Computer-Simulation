@@ -144,7 +144,7 @@ char* intToBinary(int a){ // Now works in regards to printing leading zeros
 
 gsl_vector_complex* hadamard_gate(gsl_vector_complex* wavefunction, int qubit){
     if(qubit > N){
-        printf("Please operate the gate on a valid qubit\n");
+        printf("please operate the gate on a valid qubit");
         exit(0);
     }
     // Will beome the NxN matrix for operation on whole register

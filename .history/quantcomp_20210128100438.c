@@ -109,54 +109,112 @@ void measure_register_gate(gsl_vector_complex* wavefunction){
 // effects when it comes to measuring the whole register as sometimes that qubit will be spin up, 
 // sometimes it will be spin down, which will change the overall state of the register.
 
+long num_to_bin(int number){
+    
+    long bin = 0;
+    int remainder, temp = 1;
 
-// // This function will find the element of the tensor product for a given gate for one qubit
-double findElement(char* inta, char* intb, int qubit){
+    while(number != 0){
+        remainder = number % 2;
+        number /= 2;
+        bin += remainder*temp;
+        temp *= 10; 
+    }
+    return bin;
+}
+// This function will find the element of the tensor product for a given gate for one qubit
+double findElement(long inta, long intb, int qubit){
+    // Convert into str to analyse each digit
+    char str1[N];
+    char str2[N];
+    sprintf(str1, "%ld", inta);
+    sprintf(str2, "%ld", intb);
+    printf("%s %s\n", str1, str2);
+
     // Hadamard gate for single qubit used to calculate tensor product
     gsl_matrix_complex *hadamard_single = gsl_matrix_complex_alloc(BASIS, BASIS);
     gsl_matrix_complex_set_all(hadamard_single, gsl_complex_rect(1/sqrt(BASIS),0));
     gsl_matrix_complex_set(hadamard_single,1,1, gsl_complex_rect(-1/sqrt(BASIS),0));
 
-    double value = 1.0;
-    for(int i = 0; i < N; i++){
-        if(inta[i] != intb[i] && i != qubit - 1){
-            return 0.0; // Invokes Kronecker delta
-        }
-        value =  GSL_REAL(gsl_matrix_complex_get(hadamard_single, inta[qubit-1] - '0', intb[qubit -1] - '0'));
+    double value = 0.0;
 
+    for(int i = 0; i < N; i++){
+        if(str1[i] != str2[i] && i != qubit - 1){
+            return 0.0; //If they all match (except the H term)then the element wont be 0 due to deltas
+        }
+        if(i == qubit - 1){
+            int row = str1[1];
+            int col = str2[1];
+
+            value = GSL_REAL(gsl_matrix_complex_get(hadamard_single, row, col));
+        }
     }
     return value;
 }
-char* intToBinary(int a){ // Now works in regards to printing leading zeros
-    int bin = 0;
-    int remainder, temp = 1;
-
-    while(a != 0){
-        remainder = a % 2;
-        a /= 2;
-        bin += remainder*temp;
-        temp *= 10;
-    }
-    char *bin_str = (char *)malloc(N*sizeof(char));
-    sprintf(bin_str, "%03d", bin);    
-    return bin_str;
-}
-
 gsl_vector_complex* hadamard_gate(gsl_vector_complex* wavefunction, int qubit){
-    if(qubit > N){
-        printf("Please operate the gate on a valid qubit\n");
-        exit(0);
-    }
     // Will beome the NxN matrix for operation on whole register
     gsl_matrix_complex *hadamard = gsl_matrix_complex_alloc(wavefunction->size, wavefunction->size);
     gsl_matrix_complex_set_all(hadamard, GSL_COMPLEX_ZERO);
     gsl_matrix_complex_set_identity(hadamard);
 
-    for(int i = 0; i < wavefunction->size; i++){
-        for(int j = 0; j < wavefunction->size; j++){
-            double val = findElement(intToBinary(i), intToBinary(j), qubit); //This is causing some errors
-            gsl_matrix_complex_set(hadamard, i , j, gsl_complex_rect(val,0));
+    // Hadamard gate for single qubit used to calculate tensor product
+    gsl_matrix_complex *hadamard_single = gsl_matrix_complex_alloc(BASIS, BASIS);
+    gsl_matrix_complex_set_all(hadamard_single, gsl_complex_rect(1/sqrt(BASIS),0));
+    gsl_matrix_complex_set(hadamard_single,1,1, gsl_complex_rect(-1/sqrt(BASIS),0));
+
+    if (qubit == 1){
+        for(int i = 0; i < wavefunction->size; i++){
+            for(int j = 0; j < wavefunction->size; j++){
+                double val = findElement(num_to_bin(i), num_to_bin(j), qubit); //This is causing some errors
+                gsl_matrix_complex_set(hadamard, i , j, gsl_complex_rect(val,0));
+            }
         }
+        // gsl_matrix_complex_set(hadamard, 4,4, gsl_complex_rect(-1.0,0));
+        // gsl_matrix_complex_set(hadamard, 5,5, gsl_complex_rect(-1.0,0));
+        // gsl_matrix_complex_set(hadamard, 6,6, gsl_complex_rect(-1.0,0));
+        // gsl_matrix_complex_set(hadamard, 7,7, gsl_complex_rect(-1.0,0));
+        // gsl_matrix_complex_set(hadamard, 4,0, gsl_complex_rect(1.0,0));
+        // gsl_matrix_complex_set(hadamard, 5,1, gsl_complex_rect(1.0,0));
+        // gsl_matrix_complex_set(hadamard, 6,2, gsl_complex_rect(1.0,0));
+        // gsl_matrix_complex_set(hadamard, 7,3, gsl_complex_rect(1.0,0));
+        // gsl_matrix_complex_set(hadamard, 0,4, gsl_complex_rect(1.0,0));
+        // gsl_matrix_complex_set(hadamard, 1,5, gsl_complex_rect(1.0,0));
+        // gsl_matrix_complex_set(hadamard, 2,6, gsl_complex_rect(1.0,0));
+        // gsl_matrix_complex_set(hadamard, 3,7, gsl_complex_rect(1.0,0));
+        // gsl_matrix_complex_scale(hadamard, gsl_complex_rect(1/sqrt(BASIS),0));
+    }
+    if (qubit == 2){
+        gsl_matrix_complex_set(hadamard, 2,2, gsl_complex_rect(-1.0,0));
+        gsl_matrix_complex_set(hadamard, 3,3, gsl_complex_rect(-1.0,0));
+        gsl_matrix_complex_set(hadamard, 6,6, gsl_complex_rect(-1.0,0));
+        gsl_matrix_complex_set(hadamard, 7,7, gsl_complex_rect(-1.0,0));
+        gsl_matrix_complex_set(hadamard, 0,2, gsl_complex_rect(1.0,0));
+        gsl_matrix_complex_set(hadamard, 1,3, gsl_complex_rect(1.0,0));
+        gsl_matrix_complex_set(hadamard, 4,6, gsl_complex_rect(1.0,0));
+        gsl_matrix_complex_set(hadamard, 5,7, gsl_complex_rect(1.0,0));
+        gsl_matrix_complex_set(hadamard, 2,0, gsl_complex_rect(1.0,0));
+        gsl_matrix_complex_set(hadamard, 3,1, gsl_complex_rect(1.0,0));
+        gsl_matrix_complex_set(hadamard, 6,4, gsl_complex_rect(1.0,0));
+        gsl_matrix_complex_set(hadamard, 7,5, gsl_complex_rect(1.0,0));
+        gsl_matrix_complex_scale(hadamard, gsl_complex_rect(1/sqrt(BASIS),0));
+    }
+    if (qubit == 3){
+        gsl_matrix_complex_set(hadamard, 1,1, gsl_complex_rect(-1.0,0));
+        gsl_matrix_complex_set(hadamard, 3,3, gsl_complex_rect(1.0,0));
+        gsl_matrix_complex_set(hadamard, 5,5, gsl_complex_rect(-1.0,0));
+        gsl_matrix_complex_set(hadamard, 7,7, gsl_complex_rect(-1.0,0));
+        gsl_matrix_complex_set(hadamard, 1,0, gsl_complex_rect(1.0,0));
+        gsl_matrix_complex_set(hadamard, 0,1, gsl_complex_rect(1.0,0));
+        gsl_matrix_complex_set(hadamard, 2,3, gsl_complex_rect(1.0,0));
+        gsl_matrix_complex_set(hadamard, 3,2, gsl_complex_rect(1.0,0));
+        gsl_matrix_complex_set(hadamard, 4,5, gsl_complex_rect(1.0,0));
+        gsl_matrix_complex_set(hadamard, 5,4, gsl_complex_rect(1.0,0));
+        gsl_matrix_complex_set(hadamard, 6,7, gsl_complex_rect(1.0,0));
+        gsl_matrix_complex_set(hadamard, 7,6, gsl_complex_rect(1.0,0));
+        gsl_matrix_complex_scale(hadamard, gsl_complex_rect(1/sqrt(BASIS),0));
+    }
+    else{
+        //qubit_error();
     }
     gsl_vector_complex* h_psi = gsl_vector_complex_alloc(wavefunction->size);
     gsl_vector_complex_set_zero(h_psi);
@@ -165,7 +223,15 @@ gsl_vector_complex* hadamard_gate(gsl_vector_complex* wavefunction, int qubit){
 }
 
 void phase_shift_gate(gsl_vector_complex *wavefunction, int qubit, float phase){
-   
+    if(qubit == 1){
+    }
+    if(qubit == 2){
+    }
+    if(qubit == 3){
+    }
+    else{
+        //qubit_error();
+    }
     return;
 }
 
@@ -179,8 +245,7 @@ int main(){
     gsl_vector_complex* wavefunction = init_wavefunction_sd(states);
 
     measure_register_gate(wavefunction);
-    //wavefunction  = hadamard_gate(wavefunction, 1);
-    wavefunction = hadamard_gate(wavefunction, 4); 
+    wavefunction  = hadamard_gate(wavefunction, 1); 
     measure_register_gate(wavefunction);
     return 0;
 }
