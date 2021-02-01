@@ -32,7 +32,7 @@ License: Public Domain
  28/01/21       0.0.8  Implemented Grovers algorithm, not sure if working...
  1/02/21        0.0.9  Grovers Algorithm corectly implemented.
  1/02/21        0.1.0  Need to Generalise for any number of qubits, N as i kepp getting memory problems
- 1/02/21        0.1.0  Fixed for general N, although some refinement needed (line 96)
+ 1/02/21        0.1.0  No problems with hadamard gates for general N
 */
 
 #include <stdio.h>
@@ -270,9 +270,9 @@ int main(){
     wavefunction = hadamard_gate(wavefunction, 3);
     wavefunction = hadamard_gate(wavefunction, 4);
     wavefunction = hadamard_gate(wavefunction, 5);
-
+    
     for(int i = 0; i < floor(M_PI_4*sqrt(pow(2,N))); i++){ // Needs to be called "floor(pi/4*sqrt(2^N))"" times for optimum output roughly 2 in our case
-        wavefunction = groversBlock(wavefunction, 31); //Second argument is the basis state you want to be "right" in this case its |110>
+        wavefunction = groversBlock(wavefunction, 6); //Second argument is the basis state you want to be "right" in this case its |110>
     }
     measure_register_gate(wavefunction);
 

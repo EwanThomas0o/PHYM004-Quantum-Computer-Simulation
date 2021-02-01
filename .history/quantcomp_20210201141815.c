@@ -32,7 +32,7 @@ License: Public Domain
  28/01/21       0.0.8  Implemented Grovers algorithm, not sure if working...
  1/02/21        0.0.9  Grovers Algorithm corectly implemented.
  1/02/21        0.1.0  Need to Generalise for any number of qubits, N as i kepp getting memory problems
- 1/02/21        0.1.0  Fixed for general N, although some refinement needed (line 96)
+ 1/02/21        0.1.0  No problems with hadamard gates for general N
 */
 
 #include <stdio.h>

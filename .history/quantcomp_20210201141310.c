@@ -32,7 +32,7 @@ License: Public Domain
  28/01/21       0.0.8  Implemented Grovers algorithm, not sure if working...
  1/02/21        0.0.9  Grovers Algorithm corectly implemented.
  1/02/21        0.1.0  Need to Generalise for any number of qubits, N as i kepp getting memory problems
- 1/02/21        0.1.0  Fixed for general N, although some refinement needed (line 96)
+ 1/02/21        0.1.0  No problems with hadamard gates for general N
 */
 
 #include <stdio.h>
@@ -49,7 +49,7 @@ License: Public Domain
 #include <gsl/gsl_math.h>
 
 #define BASIS 2
-#define N 5 // Number of qubits defined
+#define N 4 // Number of qubits defined
 #define STATES_MAX 1024 //max of 10 qubits 
 
 struct timeval tv;
@@ -77,7 +77,7 @@ gsl_vector_complex* init_wavefunction_ep(int states){ //Initialising wf to "Equa
     
     gsl_vector_complex* wavefunction = NULL;
     wavefunction = gsl_vector_complex_alloc(states);
-    gsl_vector_complex_set_all(wavefunction, gsl_complex_rect(1/sqrt(32),0));
+    gsl_vector_complex_set_all(wavefunction, gsl_complex_rect(1/sqrt(8),0));
 
     return wavefunction;
 }
@@ -93,7 +93,7 @@ char* intToBinary(int a){ // Now works in regards to printing leading zeros
         temp *= 10;
     }
     char *bin_str = (char *)malloc(N*sizeof(char));
-    sprintf(bin_str, "%05d", bin);    
+    sprintf(bin_str, "%04d", bin);    
     return bin_str;
 }
 
@@ -107,7 +107,7 @@ void measure_register_gate(gsl_vector_complex* wavefunction){
     double probabilities[states];
     for(int i = 0; i < states; i++){ //creating a list of the probabilities (non-normalised)
         probabilities[i] = GSL_REAL(gsl_vector_complex_get(wavefunction,i))*GSL_REAL(gsl_vector_complex_get(wavefunction,i)) + GSL_IMAG(gsl_vector_complex_get(wavefunction,i))*GSL_IMAG(gsl_vector_complex_get(wavefunction,i));
-        //printf("%lg\n", probabilities[i]);
+        printf("%lg\n", probabilities[i]);
     }
     gsl_ran_discrete_t* lookup = gsl_ran_discrete_preproc(states, probabilities); // Preproc normalises the probabilities
     gsl_rng* r = gsl_rng_alloc(gsl_rng_mt19937); // Mersene Twister Algorithm is used for high quality random numbers
@@ -115,7 +115,7 @@ void measure_register_gate(gsl_vector_complex* wavefunction){
     unsigned long int seed = tv.tv_usec;    
     gsl_rng_set(r, seed); 
     size_t t = gsl_ran_discrete(r, lookup); // Choosing from the discrete probability distribution defined by the wavefunction 
-    printf("Wavefunction collapsed into the state:\n|%s>\n", intToBinary(t));
+    //printf("Wavefunction collapsed into the state:\n|%s>\n", intToBinary(t));
     // Wavefunction collapsed so will only find system in the state from now on
     gsl_vector_complex_set_all(wavefunction, GSL_COMPLEX_ZERO);
     gsl_vector_complex_set(wavefunction, t, GSL_COMPLEX_ONE); // Set measured state to probability one so that if we measure again we get the same outcome
@@ -269,11 +269,10 @@ int main(){
     wavefunction = hadamard_gate(wavefunction, 2); 
     wavefunction = hadamard_gate(wavefunction, 3);
     wavefunction = hadamard_gate(wavefunction, 4);
-    wavefunction = hadamard_gate(wavefunction, 5);
 
-    for(int i = 0; i < floor(M_PI_4*sqrt(pow(2,N))); i++){ // Needs to be called "floor(pi/4*sqrt(2^N))"" times for optimum output roughly 2 in our case
-        wavefunction = groversBlock(wavefunction, 31); //Second argument is the basis state you want to be "right" in this case its |110>
-    }
+    //for(int i = 0; i < floor(M_PI_4*sqrt(pow(2,N))); i++){ // Needs to be called "floor(pi/4*sqrt(2^N))"" times for optimum output roughly 2 in our case
+        //wavefunction = groversBlock(wavefunction, 6); //Second argument is the basis state you want to be "right" in this case its |110>
+    //}
     measure_register_gate(wavefunction);
 
     return 0;

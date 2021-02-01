@@ -30,9 +30,6 @@ License: Public Domain
  28/01/21       0.0.6  Hadamard gate working for general N
  28/01/21       0.0.7  Same goes for phase gate
  28/01/21       0.0.8  Implemented Grovers algorithm, not sure if working...
- 1/02/21        0.0.9  Grovers Algorithm corectly implemented.
- 1/02/21        0.1.0  Need to Generalise for any number of qubits, N as i kepp getting memory problems
- 1/02/21        0.1.0  Fixed for general N, although some refinement needed (line 96)
 */
 
 #include <stdio.h>
@@ -49,7 +46,7 @@ License: Public Domain
 #include <gsl/gsl_math.h>
 
 #define BASIS 2
-#define N 5 // Number of qubits defined
+#define N 3 // Number of qubits defined
 #define STATES_MAX 1024 //max of 10 qubits 
 
 struct timeval tv;
@@ -68,7 +65,7 @@ gsl_vector_complex* init_wavefunction_sd(int states){ //Initialising wf to all "
     //Initialising the wf to |000> 
     gsl_vector_complex* wavefunction = NULL;
     wavefunction = gsl_vector_complex_alloc(states);
-    gsl_vector_complex_set(wavefunction, 0, GSL_COMPLEX_ONE);
+    gsl_vector_complex_set(wavefunction, 0, gsl_complex_rect(1,0));
 
     return wavefunction;
 }
@@ -77,7 +74,7 @@ gsl_vector_complex* init_wavefunction_ep(int states){ //Initialising wf to "Equa
     
     gsl_vector_complex* wavefunction = NULL;
     wavefunction = gsl_vector_complex_alloc(states);
-    gsl_vector_complex_set_all(wavefunction, gsl_complex_rect(1/sqrt(32),0));
+    gsl_vector_complex_set_all(wavefunction, gsl_complex_rect(1/sqrt(8),0));
 
     return wavefunction;
 }
@@ -93,7 +90,7 @@ char* intToBinary(int a){ // Now works in regards to printing leading zeros
         temp *= 10;
     }
     char *bin_str = (char *)malloc(N*sizeof(char));
-    sprintf(bin_str, "%05d", bin);    
+    sprintf(bin_str, "%03d", bin);    
     return bin_str;
 }
 
@@ -176,7 +173,7 @@ gsl_vector_complex* hadamard_gate(gsl_vector_complex* wavefunction, int qubit){
 
     for(int i = 0; i < wavefunction->size; i++){
         for(int j = 0; j < wavefunction->size; j++){
-            double val = findElementHad(intToBinary(i), intToBinary(j), qubit);
+            double val = findElementHad(intToBinary(i), intToBinary(j), qubit); //This is causing some errors
             gsl_matrix_complex_set(hadamard, i , j, gsl_complex_rect(val,0));
         }
     }
@@ -267,12 +264,11 @@ int main(){
     //Putting system into equal super position of superposition all 2^N basis'
     wavefunction = hadamard_gate(wavefunction, 1);
     wavefunction = hadamard_gate(wavefunction, 2); 
-    wavefunction = hadamard_gate(wavefunction, 3);
-    wavefunction = hadamard_gate(wavefunction, 4);
-    wavefunction = hadamard_gate(wavefunction, 5);
+    wavefunction = hadamard_gate(wavefunction, 3); 
+    //wavefunction = hadamard_gate(wavefunction, 4);
 
     for(int i = 0; i < floor(M_PI_4*sqrt(pow(2,N))); i++){ // Needs to be called "floor(pi/4*sqrt(2^N))"" times for optimum output roughly 2 in our case
-        wavefunction = groversBlock(wavefunction, 31); //Second argument is the basis state you want to be "right" in this case its |110>
+        wavefunction = groversBlock(wavefunction, 6); //Second argument is the basis state you want to be "right" in this case its |110>
     }
     measure_register_gate(wavefunction);
 

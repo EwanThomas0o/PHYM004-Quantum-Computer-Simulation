@@ -30,9 +30,6 @@ License: Public Domain
  28/01/21       0.0.6  Hadamard gate working for general N
  28/01/21       0.0.7  Same goes for phase gate
  28/01/21       0.0.8  Implemented Grovers algorithm, not sure if working...
- 1/02/21        0.0.9  Grovers Algorithm corectly implemented.
- 1/02/21        0.1.0  Need to Generalise for any number of qubits, N as i kepp getting memory problems
- 1/02/21        0.1.0  Fixed for general N, although some refinement needed (line 96)
 */
 
 #include <stdio.h>
@@ -46,11 +43,16 @@ License: Public Domain
 #include <gsl/gsl_complex.h>
 #include <gsl/gsl_complex_math.h>
 #include <gsl/gsl_rng.h>
-#include <gsl/gsl_math.h>
 
 #define BASIS 2
-#define N 5 // Number of qubits defined
+#define N 3 // Number of qubits defined
 #define STATES_MAX 1024 //max of 10 qubits 
+
+// Bit map for 3 qubits and their corresponding states
+const char *bit_rep[16] = {
+    [ 0] = "000", [ 1] = "001", [ 2] = "010", [ 3] = "011",
+    [ 4] = "100", [ 5] = "101", [ 6] = "110", [ 7] = "111",
+}; 
 
 struct timeval tv;
 
@@ -68,7 +70,7 @@ gsl_vector_complex* init_wavefunction_sd(int states){ //Initialising wf to all "
     //Initialising the wf to |000> 
     gsl_vector_complex* wavefunction = NULL;
     wavefunction = gsl_vector_complex_alloc(states);
-    gsl_vector_complex_set(wavefunction, 0, GSL_COMPLEX_ONE);
+    gsl_vector_complex_set(wavefunction, 0, gsl_complex_rect(1,0));
 
     return wavefunction;
 }
@@ -77,37 +79,22 @@ gsl_vector_complex* init_wavefunction_ep(int states){ //Initialising wf to "Equa
     
     gsl_vector_complex* wavefunction = NULL;
     wavefunction = gsl_vector_complex_alloc(states);
-    gsl_vector_complex_set_all(wavefunction, gsl_complex_rect(1/sqrt(32),0));
+    gsl_vector_complex_set_all(wavefunction, gsl_complex_rect(1/sqrt(8),0));
 
     return wavefunction;
-}
-
-char* intToBinary(int a){ // Now works in regards to printing leading zeros
-    int bin = 0;
-    int remainder, temp = 1;
-
-    while(a != 0){
-        remainder = a % 2;
-        a /= 2;
-        bin += remainder*temp;
-        temp *= 10;
-    }
-    char *bin_str = (char *)malloc(N*sizeof(char));
-    sprintf(bin_str, "%05d", bin);    
-    return bin_str;
 }
 
 // To measure the quantum state we must use the discrete probability distribution provided by the 
 // wavefuntion. The measurement function finds the probabilities of each state and observes the wf
 // according to those probabilities. After measurement the wavefunction is "collapsed" and gives the 
 // measurement over and over again.
-void measure_register_gate(gsl_vector_complex* wavefunction){
+const char* measure_register_gate(gsl_vector_complex* wavefunction){
     int states = (int) wavefunction->size;
 
     double probabilities[states];
     for(int i = 0; i < states; i++){ //creating a list of the probabilities (non-normalised)
         probabilities[i] = GSL_REAL(gsl_vector_complex_get(wavefunction,i))*GSL_REAL(gsl_vector_complex_get(wavefunction,i)) + GSL_IMAG(gsl_vector_complex_get(wavefunction,i))*GSL_IMAG(gsl_vector_complex_get(wavefunction,i));
-        //printf("%lg\n", probabilities[i]);
+        printf("%lg\n", probabilities[i])
     }
     gsl_ran_discrete_t* lookup = gsl_ran_discrete_preproc(states, probabilities); // Preproc normalises the probabilities
     gsl_rng* r = gsl_rng_alloc(gsl_rng_mt19937); // Mersene Twister Algorithm is used for high quality random numbers
@@ -115,14 +102,14 @@ void measure_register_gate(gsl_vector_complex* wavefunction){
     unsigned long int seed = tv.tv_usec;    
     gsl_rng_set(r, seed); 
     size_t t = gsl_ran_discrete(r, lookup); // Choosing from the discrete probability distribution defined by the wavefunction 
-    printf("Wavefunction collapsed into the state:\n|%s>\n", intToBinary(t));
+    //printf("Wavefunction collapsed into the state:\n|%s>\n", bit_rep[t]);
     // Wavefunction collapsed so will only find system in the state from now on
     gsl_vector_complex_set_all(wavefunction, GSL_COMPLEX_ZERO);
     gsl_vector_complex_set(wavefunction, t, GSL_COMPLEX_ONE); // Set measured state to probability one so that if we measure again we get the same outcome
     // Free memory to avoid bloats
     gsl_ran_discrete_free(lookup);
     gsl_rng_free(r);
-    return;
+    return bit_rep[t];
 }
 // The Hadamard gate sets qubits into a superposition of their basis states. This function does this 
 // by allowing the user to specify which qubit we will be setting to a superposition. This will have 
@@ -165,6 +152,21 @@ double findElementPhase(char* inta, char* intb, int qubit, double phi){
     return value;
 }
 
+char* intToBinary(int a){ // Now works in regards to printing leading zeros
+    int bin = 0;
+    int remainder, temp = 1;
+
+    while(a != 0){
+        remainder = a % 2;
+        a /= 2;
+        bin += remainder*temp;
+        temp *= 10;
+    }
+    char *bin_str = (char *)malloc(N*sizeof(char));
+    sprintf(bin_str, "%03d", bin);    
+    return bin_str;
+}
+
 gsl_vector_complex* hadamard_gate(gsl_vector_complex* wavefunction, int qubit){
     if(qubit > N){
         printf("Please operate the gate on a valid qubit\n");
@@ -176,7 +178,7 @@ gsl_vector_complex* hadamard_gate(gsl_vector_complex* wavefunction, int qubit){
 
     for(int i = 0; i < wavefunction->size; i++){
         for(int j = 0; j < wavefunction->size; j++){
-            double val = findElementHad(intToBinary(i), intToBinary(j), qubit);
+            double val = findElementHad(intToBinary(i), intToBinary(j), qubit); //This is causing some errors
             gsl_matrix_complex_set(hadamard, i , j, gsl_complex_rect(val,0));
         }
     }
@@ -267,12 +269,10 @@ int main(){
     //Putting system into equal super position of superposition all 2^N basis'
     wavefunction = hadamard_gate(wavefunction, 1);
     wavefunction = hadamard_gate(wavefunction, 2); 
-    wavefunction = hadamard_gate(wavefunction, 3);
-    wavefunction = hadamard_gate(wavefunction, 4);
-    wavefunction = hadamard_gate(wavefunction, 5);
+    wavefunction = hadamard_gate(wavefunction, 3); 
 
-    for(int i = 0; i < floor(M_PI_4*sqrt(pow(2,N))); i++){ // Needs to be called "floor(pi/4*sqrt(2^N))"" times for optimum output roughly 2 in our case
-        wavefunction = groversBlock(wavefunction, 31); //Second argument is the basis state you want to be "right" in this case its |110>
+    for(int i = 0; i < 3; i++){ // Needs to be called pi/4*sqrt(2^N) times for optimum output roughly 3 in our case
+        wavefunction = groversBlock(wavefunction, 7); //Second argument is the basis state you want to be "right"
     }
     measure_register_gate(wavefunction);
 
