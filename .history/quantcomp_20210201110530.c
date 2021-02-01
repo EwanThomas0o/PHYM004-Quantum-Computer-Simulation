@@ -88,7 +88,7 @@ gsl_vector_complex* init_wavefunction_ep(int states){ //Initialising wf to "Equa
 // wavefuntion. The measurement function finds the probabilities of each state and observes the wf
 // according to those probabilities. After measurement the wavefunction is "collapsed" and gives the 
 // measurement over and over again.
-const char* measure_register_gate(gsl_vector_complex* wavefunction){
+void measure_register_gate(gsl_vector_complex* wavefunction){
     int states = (int) wavefunction->size;
 
     double probabilities[states];
@@ -108,7 +108,7 @@ const char* measure_register_gate(gsl_vector_complex* wavefunction){
     // Free memory to avoid bloats
     gsl_ran_discrete_free(lookup);
     gsl_rng_free(r);
-    return bit_rep[t];
+    return;
 }
 // The Hadamard gate sets qubits into a superposition of their basis states. This function does this 
 // by allowing the user to specify which qubit we will be setting to a superposition. This will have 
@@ -258,7 +258,6 @@ void print_wf(gsl_vector_complex* wavefunction){
     }
 }
 int main(){
-    int count = 0;
     for(int j = 0; j < 100; j++){
         int states = (int)pow(BASIS, N);
         gsl_vector_complex* wavefunction = init_wavefunction_sd(states);
@@ -270,13 +269,7 @@ int main(){
         for(int i = 0; i < 5; i++){ // Needs to be called pi/4*sqrt(2^N) times for optimum output
             wavefunction = groversBlock(wavefunction, 7); //Second argument is the basis state you want to be right
         }
-        char * state;
-        state = measure_register_gate(wavefunction);
-        
-        if(strcmp(state, "110") == 0){
-            count++;
-        }
+        measure_register_gate(wavefunction);
     }
-    printf("%d\n", count);
     return 0;
 }

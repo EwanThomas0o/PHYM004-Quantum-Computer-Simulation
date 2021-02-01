@@ -272,8 +272,7 @@ int main(){
         }
         char * state;
         state = measure_register_gate(wavefunction);
-        
-        if(strcmp(state, "110") == 0){
+        if(state == "110"){
             count++;
         }
     }
