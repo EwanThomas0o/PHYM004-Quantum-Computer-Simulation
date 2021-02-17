@@ -34,7 +34,7 @@ License: Public Domain
  1/02/21        0.1.0  Need to Generalise for any number of qubits, N as i kepp getting memory problems
  1/02/21        0.1.0  Fixed for general N, although some refinement needed (line 96)
  16/02/21       P.1.1  Want to implement sparse matrices
- 17/02/21       P.1.2  Implementing CNOT Gate. Error found. Will squash tomorrow.
+ 17/02/21       P.1.2  Implementing CNOT Gate
 */
 
 #include <stdio.h>
@@ -178,36 +178,28 @@ double findElementCnot(char* row, char* col, int target_qubit, int control_qubit
 
     for(int i = 0; i < num_qbits; i++){
         // Employ the deltas first
-        char char1 = row[i];
-        char char2 = col[i];
-        printf("%c\n", char1);
-        printf("%c\n", char2);
-        if(i != target_qubit-1 && i != control_qubit-1 && char1!=char2){
+        if((i != target_qubit-1 && i != control_qubit-1) && strcmp(&row[i], &col[i])!= 0){
             // If an element of row and col strings not a match on any element other that targ or contr then we know 
             // a delta will set the whole element to zero
-            printf("%c\n", char1);
-            printf("%c\n", char2);
+            printf("im a cat1\n");
             return 0.0;
         }
     }
-
-    // TODO: THE ERROR IS IN HERE SOMEWHERE. FIND OR DIE
     // use strcat to put the control index first in the string that will be converted to 
-    // char str1[BASIS];
-    // char str2[BASIS];
-    // strcat(str1, &row[control_qubit-1]);
-    // strcat(str1, &row[target_qubit-1]);
-    // strcat(str2, &col[control_qubit-1]);
-    // strcat(str2, &col[target_qubit-1]);
-    // printf("i am a cat2");
+    char str1[BASIS];
+    char str2[BASIS];
+    strcat(str1, &row[control_qubit-1]);
+    strcat(str1, &row[target_qubit-1]);
+    strcat(str2, &col[control_qubit-1]);
+    strcat(str2, &col[target_qubit-1]);
+    printf("i am a cat2");
 
 
-    // // use strtol to make a number that will give us a value from cnot  above
-    // long row_index = strtol(str1, NULL, 10);
-    // long col_index = strtol(str2, NULL, 10);
-    // double value = gsl_matrix_get(cnot, row_index, col_index);
-    // gsl_matrix_free(cnot);
-    double value = 1;
+    // use strtol to make a number that will give us a value from cnot  above
+    long row_index = strtol(str1, NULL, 10);
+    long col_index = strtol(str2, NULL, 10);
+    double value = gsl_matrix_get(cnot, row_index, col_index);
+    gsl_matrix_free(cnot);
     return value;
 }
 // The Hadamard gate sets qubits into a superposition of their basis states. This function does this 
@@ -325,7 +317,7 @@ int main(){
     }
     measureRegisterGate(wavefunction);
     double val = findElementCnot(intToBinary(6),intToBinary(7), 3, 2, N);
-    //printf("%lg\n", val);
+    printf("%lg\n", val);
 
     return 0;
 }

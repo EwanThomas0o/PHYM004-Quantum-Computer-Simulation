@@ -20,7 +20,7 @@ License: Public Domain
 // -------
 //
 /*      UPDATES
- Date         Version  Comments  #P.x.y means pending 
+ Date         Version  Comments
  ----         -------  --------
  13/01/21       0.0.1  Create file with intention to work on part 1: Building a quantum register
  14/01/21       0.0.2  Quantum register of 3 qubits created. Now working on quantum gates for register
@@ -33,8 +33,6 @@ License: Public Domain
  1/02/21        0.0.9  Grovers Algorithm corectly implemented.
  1/02/21        0.1.0  Need to Generalise for any number of qubits, N as i kepp getting memory problems
  1/02/21        0.1.0  Fixed for general N, although some refinement needed (line 96)
- 16/02/21       P.1.1  Want to implement sparse matrices
- 17/02/21       P.1.2  Implementing CNOT Gate. Error found. Will squash tomorrow.
 */
 
 #include <stdio.h>
@@ -51,7 +49,7 @@ License: Public Domain
 #include <gsl/gsl_math.h>
 
 #define BASIS 2
-#define N 3 // Number of qubits defined
+#define N 5 // Number of qubits defined
 #define STATES_MAX 1024 //max of 10 qubits 
 
 struct timeval tv;
@@ -65,29 +63,26 @@ typedef struct element{
     int a;
     int b;
 } element;
-//   Creates a wavefunction where all spins are "down" i.e. |00..0>.
-//  A 1 in the ket represents a spin down. e.g. |010> means all qubits are spin down apart from qbit 2.  Note how 010 is 2 in binary.
-//  Since 000 is 0 in binary, we set probability amplitude of state 0 to 1.
-gsl_vector_complex* initWavefunctionSpinDown(int states){ 
+
+gsl_vector_complex* init_wavefunction_sd(int states){ //Initialising wf to all "Spin Down" 
+    //Initialising the wf to |000> 
     gsl_vector_complex* wavefunction = NULL;
     wavefunction = gsl_vector_complex_alloc(states);
-    // Probability amplitude stored in "wavefuction" vector
     gsl_vector_complex_set(wavefunction, 0, GSL_COMPLEX_ONE);
 
     return wavefunction;
 }
 
-// Set the probability amplitudes of all states to 1/sqrt(basis^N) so equal probability of wavefunction collapsing into any state.
-gsl_vector_complex* initWavefunctionEqualProb(int states){ //Initialising wf to "Equal Probability" of all states
+gsl_vector_complex* init_wavefunction_ep(int states){ //Initialising wf to "Equal Probability" of all states
     
     gsl_vector_complex* wavefunction = NULL;
     wavefunction = gsl_vector_complex_alloc(states);
-    gsl_vector_complex_set_all(wavefunction, gsl_complex_rect(1/sqrt(8),0));
+    gsl_vector_complex_set_all(wavefunction, gsl_complex_rect(1/sqrt(32),0));
 
     return wavefunction;
 }
- // Takes an integer and return binary representation in string format
-char* intToBinary(int a){
+
+char* intToBinary(int a){ // Now works in regards to printing leading zeros
     int bin = 0;
     int remainder, temp = 1;
 
@@ -98,15 +93,15 @@ char* intToBinary(int a){
         temp *= 10;
     }
     char *bin_str = (char *)malloc(N*sizeof(char));
-    sprintf(bin_str, "%03d", bin);    
+    sprintf(bin_str, "%05d", bin);    
     return bin_str;
 }
 
 // To measure the quantum state we must use the discrete probability distribution provided by the 
 // wavefuntion. The measurement function finds the probabilities of each state and observes the wf
-// according to those probabilities using a random number generator. After measurement the wavefunction is "collapsed" and gives the 
+// according to those probabilities. After measurement the wavefunction is "collapsed" and gives the 
 // measurement over and over again.
-void measureRegisterGate(gsl_vector_complex* wavefunction){
+void measure_register_gate(gsl_vector_complex* wavefunction){
     int states = (int) wavefunction->size;
 
     double probabilities[states];
@@ -129,9 +124,13 @@ void measureRegisterGate(gsl_vector_complex* wavefunction){
     gsl_rng_free(r);
     return;
 }
+// The Hadamard gate sets qubits into a superposition of their basis states. This function does this 
+// by allowing the user to specify which qubit we will be setting to a superposition. This will have 
+// effects when it comes to measuring the whole register as sometimes that qubit will be spin up, 
+// sometimes it will be spin down, which will change the overall state of the register.
 
 
-// This function will find the element of the tensor product for a given gate for one qubit
+// // This function will find the element of the tensor product for a given gate for one qubit
 double findElementHad(char* inta, char* intb, int qubit){
     // Hadamard gate for single qubit used to calculate tensor product
     gsl_matrix_complex *hadamard_single = gsl_matrix_complex_alloc(BASIS, BASIS);
@@ -146,7 +145,6 @@ double findElementHad(char* inta, char* intb, int qubit){
         value =  GSL_REAL(gsl_matrix_complex_get(hadamard_single, inta[qubit-1] - '0', intb[qubit -1] - '0'));
 
     }
-    gsl_matrix_complex_free(hadamard_single);
     return value;
 }
 
@@ -164,57 +162,10 @@ double findElementPhase(char* inta, char* intb, int qubit, double phi){
         value =  GSL_REAL(gsl_matrix_complex_get(phase_single, inta[qubit-1] - '0', intb[qubit -1] - '0'));
 
     }
-    gsl_matrix_complex_free(phase_single);
     return value;
 }
 
-double findElementCnot(char* row, char* col, int target_qubit, int control_qubit, int num_qbits){
-    // Defining the two qubit cnot gate that we will draw values from
-    gsl_matrix *cnot = gsl_matrix_alloc(BASIS*BASIS, BASIS*BASIS);
-    gsl_matrix_set(cnot, 0, 0, 1);
-    gsl_matrix_set(cnot, 1, 1, 1);
-    gsl_matrix_set(cnot, 2, 3, 1);
-    gsl_matrix_set(cnot, 3, 2, 1);
-
-    for(int i = 0; i < num_qbits; i++){
-        // Employ the deltas first
-        char char1 = row[i];
-        char char2 = col[i];
-        printf("%c\n", char1);
-        printf("%c\n", char2);
-        if(i != target_qubit-1 && i != control_qubit-1 && char1!=char2){
-            // If an element of row and col strings not a match on any element other that targ or contr then we know 
-            // a delta will set the whole element to zero
-            printf("%c\n", char1);
-            printf("%c\n", char2);
-            return 0.0;
-        }
-    }
-
-    // TODO: THE ERROR IS IN HERE SOMEWHERE. FIND OR DIE
-    // use strcat to put the control index first in the string that will be converted to 
-    // char str1[BASIS];
-    // char str2[BASIS];
-    // strcat(str1, &row[control_qubit-1]);
-    // strcat(str1, &row[target_qubit-1]);
-    // strcat(str2, &col[control_qubit-1]);
-    // strcat(str2, &col[target_qubit-1]);
-    // printf("i am a cat2");
-
-
-    // // use strtol to make a number that will give us a value from cnot  above
-    // long row_index = strtol(str1, NULL, 10);
-    // long col_index = strtol(str2, NULL, 10);
-    // double value = gsl_matrix_get(cnot, row_index, col_index);
-    // gsl_matrix_free(cnot);
-    double value = 1;
-    return value;
-}
-// The Hadamard gate sets qubits into a superposition of their basis states. This function does this 
-// by allowing the user to specify which qubit we will be setting to a superposition. This will have 
-// effects when it comes to measuring the whole register as sometimes that qubit will be spin up, 
-// sometimes it will be spin down, which will change the overall state of the register.
-gsl_vector_complex* hadamardGate(gsl_vector_complex* wavefunction, int qubit){
+gsl_vector_complex* hadamard_gate(gsl_vector_complex* wavefunction, int qubit){
     if(qubit > N){
         printf("Please operate the gate on a valid qubit\n");
         exit(0);
@@ -231,81 +182,79 @@ gsl_vector_complex* hadamardGate(gsl_vector_complex* wavefunction, int qubit){
     }
     gsl_vector_complex* h_psi = gsl_vector_complex_alloc(wavefunction->size);
     gsl_vector_complex_set_zero(h_psi);
-    // When implementing the sparse matrix version, the gate it real and the wf is complex so can split into real and im
     gsl_blas_zgemv(CblasNoTrans, GSL_COMPLEX_ONE, hadamard, wavefunction, GSL_COMPLEX_ZERO, h_psi);
     return h_psi;
 }
 
-gsl_vector_complex* phaseShiftGate(gsl_vector_complex *wavefunction, int qubit, float phase){
+gsl_vector_complex* phase_shift_gate(gsl_vector_complex *wavefunction, int qubit, float phase){
     if(qubit > N){
         printf("Please operate the gate on a valid qubit\n");
         exit(0);
     }
     // Will beome the NxN matrix for operation on whole register
-    gsl_matrix_complex *phaseGate = gsl_matrix_complex_alloc(wavefunction->size, wavefunction->size);
-    gsl_matrix_complex_set_all(phaseGate, GSL_COMPLEX_ZERO);
+    gsl_matrix_complex *phase_gate = gsl_matrix_complex_alloc(wavefunction->size, wavefunction->size);
+    gsl_matrix_complex_set_all(phase_gate, GSL_COMPLEX_ZERO);
 
     for(int i = 0; i < wavefunction->size; i++){
         for(int j = 0; j < wavefunction->size; j++){
             double val = findElementPhase(intToBinary(i), intToBinary(j), qubit, phase); //This is causing some errors
-            gsl_matrix_complex_set(phaseGate, i , j, gsl_complex_rect(val,0));
+            gsl_matrix_complex_set(phase_gate, i , j, gsl_complex_rect(val,0));
         }
     }
     gsl_vector_complex* r_psi = gsl_vector_complex_alloc(wavefunction->size);
     gsl_vector_complex_set_zero(r_psi);
-    gsl_blas_zgemv(CblasNoTrans, GSL_COMPLEX_ONE, phaseGate, wavefunction, GSL_COMPLEX_ZERO, r_psi);
+    gsl_blas_zgemv(CblasNoTrans, GSL_COMPLEX_ONE, phase_gate, wavefunction, GSL_COMPLEX_ZERO, r_psi);
     return r_psi;
 }
 
 // Oracle gate used in grovers quantum search algorithm. Argument answer is the "Correct question" mentioned
 // in paper
-gsl_vector_complex* oracleGate(gsl_vector_complex* wavefunction, int answer){
-    gsl_matrix_complex* oracleGate = gsl_matrix_complex_alloc(wavefunction->size, wavefunction->size);
-    gsl_matrix_complex_set_identity(oracleGate);
-    gsl_matrix_complex_set(oracleGate, answer-1, answer-1, gsl_complex_rect(-1,0)); //Minus one as index from 0
+gsl_vector_complex* oracle_gate(gsl_vector_complex* wavefunction, int answer){
+    gsl_matrix_complex* oracle_gate = gsl_matrix_complex_alloc(wavefunction->size, wavefunction->size);
+    gsl_matrix_complex_set_identity(oracle_gate);
+    gsl_matrix_complex_set(oracle_gate, answer-1, answer-1, gsl_complex_rect(-1,0)); //Minus one as index from 0
     
     gsl_vector_complex* o_psi = gsl_vector_complex_alloc(wavefunction->size);
     gsl_vector_complex_set_zero(o_psi);
-    gsl_blas_zgemv(CblasNoTrans, GSL_COMPLEX_ONE, oracleGate, wavefunction, GSL_COMPLEX_ZERO, o_psi);
+    gsl_blas_zgemv(CblasNoTrans, GSL_COMPLEX_ONE, oracle_gate, wavefunction, GSL_COMPLEX_ZERO, o_psi);
 
     return o_psi;
 }
-// Unity matrix of size 2^N*2^N with -1 in the 0,0th element
-gsl_vector_complex* jGate(gsl_vector_complex* wavefunction){
-    gsl_matrix_complex* jGate = gsl_matrix_complex_alloc(wavefunction->size, wavefunction->size);
-    gsl_matrix_complex_set_identity(jGate);
-    gsl_matrix_complex_set(jGate, 0, 0, gsl_complex_rect(-1,0));
+
+gsl_vector_complex* j_gate(gsl_vector_complex* wavefunction){
+    gsl_matrix_complex* j_gate = gsl_matrix_complex_alloc(wavefunction->size, wavefunction->size);
+    gsl_matrix_complex_set_identity(j_gate);
+    gsl_matrix_complex_set(j_gate, 0, 0, gsl_complex_rect(-1,0));
     
     gsl_vector_complex* j_psi = gsl_vector_complex_alloc(wavefunction->size);
     gsl_vector_complex_set_zero(j_psi);
-    gsl_blas_zgemv(CblasNoTrans, GSL_COMPLEX_ONE, jGate, wavefunction, GSL_COMPLEX_ZERO, j_psi);
+    gsl_blas_zgemv(CblasNoTrans, GSL_COMPLEX_ONE, j_gate, wavefunction, GSL_COMPLEX_ZERO, j_psi);
 
     return j_psi;
 }
+
+// gsl_vector_complex* diffusion_gate(gsl_vector_complex* wavefunction){
+//     gsl_matrix_complex* diffusion_gate = gsl_matrix_complex_alloc(wavefunction->size, wavefunction->size);
+
+// }
 
 gsl_vector_complex* groversBlock(gsl_vector_complex* wavefunction, int answer){
     gsl_vector_complex* b_psi = gsl_vector_complex_alloc(wavefunction->size);
     gsl_vector_complex_set_zero(b_psi);
     //First operation in the block is to apply a quantum oracle gate
-    b_psi = oracleGate(wavefunction, answer); 
+    b_psi = oracle_gate(wavefunction, answer); 
     //Then we apply a hadamard gate to each gate
     for(int i = 1; i < N+1; i++){
-        b_psi = hadamardGate(b_psi, i); // +1 bc had takes in canonical qubit number.       
+        b_psi = hadamard_gate(b_psi, i); // +1 bc had takes in canonical qubit number.       
     }
     // Apply the j gate
-    b_psi = jGate(b_psi);
+    b_psi = j_gate(b_psi);
     // Finally a hadamard gate on each qubit again
     for(int j = 1; j < N+1; j++){
-        b_psi = hadamardGate(b_psi, j);        
+        b_psi = hadamard_gate(b_psi, j);        
     }
     return b_psi;
 }
-
-// gsl_vector_complex* cnotGate(gsl_vector_complex* wavefunction, int target_qubit, int control_qubit);
-// //     There is a knronecker delta for every qubit that the gate doesn't operate on. So similar to 
-// //  findElementHad and findElementPhase implementation of kronecker deltas. we have pqr and p'q'r' 
-// //  that represent the binary number of the element. The control qubit (in example 2) has its bit placed
-// //  at the beinging
 
 void print_wf(gsl_vector_complex* wavefunction){
     for (int i = 0; i < wavefunction->size; i++){
@@ -314,18 +263,18 @@ void print_wf(gsl_vector_complex* wavefunction){
 }
 int main(){
     int states = (int)pow(BASIS, N);
-    gsl_vector_complex* wavefunction = initWavefunctionSpinDown(states);
+    gsl_vector_complex* wavefunction = init_wavefunction_sd(states);
     //Putting system into equal super position of superposition all 2^N basis'
-    wavefunction = hadamardGate(wavefunction, 1);
-    wavefunction = hadamardGate(wavefunction, 2); 
-    wavefunction = hadamardGate(wavefunction, 3);
+    wavefunction = hadamard_gate(wavefunction, 1);
+    wavefunction = hadamard_gate(wavefunction, 2); 
+    wavefunction = hadamard_gate(wavefunction, 3);
+    wavefunction = hadamard_gate(wavefunction, 4);
+    wavefunction = hadamard_gate(wavefunction, 5);
 
     for(int i = 0; i < floor(M_PI_4*sqrt(pow(2,N))); i++){ // Needs to be called "floor(pi/4*sqrt(2^N))"" times for optimum output roughly 2 in our case
-        wavefunction = groversBlock(wavefunction, 3); //Second argument is the basis state you want to be "right" in this case its |110>
+        wavefunction = groversBlock(wavefunction, 31); //Second argument is the basis state you want to be "right" in this case its |110>
     }
-    measureRegisterGate(wavefunction);
-    double val = findElementCnot(intToBinary(6),intToBinary(7), 3, 2, N);
-    //printf("%lg\n", val);
+    measure_register_gate(wavefunction);
 
     return 0;
 }

@@ -34,7 +34,6 @@ License: Public Domain
  1/02/21        0.1.0  Need to Generalise for any number of qubits, N as i kepp getting memory problems
  1/02/21        0.1.0  Fixed for general N, although some refinement needed (line 96)
  16/02/21       P.1.1  Want to implement sparse matrices
- 17/02/21       P.1.2  Implementing CNOT Gate. Error found. Will squash tomorrow.
 */
 
 #include <stdio.h>
@@ -146,7 +145,6 @@ double findElementHad(char* inta, char* intb, int qubit){
         value =  GSL_REAL(gsl_matrix_complex_get(hadamard_single, inta[qubit-1] - '0', intb[qubit -1] - '0'));
 
     }
-    gsl_matrix_complex_free(hadamard_single);
     return value;
 }
 
@@ -164,50 +162,6 @@ double findElementPhase(char* inta, char* intb, int qubit, double phi){
         value =  GSL_REAL(gsl_matrix_complex_get(phase_single, inta[qubit-1] - '0', intb[qubit -1] - '0'));
 
     }
-    gsl_matrix_complex_free(phase_single);
-    return value;
-}
-
-double findElementCnot(char* row, char* col, int target_qubit, int control_qubit, int num_qbits){
-    // Defining the two qubit cnot gate that we will draw values from
-    gsl_matrix *cnot = gsl_matrix_alloc(BASIS*BASIS, BASIS*BASIS);
-    gsl_matrix_set(cnot, 0, 0, 1);
-    gsl_matrix_set(cnot, 1, 1, 1);
-    gsl_matrix_set(cnot, 2, 3, 1);
-    gsl_matrix_set(cnot, 3, 2, 1);
-
-    for(int i = 0; i < num_qbits; i++){
-        // Employ the deltas first
-        char char1 = row[i];
-        char char2 = col[i];
-        printf("%c\n", char1);
-        printf("%c\n", char2);
-        if(i != target_qubit-1 && i != control_qubit-1 && char1!=char2){
-            // If an element of row and col strings not a match on any element other that targ or contr then we know 
-            // a delta will set the whole element to zero
-            printf("%c\n", char1);
-            printf("%c\n", char2);
-            return 0.0;
-        }
-    }
-
-    // TODO: THE ERROR IS IN HERE SOMEWHERE. FIND OR DIE
-    // use strcat to put the control index first in the string that will be converted to 
-    // char str1[BASIS];
-    // char str2[BASIS];
-    // strcat(str1, &row[control_qubit-1]);
-    // strcat(str1, &row[target_qubit-1]);
-    // strcat(str2, &col[control_qubit-1]);
-    // strcat(str2, &col[target_qubit-1]);
-    // printf("i am a cat2");
-
-
-    // // use strtol to make a number that will give us a value from cnot  above
-    // long row_index = strtol(str1, NULL, 10);
-    // long col_index = strtol(str2, NULL, 10);
-    // double value = gsl_matrix_get(cnot, row_index, col_index);
-    // gsl_matrix_free(cnot);
-    double value = 1;
     return value;
 }
 // The Hadamard gate sets qubits into a superposition of their basis states. This function does this 
@@ -301,11 +255,7 @@ gsl_vector_complex* groversBlock(gsl_vector_complex* wavefunction, int answer){
     return b_psi;
 }
 
-// gsl_vector_complex* cnotGate(gsl_vector_complex* wavefunction, int target_qubit, int control_qubit);
-// //     There is a knronecker delta for every qubit that the gate doesn't operate on. So similar to 
-// //  findElementHad and findElementPhase implementation of kronecker deltas. we have pqr and p'q'r' 
-// //  that represent the binary number of the element. The control qubit (in example 2) has its bit placed
-// //  at the beinging
+gsl_vector_complex* cnotGate(int target_qubit, int control_qubit);
 
 void print_wf(gsl_vector_complex* wavefunction){
     for (int i = 0; i < wavefunction->size; i++){
@@ -321,11 +271,9 @@ int main(){
     wavefunction = hadamardGate(wavefunction, 3);
 
     for(int i = 0; i < floor(M_PI_4*sqrt(pow(2,N))); i++){ // Needs to be called "floor(pi/4*sqrt(2^N))"" times for optimum output roughly 2 in our case
-        wavefunction = groversBlock(wavefunction, 3); //Second argument is the basis state you want to be "right" in this case its |110>
+        wavefunction = groversBlock(wavefunction, 6); //Second argument is the basis state you want to be "right" in this case its |110>
     }
     measureRegisterGate(wavefunction);
-    double val = findElementCnot(intToBinary(6),intToBinary(7), 3, 2, N);
-    //printf("%lg\n", val);
 
     return 0;
 }

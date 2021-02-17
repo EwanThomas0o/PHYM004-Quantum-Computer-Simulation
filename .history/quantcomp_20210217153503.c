@@ -34,7 +34,7 @@ License: Public Domain
  1/02/21        0.1.0  Need to Generalise for any number of qubits, N as i kepp getting memory problems
  1/02/21        0.1.0  Fixed for general N, although some refinement needed (line 96)
  16/02/21       P.1.1  Want to implement sparse matrices
- 17/02/21       P.1.2  Implementing CNOT Gate. Error found. Will squash tomorrow.
+ 17/02/21       P.1.2  Implementing CNOT Gate
 */
 
 #include <stdio.h>

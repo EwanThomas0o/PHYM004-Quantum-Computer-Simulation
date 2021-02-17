@@ -34,7 +34,7 @@ License: Public Domain
  1/02/21        0.1.0  Need to Generalise for any number of qubits, N as i kepp getting memory problems
  1/02/21        0.1.0  Fixed for general N, although some refinement needed (line 96)
  16/02/21       P.1.1  Want to implement sparse matrices
- 17/02/21       P.1.2  Implementing CNOT Gate. Error found. Will squash tomorrow.
+ 17/02/21       P.1.2  Implementing CNOT Gate
 */
 
 #include <stdio.h>
@@ -190,8 +190,6 @@ double findElementCnot(char* row, char* col, int target_qubit, int control_qubit
             return 0.0;
         }
     }
-
-    // TODO: THE ERROR IS IN HERE SOMEWHERE. FIND OR DIE
     // use strcat to put the control index first in the string that will be converted to 
     // char str1[BASIS];
     // char str2[BASIS];
@@ -325,7 +323,7 @@ int main(){
     }
     measureRegisterGate(wavefunction);
     double val = findElementCnot(intToBinary(6),intToBinary(7), 3, 2, N);
-    //printf("%lg\n", val);
+    printf("%lg\n", val);
 
     return 0;
 }
