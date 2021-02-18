@@ -36,7 +36,6 @@ License: Public Domain
  16/02/21       P.1.1  Want to implement sparse matrices
  17/02/21       P.1.1  Implementing CNOT Gate. Error found. Will squash tomorrow.
  18/02/21       P.1.2  CNOT implemented. NOT 100% correct.
- 18/02/21       1.1.3  CNOT implemented successfully
 */
 
 #include <stdio.h>
@@ -67,13 +66,9 @@ typedef struct element{
     int a;
     int b;
 } element;
-
 //   Creates a wavefunction where all spins are "down" i.e. |00..0>.
 //  A 1 in the ket represents a spin down. e.g. |010> means all qubits are spin down apart from qbit 2.  Note how 010 is 2 in binary.
 //  Since 000 is 0 in binary, we set probability amplitude of state 0 to 1.
-//  Arguments
-//  ---------
-// [1] states -> The number of total states for the system. This depends on the number of quibits defined and the basis vector.
 gsl_vector_complex* initWavefunctionSpinDown(int states){ 
     gsl_vector_complex* wavefunction = NULL;
     wavefunction = gsl_vector_complex_alloc(states);
@@ -84,9 +79,6 @@ gsl_vector_complex* initWavefunctionSpinDown(int states){
 }
 
 // Set the probability amplitudes of all states to 1/sqrt(basis^N) so equal probability of wavefunction collapsing into any state.
-//  Arguments
-//  ---------
-// [1] states -> The number of total states for the system. This depends on the number of quibits defined and the basis vector.]
 gsl_vector_complex* initWavefunctionEqualProb(int states){ //Initialising wf to "Equal Probability" of all states
     
     gsl_vector_complex* wavefunction = NULL;
@@ -96,9 +88,6 @@ gsl_vector_complex* initWavefunctionEqualProb(int states){ //Initialising wf to 
     return wavefunction;
 }
  // Takes an integer and return binary representation in string format
-//  Arguments
-//  ---------
-// [1] a -> The integer number that is to be turned into a binary string
 char* intToBinary(int a){
     int bin = 0;
     int remainder, temp = 1;
@@ -113,9 +102,7 @@ char* intToBinary(int a){
     sprintf(bin_str, "%03d", bin);    
     return bin_str;
 }
-//  Arguments
-//  ---------
-// [1] matrix -> The matrix that is to be printed
+
 void print_matrix(gsl_matrix_complex* matrix){
     for(int i = 0; i<matrix->size1;i++){
         for(int j = 0; j < matrix->size2; j++){
@@ -128,10 +115,6 @@ void print_matrix(gsl_matrix_complex* matrix){
 // wavefuntion. The measurement function finds the probabilities of each state and observes the wf
 // according to those probabilities using a random number generator. After measurement the wavefunction is "collapsed" and gives the 
 // measurement over and over again.
-
-//  Arguments
-//  ---------
-// [1] Wavefunction -> Defines the state of the system with probability amplitudes of possible configurations
 void measureRegisterGate(gsl_vector_complex* wavefunction){
     int states = (int) wavefunction->size;
 
@@ -158,12 +141,6 @@ void measureRegisterGate(gsl_vector_complex* wavefunction){
 
 
 // This function will find the element of the tensor product for a given gate for one qubit
-
-//  Arguments
-//  ---------
-// [1] inta -> the row of the desired element in base 2 
-// [2] intb -> the col of the desired element in base 2
-// [3] qubit -> specifies which qubit the Hadamard gate will be acting upon.
 double findElementHad(char* inta, char* intb, int qubit){
     // Hadamard gate for single qubit used to calculate tensor product
     gsl_matrix_complex *hadamard_single = gsl_matrix_complex_alloc(BASIS, BASIS);
@@ -181,14 +158,7 @@ double findElementHad(char* inta, char* intb, int qubit){
     gsl_matrix_complex_free(hadamard_single);
     return value;
 }
-//  This function calculates values of the phase matrix for a system of arbitrary size in an element-wise method.
 
-//  Arguments
-//  ---------
-// [1] inta -> the row of the desired element in base 2 
-// [2] intb -> the col of the desired element in base 2
-// [3] qubit -> specifies which qubit the Phase gate will be acting upon.
-// [4] phi -> The angle of rotation
 double findElementPhase(char* inta, char* intb, int qubit, double phi){
     // Hadamard gate for single qubit used to calculate tensor product
     gsl_matrix_complex *phase_single = gsl_matrix_complex_alloc(BASIS, BASIS);
@@ -206,15 +176,7 @@ double findElementPhase(char* inta, char* intb, int qubit, double phi){
     gsl_matrix_complex_free(phase_single);
     return value;
 }
-//  This function calculates values of the cnot matrix for a system of arbitrary size in an element-wise method.
 
-//  Arguments
-//  ---------
-// [1] row -> the row of the desired element in base 2 
-// [2] col -> the col of the desired element in base 2
-// [3] control_qubit -> specifies which qubit acts as the control
-// [4] target_qubit -> specifies target qubit
-// [5] num_qubits -> total number of qubits
 double findElementCnot(char* row, char* col, int control_qubit, int target_qubit, int num_qbits){
     // Defining the two qubit cnot gate that we will draw values from
     gsl_matrix *cnot = gsl_matrix_alloc(BASIS*BASIS, BASIS*BASIS);
@@ -249,15 +211,10 @@ double findElementCnot(char* row, char* col, int control_qubit, int target_qubit
     gsl_matrix_free(cnot);
     return value;
 }
-//  The Hadamard gate operates on the register by setting qubits into a superposition of their basis states. 
-//  This function does this by allowing the user to specify which qubit we will be setting to a superposition. 
-//  This will have effects when it comes to measuring the whole register as sometimes that qubit will be spin up, 
-//  sometimes it will be spin down, which will change the overall state of the register.
-
-//  Arguments
-//  ---------
-// [1] Wavefunction -> Defines the state of the system with probability amplitudes of possible configurations
-// [2] qubit -> specifies which qubit the Hadamard gate will be acting upon.
+// The Hadamard gate sets qubits into a superposition of their basis states. This function does this 
+// by allowing the user to specify which qubit we will be setting to a superposition. This will have 
+// effects when it comes to measuring the whole register as sometimes that qubit will be spin up, 
+// sometimes it will be spin down, which will change the overall state of the register.
 gsl_vector_complex* hadamardGate(gsl_vector_complex* wavefunction, int qubit){
     if(qubit > N){
         printf("Please operate the gate on a valid qubit\n");
@@ -279,15 +236,7 @@ gsl_vector_complex* hadamardGate(gsl_vector_complex* wavefunction, int qubit){
     gsl_blas_zgemv(CblasNoTrans, GSL_COMPLEX_ONE, hadamard, wavefunction, GSL_COMPLEX_ZERO, h_psi);
     return h_psi;
 }
-//  A phase gate does not alter the probabilites of finding the the system in a given state, 
-//  however it does alter the relative phase between the states. Quantum phase cannot be measured
-//  directly, however it can have effects if more gates are subsequently applied before register measuremnt.
 
-//  Arguments
-//  ---------
-// [1] Wavefunction ->Defines the state of the system with probability amplitudes of possible configurations
-// [2] qubit -> specifies which qubit the phase shift gate is operating on.
-// [3] phase -> the angle of rotation 
 gsl_vector_complex* phaseShiftGate(gsl_vector_complex *wavefunction, int qubit, float phase){
     if(qubit > N){
         printf("Please operate the gate on a valid qubit\n");
@@ -365,10 +314,18 @@ gsl_vector_complex* cnotGate(gsl_vector_complex* wavefunction, int control, int 
             gsl_matrix_complex_set(cnot, i, j, gsl_complex_rect(findElementCnot(intToBinary(i), intToBinary(j), control, target, N), 0));
         }
     }
+    // print_matrix(cnot);
     gsl_blas_zgemv(CblasNoTrans, GSL_COMPLEX_ONE, cnot, wavefunction, GSL_COMPLEX_ZERO, c_psi);
     return c_psi;
 }
 
+
+
+// gsl_vector_complex* cnotGate(gsl_vector_complex* wavefunction, int target_qubit, int control_qubit);
+// //     There is a knronecker delta for every qubit that the gate doesn't operate on. So similar to 
+// //  findElementHad and findElementPhase implementation of kronecker deltas. we have pqr and p'q'r' 
+// //  that represent the binary number of the element. The control qubit (in example 2) has its bit placed
+// //  at the beinging
 
 void print_wf(gsl_vector_complex* wavefunction){
     for (int i = 0; i < wavefunction->size; i++){
