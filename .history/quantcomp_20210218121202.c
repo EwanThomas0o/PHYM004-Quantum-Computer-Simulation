@@ -35,7 +35,7 @@ License: Public Domain
  1/02/21        0.1.0  Fixed for general N, although some refinement needed (line 96)
  16/02/21       P.1.1  Want to implement sparse matrices
  17/02/21       P.1.1  Implementing CNOT Gate. Error found. Will squash tomorrow.
- 18/02/21       P.1.2  CNOT implemented. NOT 100% correct.
+ 18/02/21       P.1.2  CNOT implemented.
 */
 
 #include <stdio.h>

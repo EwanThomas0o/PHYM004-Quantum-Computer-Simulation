@@ -35,7 +35,7 @@ License: Public Domain
  1/02/21        0.1.0  Fixed for general N, although some refinement needed (line 96)
  16/02/21       P.1.1  Want to implement sparse matrices
  17/02/21       P.1.1  Implementing CNOT Gate. Error found. Will squash tomorrow.
- 18/02/21       P.1.2  CNOT implemented. NOT 100% correct.
+ 18/02/21       P.1.2  CNOT implemented.
 */
 
 #include <stdio.h>
@@ -101,14 +101,6 @@ char* intToBinary(int a){
     char *bin_str = (char *)malloc(N*sizeof(char));
     sprintf(bin_str, "%03d", bin);    
     return bin_str;
-}
-
-void print_matrix(gsl_matrix_complex* matrix){
-    for(int i = 0; i<matrix->size1;i++){
-        for(int j = 0; j < matrix->size2; j++){
-            printf("%.3lg\t", GSL_REAL(gsl_matrix_complex_get(matrix, i, j)));
-        }printf("\n");
-    }
 }
 
 // To measure the quantum state we must use the discrete probability distribution provided by the 
@@ -177,7 +169,7 @@ double findElementPhase(char* inta, char* intb, int qubit, double phi){
     return value;
 }
 
-double findElementCnot(char* row, char* col, int control_qubit, int target_qubit, int num_qbits){
+double findElementCnot(char* row, char* col, int target_qubit, int control_qubit, int num_qbits){
     // Defining the two qubit cnot gate that we will draw values from
     gsl_matrix *cnot = gsl_matrix_alloc(BASIS*BASIS, BASIS*BASIS);
     gsl_matrix_set(cnot, 0, 0, 1);
@@ -303,22 +295,8 @@ gsl_vector_complex* groversBlock(gsl_vector_complex* wavefunction, int answer){
 
 
 gsl_vector_complex* cnotGate(gsl_vector_complex* wavefunction, int control, int target){
-    gsl_vector_complex* c_psi = gsl_vector_complex_alloc(wavefunction->size);
-    gsl_vector_complex_set_zero(c_psi);
-
-    gsl_matrix_complex *cnot = gsl_matrix_complex_alloc(wavefunction->size, wavefunction->size);
     
-    for(int i = 0; i < wavefunction->size; i++){
-        for(int j = 0; j < wavefunction->size; j++){
-            gsl_matrix_complex_set(cnot, i, j, gsl_complex_rect(findElementCnot(intToBinary(i), intToBinary(j), control, target, N), 0));
-        }
-    }
-    print_matrix(cnot);
-    gsl_blas_zgemv(CblasNoTrans, GSL_COMPLEX_ONE, cnot, wavefunction, GSL_COMPLEX_ZERO, c_psi);
-    return c_psi;
 }
-
-
 
 // gsl_vector_complex* cnotGate(gsl_vector_complex* wavefunction, int target_qubit, int control_qubit);
 // //     There is a knronecker delta for every qubit that the gate doesn't operate on. So similar to 
@@ -331,20 +309,20 @@ void print_wf(gsl_vector_complex* wavefunction){
         printf("%lg\n", GSL_REAL(gsl_vector_complex_get(wavefunction, i)));
     }
 }
-
 int main(){
     int states = (int)pow(BASIS, N);
     gsl_vector_complex* wavefunction = initWavefunctionSpinDown(states);
     //Putting system into equal super position of superposition all 2^N basis'
-    // wavefunction = hadamardGate(wavefunction, 1);
+    wavefunction = hadamardGate(wavefunction, 1);
     wavefunction = hadamardGate(wavefunction, 2); 
-    // wavefunction = hadamardGate(wavefunction, 3);
-    wavefunction = cnotGate(wavefunction, 2, 3);
-    // wavefunction = cnotGate(wavefunction, 2, 1);
+    wavefunction = hadamardGate(wavefunction, 3);
 
-    // for(int i = 0; i < floor(M_PI_4*sqrt(pow(2,N))); i++){ // Needs to be called "floor(pi/4*sqrt(2^N))"" times for optimum output roughly 2 in our case
-    //     wavefunction = groversBlock(wavefunction, 3); //Second argument is the basis state you want to be "right" in this case its |110>
-    // }
+    for(int i = 0; i < floor(M_PI_4*sqrt(pow(2,N))); i++){ // Needs to be called "floor(pi/4*sqrt(2^N))"" times for optimum output roughly 2 in our case
+        wavefunction = groversBlock(wavefunction, 3); //Second argument is the basis state you want to be "right" in this case its |110>
+    }
     measureRegisterGate(wavefunction);
+    double val = findElementCnot(intToBinary(6),intToBinary(2), 1, 2, N);
+    printf("%lg\n", val);
+
     return 0;
 }

@@ -35,7 +35,7 @@ License: Public Domain
  1/02/21        0.1.0  Fixed for general N, although some refinement needed (line 96)
  16/02/21       P.1.1  Want to implement sparse matrices
  17/02/21       P.1.1  Implementing CNOT Gate. Error found. Will squash tomorrow.
- 18/02/21       P.1.2  CNOT implemented. NOT 100% correct.
+ 18/02/21       P.1.2  CNOT implemented.
 */
 
 #include <stdio.h>
@@ -101,14 +101,6 @@ char* intToBinary(int a){
     char *bin_str = (char *)malloc(N*sizeof(char));
     sprintf(bin_str, "%03d", bin);    
     return bin_str;
-}
-
-void print_matrix(gsl_matrix_complex* matrix){
-    for(int i = 0; i<matrix->size1;i++){
-        for(int j = 0; j < matrix->size2; j++){
-            printf("%.3lg\t", GSL_REAL(gsl_matrix_complex_get(matrix, i, j)));
-        }printf("\n");
-    }
 }
 
 // To measure the quantum state we must use the discrete probability distribution provided by the 
@@ -177,7 +169,7 @@ double findElementPhase(char* inta, char* intb, int qubit, double phi){
     return value;
 }
 
-double findElementCnot(char* row, char* col, int control_qubit, int target_qubit, int num_qbits){
+double findElementCnot(char* row, char* col, int target_qubit, int control_qubit, int num_qbits){
     // Defining the two qubit cnot gate that we will draw values from
     gsl_matrix *cnot = gsl_matrix_alloc(BASIS*BASIS, BASIS*BASIS);
     gsl_matrix_set(cnot, 0, 0, 1);
@@ -310,7 +302,7 @@ gsl_vector_complex* cnotGate(gsl_vector_complex* wavefunction, int control, int 
     
     for(int i = 0; i < wavefunction->size; i++){
         for(int j = 0; j < wavefunction->size; j++){
-            gsl_matrix_complex_set(cnot, i, j, gsl_complex_rect(findElementCnot(intToBinary(i), intToBinary(j), control, target, N), 0));
+            gsl_matrix_complex_set(cnot, i, j, gsl_complex_rect(findElementCnot(intToBinary(i), intToBinary(j), target, control, N), 0));
         }
     }
     print_matrix(cnot);
@@ -332,6 +324,13 @@ void print_wf(gsl_vector_complex* wavefunction){
     }
 }
 
+void print_matrix(gsl_matrix_complex* matrix){
+    for(int i = 0; i<matrix->size1;i++){
+        for(int j = 0; j < matrix->size2; j++){
+            printf("%d", GSL_REAL(gsl_matrix_complex_get(matrix, i, j)));
+        }printf("\n");
+    }
+}
 int main(){
     int states = (int)pow(BASIS, N);
     gsl_vector_complex* wavefunction = initWavefunctionSpinDown(states);
