@@ -578,15 +578,7 @@ gsl_vector_complex* cnotGate(gsl_vector_complex* wavefunction, int control, int 
     return c_psi;
 }
 
-// Simply prints the probability amplitudes of each state.
-//
-// Arguments
-// ---------
-// [1] Wavefunction -> Contains probability amplitudes to be printed.
-// 
-// Returns
-// -------
-// void
+
 void print_wf(gsl_vector_complex* wavefunction){
     for (int i = 0; i < wavefunction->size; i++){
         printf("%lg\n", GSL_REAL(gsl_vector_complex_get(wavefunction, i)));

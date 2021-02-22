@@ -556,13 +556,7 @@ gsl_vector_complex* groversBlock(gsl_vector_complex* wavefunction, int answer){
 //
 // Arguments
 // ---------
-// [1] Wavefunction -> Defines the state of the system with probability amplitudes of possible configurations
-// [2] Control -> Specifies the control qubit (Min: 0 ; Max: 2^N-1 )
-// [3] target -> Specifies the target qubit (Min: 0 ; Max: 2^N-1 )
-//
-// Returns
-// -------
-// [1] Wavefunction -> Wavefunction after manipulation by the cnot gate
+// [1] Wavefunction -> 
 gsl_vector_complex* cnotGate(gsl_vector_complex* wavefunction, int control, int target){
     gsl_vector_complex* c_psi = gsl_vector_complex_alloc(wavefunction->size);
     gsl_vector_complex_set_zero(c_psi);
@@ -578,15 +572,7 @@ gsl_vector_complex* cnotGate(gsl_vector_complex* wavefunction, int control, int 
     return c_psi;
 }
 
-// Simply prints the probability amplitudes of each state.
-//
-// Arguments
-// ---------
-// [1] Wavefunction -> Contains probability amplitudes to be printed.
-// 
-// Returns
-// -------
-// void
+
 void print_wf(gsl_vector_complex* wavefunction){
     for (int i = 0; i < wavefunction->size; i++){
         printf("%lg\n", GSL_REAL(gsl_vector_complex_get(wavefunction, i)));
