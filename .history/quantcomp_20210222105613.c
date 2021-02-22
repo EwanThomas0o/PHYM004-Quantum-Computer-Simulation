@@ -146,32 +146,7 @@ gsl_vector_complex* swapsies(gsl_vector_complex* new_state, gsl_vector_complex* 
     return wavefunction;
 }
 
-gsl_vector_complex* complexVecMultRealMat(gsl_vector_complex* wavefunction, gsl_spmatrix* gate){
-    gsl_vector_view real = gsl_vector_complex_real(wavefunction);
-    gsl_vector_view imag = gsl_vector_complex_imag(wavefunction);
 
-    gsl_vector_complex* gate_psi = gsl_vector_complex_alloc(wavefunction->size);
-    gsl_vector_view new_real = gsl_vector_complex_real(gate_psi); // On the stack so not mem intensive
-    gsl_vector_view new_imag = gsl_vector_complex_imag(gate_psi);
-
-    gsl_spblas_dgemv(CblasNoTrans, 1.0, gate, &real.vector, 0.0, &new_real.vector);
-    gsl_spblas_dgemv(CblasNoTrans, 1.0, gate, &imag.vector, 0.0, &new_imag.vector);
-
-    return gate_psi;
-}
-
-gsl_spmatrix* spmatrixIdentity(gsl_spmatrix* matrix){
-    int i = 0;
-    int j = 0;
-
-    while(i < matrix->size1 && j < matrix->size2){
-        gsl_spmatrix_set(matrix, i ,j, 1);
-        i++;
-        j++;
-    }
-
-    return matrix;
-}
 //  Arguments
 //  ---------
 // [1] matrix -> The matrix that is to be printed
@@ -346,20 +321,20 @@ gsl_vector_complex* hadamardGate(gsl_vector_complex* wavefunction, int qubit){
             gsl_spmatrix_set(hadamard, i , j, val);
         }
     }
-    // // Can use gsl_vector_views to split wf into real and imaginary
-    // gsl_vector_view real = gsl_vector_complex_real(wavefunction);
-    // gsl_vector_view imag = gsl_vector_complex_imag(wavefunction);
+    // Can use gsl_vector_views to split wf into real and imaginary
+    gsl_vector_view real = gsl_vector_complex_real(wavefunction);
+    gsl_vector_view imag = gsl_vector_complex_imag(wavefunction);
 
-     gsl_vector_complex* h_psi = gsl_vector_complex_alloc(wavefunction->size);
-    // gsl_vector_view new_real = gsl_vector_complex_real(h_psi); // On the stack so not mem intensive
-    // gsl_vector_view new_imag = gsl_vector_complex_imag(h_psi);
+    gsl_vector_complex* h_psi = gsl_vector_complex_alloc(wavefunction->size);
+    gsl_vector_view new_real = gsl_vector_complex_real(h_psi); // On the stack so not mem intensive
+    gsl_vector_view new_imag = gsl_vector_complex_imag(h_psi);
 
-    // gsl_spblas_dgemv(CblasNoTrans, 1.0, hadamard, &real.vector, 0.0, &new_real.vector);
-    // gsl_spblas_dgemv(CblasNoTrans, 1.0, hadamard, &imag.vector, 0.0, &new_imag.vector);
-    h_psi = complexVecMultRealMat(wavefunction, hadamard);
-    
+    gsl_spblas_dgemv(CblasNoTrans, 1.0, hadamard, &real.vector, 0.0, &new_real.vector);
+    gsl_spblas_dgemv(CblasNoTrans, 1.0, hadamard, &imag.vector, 0.0, &new_imag.vector);
 
-    return swapsies(h_psi, wavefunction); ; //updates wf to new state using pointers rather than memcopy
+    swapsies(h_psi, wavefunction);
+
+    return swapsies(h_psi, wavefunction); //updates wf to new state using pointers rather than memcopy
 }
 //  A phase gate does not alter the probabilites of finding the the system in a given state, 
 //  however it does alter the relative phase between the states. Quantum phase cannot be measured
@@ -398,16 +373,15 @@ gsl_vector_complex* phaseShiftGate(gsl_vector_complex *wavefunction, int qubit, 
 // Oracle gate used in grovers quantum search algorithm. Argument answer is the "Correct question" mentioned
 // in paper
 gsl_vector_complex* oracleGate(gsl_vector_complex* wavefunction, int answer){
-    gsl_spmatrix* oracleGate = gsl_spmatrix_alloc(wavefunction->size, wavefunction->size);
-    spmatrixIdentity(oracleGate);
-    gsl_spmatrix_set(oracleGate, answer-1, answer-1, -1); //Minus one as index from 0
+    gsl_matrix_complex* oracleGate = gsl_matrix_complex_alloc(wavefunction->size, wavefunction->size);
+    gsl_matrix_complex_set_identity(oracleGate);
+    gsl_matrix_complex_set(oracleGate, answer-1, answer-1, gsl_complex_rect(-1,0)); //Minus one as index from 0
     
     gsl_vector_complex* o_psi = gsl_vector_complex_alloc(wavefunction->size);
-    o_psi = complexVecMultRealMat(wavefunction, oracleGate);
-    // gsl_vector_complex_set_zero(o_psi);
-    // gsl_blas_zgemv(CblasNoTrans, GSL_COMPLEX_ONE, oracleGate, wavefunction, GSL_COMPLEX_ZERO, o_psi);
+    gsl_vector_complex_set_zero(o_psi);
+    gsl_blas_zgemv(CblasNoTrans, GSL_COMPLEX_ONE, oracleGate, wavefunction, GSL_COMPLEX_ZERO, o_psi);
 
-    return swapsies(o_psi, wavefunction);
+    return o_psi;
 }
 // Unity matrix of size 2^N*2^N with -1 in the 0,0th element
 gsl_vector_complex* jGate(gsl_vector_complex* wavefunction){
@@ -468,16 +442,15 @@ int main(){
     gsl_vector_complex* wavefunction = initWavefunctionSpinDown(states);
     //Putting system into equal super position of superposition all 2^N basis'
     // wavefunction = hadamardGate(wavefunction, 1);
-    // wavefunction = hadamardGate(wavefunction, 2); 
-    // // wavefunction = hadamardGate(wavefunction, 3);
-    // wavefunction = cnotGate(wavefunction, 2, 3);
-    // wavefunction = cnotGate(wavefunction, 2, 1);
+    hadamardGate(wavefunction, 2); 
+    // wavefunction = hadamardGate(wavefunction, 3);
+    wavefunction = cnotGate(wavefunction, 2, 3);
+    wavefunction = cnotGate(wavefunction, 2, 1);
     // Putting into cat state.
 
-    for(int i = 0; i < floor(M_PI_4*sqrt(pow(2,N))); i++){ // Needs to be called "floor(pi/4*sqrt(2^N))"" times for optimum output roughly 2 in our case
-        wavefunction = groversBlock(wavefunction, 6); //Second argument is the basis state you want to be "right" in this case its |110>
-    }
+    // for(int i = 0; i < floor(M_PI_4*sqrt(pow(2,N))); i++){ // Needs to be called "floor(pi/4*sqrt(2^N))"" times for optimum output roughly 2 in our case
+    //     wavefunction = groversBlock(wavefunction, 3); //Second argument is the basis state you want to be "right" in this case its |110>
+    // }
     measureRegisterGate(wavefunction);
-    //print_wf(wavefunction);
     return 0;
 }

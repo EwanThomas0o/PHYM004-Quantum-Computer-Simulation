@@ -468,16 +468,16 @@ int main(){
     gsl_vector_complex* wavefunction = initWavefunctionSpinDown(states);
     //Putting system into equal super position of superposition all 2^N basis'
     // wavefunction = hadamardGate(wavefunction, 1);
-    // wavefunction = hadamardGate(wavefunction, 2); 
-    // // wavefunction = hadamardGate(wavefunction, 3);
-    // wavefunction = cnotGate(wavefunction, 2, 3);
-    // wavefunction = cnotGate(wavefunction, 2, 1);
+    wavefunction = hadamardGate(wavefunction, 2); 
+    // wavefunction = hadamardGate(wavefunction, 3);
+    wavefunction = cnotGate(wavefunction, 2, 3);
+    wavefunction = cnotGate(wavefunction, 2, 1);
     // Putting into cat state.
 
-    for(int i = 0; i < floor(M_PI_4*sqrt(pow(2,N))); i++){ // Needs to be called "floor(pi/4*sqrt(2^N))"" times for optimum output roughly 2 in our case
-        wavefunction = groversBlock(wavefunction, 6); //Second argument is the basis state you want to be "right" in this case its |110>
-    }
+    // for(int i = 0; i < floor(M_PI_4*sqrt(pow(2,N))); i++){ // Needs to be called "floor(pi/4*sqrt(2^N))"" times for optimum output roughly 2 in our case
+    //     wavefunction = groversBlock(wavefunction, 3); //Second argument is the basis state you want to be "right" in this case its |110>
+    // }
     measureRegisterGate(wavefunction);
-    //print_wf(wavefunction);
+    print_wf(wavefunction);
     return 0;
 }

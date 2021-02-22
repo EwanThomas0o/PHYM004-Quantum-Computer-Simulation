@@ -161,17 +161,8 @@ gsl_vector_complex* complexVecMultRealMat(gsl_vector_complex* wavefunction, gsl_
 }
 
 gsl_spmatrix* spmatrixIdentity(gsl_spmatrix* matrix){
-    int i = 0;
-    int j = 0;
 
-    while(i < matrix->size1 && j < matrix->size2){
-        gsl_spmatrix_set(matrix, i ,j, 1);
-        i++;
-        j++;
-    }
-
-    return matrix;
-}
+    for(int i = 0; i < matrix->size1; i++)
 //  Arguments
 //  ---------
 // [1] matrix -> The matrix that is to be printed
@@ -346,17 +337,17 @@ gsl_vector_complex* hadamardGate(gsl_vector_complex* wavefunction, int qubit){
             gsl_spmatrix_set(hadamard, i , j, val);
         }
     }
-    // // Can use gsl_vector_views to split wf into real and imaginary
-    // gsl_vector_view real = gsl_vector_complex_real(wavefunction);
-    // gsl_vector_view imag = gsl_vector_complex_imag(wavefunction);
+    // Can use gsl_vector_views to split wf into real and imaginary
+    gsl_vector_view real = gsl_vector_complex_real(wavefunction);
+    gsl_vector_view imag = gsl_vector_complex_imag(wavefunction);
 
-     gsl_vector_complex* h_psi = gsl_vector_complex_alloc(wavefunction->size);
-    // gsl_vector_view new_real = gsl_vector_complex_real(h_psi); // On the stack so not mem intensive
-    // gsl_vector_view new_imag = gsl_vector_complex_imag(h_psi);
+    gsl_vector_complex* h_psi = gsl_vector_complex_alloc(wavefunction->size);
+    gsl_vector_view new_real = gsl_vector_complex_real(h_psi); // On the stack so not mem intensive
+    gsl_vector_view new_imag = gsl_vector_complex_imag(h_psi);
 
-    // gsl_spblas_dgemv(CblasNoTrans, 1.0, hadamard, &real.vector, 0.0, &new_real.vector);
-    // gsl_spblas_dgemv(CblasNoTrans, 1.0, hadamard, &imag.vector, 0.0, &new_imag.vector);
-    h_psi = complexVecMultRealMat(wavefunction, hadamard);
+    gsl_spblas_dgemv(CblasNoTrans, 1.0, hadamard, &real.vector, 0.0, &new_real.vector);
+    gsl_spblas_dgemv(CblasNoTrans, 1.0, hadamard, &imag.vector, 0.0, &new_imag.vector);
+
     
 
     return swapsies(h_psi, wavefunction); ; //updates wf to new state using pointers rather than memcopy
@@ -399,7 +390,7 @@ gsl_vector_complex* phaseShiftGate(gsl_vector_complex *wavefunction, int qubit, 
 // in paper
 gsl_vector_complex* oracleGate(gsl_vector_complex* wavefunction, int answer){
     gsl_spmatrix* oracleGate = gsl_spmatrix_alloc(wavefunction->size, wavefunction->size);
-    spmatrixIdentity(oracleGate);
+    gsl_spmatrix_set_identity(oracleGate);
     gsl_spmatrix_set(oracleGate, answer-1, answer-1, -1); //Minus one as index from 0
     
     gsl_vector_complex* o_psi = gsl_vector_complex_alloc(wavefunction->size);
@@ -468,16 +459,15 @@ int main(){
     gsl_vector_complex* wavefunction = initWavefunctionSpinDown(states);
     //Putting system into equal super position of superposition all 2^N basis'
     // wavefunction = hadamardGate(wavefunction, 1);
-    // wavefunction = hadamardGate(wavefunction, 2); 
-    // // wavefunction = hadamardGate(wavefunction, 3);
-    // wavefunction = cnotGate(wavefunction, 2, 3);
-    // wavefunction = cnotGate(wavefunction, 2, 1);
+    wavefunction = hadamardGate(wavefunction, 2); 
+    // wavefunction = hadamardGate(wavefunction, 3);
+    wavefunction = cnotGate(wavefunction, 2, 3);
+    wavefunction = cnotGate(wavefunction, 2, 1);
     // Putting into cat state.
 
-    for(int i = 0; i < floor(M_PI_4*sqrt(pow(2,N))); i++){ // Needs to be called "floor(pi/4*sqrt(2^N))"" times for optimum output roughly 2 in our case
-        wavefunction = groversBlock(wavefunction, 6); //Second argument is the basis state you want to be "right" in this case its |110>
-    }
+    // for(int i = 0; i < floor(M_PI_4*sqrt(pow(2,N))); i++){ // Needs to be called "floor(pi/4*sqrt(2^N))"" times for optimum output roughly 2 in our case
+    //     wavefunction = groversBlock(wavefunction, 3); //Second argument is the basis state you want to be "right" in this case its |110>
+    // }
     measureRegisterGate(wavefunction);
-    //print_wf(wavefunction);
     return 0;
 }
