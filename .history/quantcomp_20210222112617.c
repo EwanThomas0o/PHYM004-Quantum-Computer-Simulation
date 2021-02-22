@@ -66,6 +66,11 @@ void qubit_error(){
     exit(1);
 }
 
+typedef struct element{
+    int a;
+    int b;
+} element;
+
 //   Creates a wavefunction where all spins are "down" i.e. |00..0>.
 //  A 1 in the ket represents a spin down. e.g. |010> means all qubits are spin down apart from qbit 2.  Note how 010 is 2 in binary.
 //  Since 000 is 0 in binary, we set probability amplitude of state 0 to 1.
@@ -77,9 +82,7 @@ void qubit_error(){
 //  ---------
 // [1] wavefunction of gsl_vector_complex type initialised to probability of 1 for all qubits in spin down state |000>
 gsl_vector_complex* initWavefunctionSpinDown(int states){ 
-    
     gsl_vector_complex* wavefunction = NULL;
-    
     wavefunction = gsl_vector_complex_alloc(states);
     // Probability amplitude stored in "wavefuction" vector
     gsl_vector_complex_set(wavefunction, 0, GSL_COMPLEX_ONE);
@@ -98,15 +101,12 @@ gsl_vector_complex* initWavefunctionSpinDown(int states){
 gsl_vector_complex* initWavefunctionEqualProb(int states){ //Initialising wf to "Equal Probability" of all states
     
     gsl_vector_complex* wavefunction = NULL;
-
     wavefunction = gsl_vector_complex_alloc(states);
-
-    gsl_vector_complex_set_all(wavefunction , gsl_complex_rect(1/sqrt(8), 0));
+    gsl_vector_complex_set_all(wavefunction, gsl_complex_rect(1/sqrt(8),0));
 
     return wavefunction;
 }
-
-// Takes an integer and return binary representation in string format
+ // Takes an integer and return binary representation in string format
 //  Arguments
 //  ---------
 // [1] a -> The integer number that is to be turned into a binary string
@@ -115,36 +115,20 @@ gsl_vector_complex* initWavefunctionEqualProb(int states){ //Initialising wf to 
 //  ---------
 //  [1] a string that is the binary representation of the integer a
 char* intToBinary(int a){
-
     int bin = 0;
-
     int remainder, temp = 1;
 
     while(a != 0){
-
         remainder = a % 2;
         a /= 2;
         bin += remainder*temp;
         temp *= 10;
     }
-    char *bin_str = (char *) malloc(N*sizeof(char));
-
-    sprintf(bin_str, "%03d", bin);   
-
+    char *bin_str = (char *)malloc(N*sizeof(char));
+    sprintf(bin_str, "%03d", bin);    
     return bin_str;
-
 }
 
-// Uses pointers to update the wavefunction, rather than using memcopy which has complexity 0(n^2)
-//
-// Arguments
-// ---------
-// [1] new_state -> The state that we wavefunction will be updated to
-// [2] wavefunction -> The wavefuction that describes the system that is to be updated
-
-// Returns
-// -------
-// [1] An updated wavefunction of type gsl_vector_complex
 gsl_vector_complex* swapsies(gsl_vector_complex* new_state, gsl_vector_complex* wavefunction){
     //update the old wf with the new 
     gsl_vector_complex** ptr1 = &new_state;
@@ -162,56 +146,28 @@ gsl_vector_complex* swapsies(gsl_vector_complex* new_state, gsl_vector_complex* 
     return wavefunction;
 }
 
-// A function that alllows one to multiply a complex vector and a real sparse matrix, involves splitting vector into two "views"
-//
-// Arguments
-// ---------
-// [1] vector -> The vector that is to be multipled
-// [2] matrix -> MAtrix to be multiplied
-//
-// Returns
-// -------
-// [1] mv -> matrix*vector result of type gsl_vector_complex
-gsl_vector_complex* complexVecMultRealMat(gsl_vector_complex* vector, gsl_spmatrix* matrix){
-    
-    // Splitting vector up into real and imag
-    gsl_vector_view real = gsl_vector_complex_real(vector); // Temp object on the stack so not mem intensive
+gsl_vector_complex* complexVecMultRealMat(gsl_vector_complex* wavefunction, gsl_spmatrix* gate){
+    gsl_vector_view real = gsl_vector_complex_real(wavefunction);
+    gsl_vector_view imag = gsl_vector_complex_imag(wavefunction);
 
-    gsl_vector_view imag = gsl_vector_complex_imag(vector);
+    gsl_vector_complex* gate_psi = gsl_vector_complex_alloc(wavefunction->size);
+    gsl_vector_view new_real = gsl_vector_complex_real(gate_psi); // On the stack so not mem intensive
+    gsl_vector_view new_imag = gsl_vector_complex_imag(gate_psi);
 
+    gsl_spblas_dgemv(CblasNoTrans, 1.0, gate, &real.vector, 0.0, &new_real.vector);
+    gsl_spblas_dgemv(CblasNoTrans, 1.0, gate, &imag.vector, 0.0, &new_imag.vector);
 
-    gsl_vector_complex* mv = gsl_vector_complex_alloc(vector->size);
-
-    gsl_vector_view new_real = gsl_vector_complex_real(mv);
-
-    gsl_vector_view new_imag = gsl_vector_complex_imag(mv);
-
-    gsl_spblas_dgemv(CblasNoTrans, 1.0, matrix, &real.vector, 0.0, &new_real.vector);
-
-    gsl_spblas_dgemv(CblasNoTrans, 1.0, matrix, &imag.vector, 0.0, &new_imag.vector);
-
-    return mv;
+    return gate_psi;
 }
-// get unitary matrix in sparse format COO
-//
-// Arguments
-// ---------
-// [1] matrix -> Matrix to become unit amtrix
-//
-// Returns
-// -------
-// [1] matrix -> unit matrix
+
 gsl_spmatrix* spmatrixIdentity(gsl_spmatrix* matrix){
-    
     int i = 0;
     int j = 0;
 
-    while(i < matrix->size1 && j < matrix->size2)
-    {    
+    while(i < matrix->size1 && j < matrix->size2){
         gsl_spmatrix_set(matrix, i ,j, 1);
         i++;
         j++;
-    
     }
 
     return matrix;
@@ -220,18 +176,12 @@ gsl_spmatrix* spmatrixIdentity(gsl_spmatrix* matrix){
 //  ---------
 // [1] matrix -> The matrix that is to be printed
 void print_matrix(gsl_matrix_complex* matrix){
-
     for(int i = 0; i<matrix->size1;i++){
-    
         for(int j = 0; j < matrix->size2; j++){
-    
             printf("%.3lg\t", GSL_REAL(gsl_matrix_complex_get(matrix, i, j)));
-    
         }printf("\n");
-    
     }
 }
-
 
 // To measure the quantum state we must use the discrete probability distribution provided by the 
 // wavefuntion. The measurement function finds the probabilities of each state and observes the wf
@@ -243,37 +193,28 @@ void print_matrix(gsl_matrix_complex* matrix){
 // [1] Wavefunction -> Defines the state of the system with probability amplitudes of possible configurations
 void measureRegisterGate(gsl_vector_complex* wavefunction){
     int states = (int) wavefunction->size;
-    double probabilities[states];
-    
-    for(int i = 0; i < states; i++){ //creating a list of the probabilities (non-normalised)
-        
-        probabilities[i] = GSL_REAL(gsl_vector_complex_get(wavefunction,i))*GSL_REAL(gsl_vector_complex_get(wavefunction,i)) + GSL_IMAG(gsl_vector_complex_get(wavefunction,i))*GSL_IMAG(gsl_vector_complex_get(wavefunction,i));
-    
-    }
 
-    gsl_ran_discrete_t* lookup = gsl_ran_discrete_preproc(states, probabilities); // Preproc normalises the probabilities given by wf
-    
-    gettimeofday(&tv,NULL); // Get time of day in usec so that the seed changes giving a different stream of #'s each time
-    
-    unsigned long int seed = tv.tv_usec; // Seed depends on time of day so repeates every 24 hours.  
+    double probabilities[states];
+    for(int i = 0; i < states; i++){ //creating a list of the probabilities (non-normalised)
+        probabilities[i] = GSL_REAL(gsl_vector_complex_get(wavefunction,i))*GSL_REAL(gsl_vector_complex_get(wavefunction,i)) + GSL_IMAG(gsl_vector_complex_get(wavefunction,i))*GSL_IMAG(gsl_vector_complex_get(wavefunction,i));
+        //printf("%lg\n", probabilities[i]);
+    }
+    gsl_ran_discrete_t* lookup = gsl_ran_discrete_preproc(states, probabilities); // Preproc normalises the probabilities
     gsl_rng* r = gsl_rng_alloc(gsl_rng_mt19937); // Mersene Twister Algorithm is used for high quality random numbers
+    gettimeofday(&tv,NULL); // Get time of day in usec so that the seed changes giving a different stream of #'s each time
+    unsigned long int seed = tv.tv_usec;    
     gsl_rng_set(r, seed); 
-   
-    size_t t = gsl_ran_discrete(r, lookup); // Choosing from the discrete probability distribution defined by the wavefunction probability amplitudes
-   
-    // Wavefunction collapsed so will only find system in the state from now on
+    size_t t = gsl_ran_discrete(r, lookup); // Choosing from the discrete probability distribution defined by the wavefunction 
     printf("Wavefunction collapsed into the state:\n|%s>\n", intToBinary(t));
-    
+    // Wavefunction collapsed so will only find system in the state from now on
     gsl_vector_complex_set_all(wavefunction, GSL_COMPLEX_ZERO);
     gsl_vector_complex_set(wavefunction, t, GSL_COMPLEX_ONE); // Set measured state to probability one so that if we measure again we get the same outcome
-    
     // Free memory to avoid bloats
     gsl_ran_discrete_free(lookup);
     gsl_rng_free(r);
-    
     return;
-
 }
+
 
 // This function will find the element of the tensor product for a given gate for one qubit
 
@@ -287,35 +228,22 @@ void measureRegisterGate(gsl_vector_complex* wavefunction){
 //  ---------
 //  [1] The value of the abth element of the corrresponding hadamard gate
 double findElementHad(char* inta, char* intb, int qubit){
-    
     // Hadamard gate for single qubit used to calculate tensor product
-    
     gsl_matrix *hadamard_single = gsl_matrix_alloc(BASIS, BASIS);
     gsl_matrix_set_all(hadamard_single, 1/sqrt(BASIS));
     gsl_matrix_set(hadamard_single,1,1, -1/sqrt(BASIS));
 
     double value = 1.0;
-
     for(int i = 0; i < N; i++){
-
         if(inta[i] != intb[i] && i != qubit - 1){
-            
-            // Invokes Kronecker delta
-
-            return 0.0; 
-
+            return 0.0; // Invokes Kronecker delta
         }
-
         value =  gsl_matrix_get(hadamard_single, inta[qubit-1] - '0', intb[qubit -1] - '0');
 
     }
-
     gsl_matrix_free(hadamard_single);
-
     return value;
-
 }
-
 //  This function calculates values of the phase matrix for a system of arbitrary size in an element-wise method.
 
 //  Arguments
@@ -345,7 +273,6 @@ gsl_complex findElementPhase(char* inta, char* intb, int qubit, double phi){
     gsl_matrix_complex_free(phase_single);
     return value;
 }
-
 //  This function calculates values of the cnot matrix for a system of arbitrary size in an element-wise method.
 
 //  Arguments
@@ -362,7 +289,6 @@ gsl_complex findElementPhase(char* inta, char* intb, int qubit, double phi){
 double findElementCnot(char* row, char* col, int control_qubit, int target_qubit, int num_qbits){
     // Defining the two qubit cnot gate that we will draw values from
     gsl_matrix *cnot = gsl_matrix_alloc(BASIS*BASIS, BASIS*BASIS);
-    
     gsl_matrix_set_zero(cnot);
     gsl_matrix_set(cnot, 0, 0, 1);
     gsl_matrix_set(cnot, 1, 1, 1);
@@ -370,47 +296,30 @@ double findElementCnot(char* row, char* col, int control_qubit, int target_qubit
     gsl_matrix_set(cnot, 3, 2, 1);
 
     for(int i = 0; i < num_qbits; i++){
-
         // Employ the deltas first
-
         char char1 = row[i];
         char char2 = col[i];
-
         if(i != target_qubit-1 && i != control_qubit-1 && char1!=char2){
-
             // If an element of row and col strings not a match on any element other that targ or contr then we know 
             // a delta will set the whole element to zero
-
             return 0.0;
         }
-   
     }
-   
     // If deltas dont cause the value to be zero then we find corresponding element from cnot matrix
-   
     char str1[] = "00";
     char str2[] = "00";
-   
     // Pushing the control qubit to the front of row and col string
-   
     str1[0] = row[control_qubit-1];
     str1[1] = row[target_qubit-1];
     str2[0] = col[control_qubit-1];
     str2[1] = col[target_qubit-1];
-   
     // Need to go from binary to dec to find the element
-   
     long row_index = strtol(str1, NULL, 2);
-   
     long col_index = strtol(str2, NULL, 2);
-   
     double value = gsl_matrix_get(cnot, row_index, col_index);
-   
     gsl_matrix_free(cnot);
-   
     return value;
 }
-
 //  The Hadamard gate operates on the register by setting qubits into a superposition of their basis states. 
 //  This function does this by allowing the user to specify which qubit we will be setting to a superposition. 
 //  This will have effects when it comes to measuring the whole register as sometimes that qubit will be spin up, 
@@ -424,33 +333,32 @@ double findElementCnot(char* row, char* col, int control_qubit, int target_qubit
 //  ---------
 //  [1] Wavefunction after entire register has been acted on by desired hadamard gate.
 gsl_vector_complex* hadamardGate(gsl_vector_complex* wavefunction, int qubit){
-    
     if(qubit > N){
-    
         printf("Please operate the gate on a valid qubit\n");
-    
         exit(0);
-    
     }
-    
     // Will beome the NxN matrix for operation on whole register
     gsl_spmatrix *hadamard = gsl_spmatrix_alloc(wavefunction->size, wavefunction->size);
 
     for(int i = 0; i < wavefunction->size; i++){
-
         for(int j = 0; j < wavefunction->size; j++){
-
             double val = findElementHad(intToBinary(i), intToBinary(j), qubit);
             gsl_spmatrix_set(hadamard, i , j, val);
-       
         }
-
     }
+    // // Can use gsl_vector_views to split wf into real and imaginary
+    // gsl_vector_view real = gsl_vector_complex_real(wavefunction);
+    // gsl_vector_view imag = gsl_vector_complex_imag(wavefunction);
 
-    gsl_vector_complex* h_psi = gsl_vector_complex_alloc(wavefunction->size);
+     gsl_vector_complex* h_psi = gsl_vector_complex_alloc(wavefunction->size);
+    // gsl_vector_view new_real = gsl_vector_complex_real(h_psi); // On the stack so not mem intensive
+    // gsl_vector_view new_imag = gsl_vector_complex_imag(h_psi);
 
+    // gsl_spblas_dgemv(CblasNoTrans, 1.0, hadamard, &real.vector, 0.0, &new_real.vector);
+    // gsl_spblas_dgemv(CblasNoTrans, 1.0, hadamard, &imag.vector, 0.0, &new_imag.vector);
     h_psi = complexVecMultRealMat(wavefunction, hadamard);
     
+
     return swapsies(h_psi, wavefunction); ; //updates wf to new state using pointers rather than memcopy
 }
 //  A phase gate does not alter the probabilites of finding the the system in a given state, 
@@ -459,7 +367,7 @@ gsl_vector_complex* hadamardGate(gsl_vector_complex* wavefunction, int qubit){
 
 //  Arguments
 //  ---------
-// [1] Wavefunction -> Defines the state of the system with probability amplitudes of possible configurations
+// [1] Wavefunction ->Defines the state of the system with probability amplitudes of possible configurations
 // [2] qubit -> specifies which qubit the phase shift gate is operating on.
 // [3] phase -> the angle of rotation 
 
@@ -483,56 +391,37 @@ gsl_vector_complex* phaseShiftGate(gsl_vector_complex *wavefunction, int qubit, 
     }
     gsl_vector_complex* r_psi = gsl_vector_complex_alloc(wavefunction->size);
     gsl_vector_complex_set_zero(r_psi);
-    gsl_blas_zgemv(CblasNoTrans, GSL_COMPLEX_ONE, phaseGate, wavefunction, GSL_COMPLEX_ZERO, r_psi); //no sparse equivalent so must build one
+    gsl_blas_zgemv(CblasNoTrans, GSL_COMPLEX_ONE, phaseGate, wavefunction, GSL_COMPLEX_ZERO, r_psi);
     return r_psi;
 }
 
 // Oracle gate used in grovers quantum search algorithm. Argument answer is the "Correct question" mentioned
 // in paper
 gsl_vector_complex* oracleGate(gsl_vector_complex* wavefunction, int answer){
-    
     gsl_spmatrix* oracleGate = gsl_spmatrix_alloc(wavefunction->size, wavefunction->size);
-    
     spmatrixIdentity(oracleGate);
     gsl_spmatrix_set(oracleGate, answer-1, answer-1, -1); //Minus one as index from 0
     
     gsl_vector_complex* o_psi = gsl_vector_complex_alloc(wavefunction->size);
     o_psi = complexVecMultRealMat(wavefunction, oracleGate);
+    // gsl_vector_complex_set_zero(o_psi);
+    // gsl_blas_zgemv(CblasNoTrans, GSL_COMPLEX_ONE, oracleGate, wavefunction, GSL_COMPLEX_ZERO, o_psi);
 
     return swapsies(o_psi, wavefunction);
-
 }
-
 // Unity matrix of size 2^N*2^N with -1 in the 0,0th element
-//
-// Arguments
-// ---------
-// [1] wavefunction -> Defines the state of the system with probability amplitudes of possible configurations
-//
-// Returns
-// -------
-// [1] wavefunction -> wavefunction after muliplication with j gate
 gsl_vector_complex* jGate(gsl_vector_complex* wavefunction){
-    gsl_matrix_complex* jGate = gsl_spalloc(wavefunction->size, wavefunction->size);
-    spmatrixIdentity(jGate);
+    gsl_matrix_complex* jGate = gsl_matrix_complex_alloc(wavefunction->size, wavefunction->size);
+    gsl_matrix_complex_set_identity(jGate);
     gsl_matrix_complex_set(jGate, 0, 0, gsl_complex_rect(-1,0));
     
     gsl_vector_complex* j_psi = gsl_vector_complex_alloc(wavefunction->size);
-    j_psi = complexVecMultRealMat(wavefunction, jGate);
+    gsl_vector_complex_set_zero(j_psi);
+    gsl_blas_zgemv(CblasNoTrans, GSL_COMPLEX_ONE, jGate, wavefunction, GSL_COMPLEX_ZERO, j_psi);
 
-    return swapsies(j_psi, wavefunction);
+    return j_psi;
 }
 
-// An ensemble of gates that are used within grovers block
-
-// Arguments
-// ---------
-// [1] wavefunction -> Defines the state of the system with probability amplitudes of possible configurations
-// [2] Answer -> The right choice in grovers alg
-
-// Returns
-// -------
-// [1] wavefunction -> wavefunction after muliplication with j gate
 gsl_vector_complex* groversBlock(gsl_vector_complex* wavefunction, int answer){
     gsl_vector_complex* b_psi = gsl_vector_complex_alloc(wavefunction->size);
     gsl_vector_complex_set_zero(b_psi);
@@ -556,7 +445,7 @@ gsl_vector_complex* cnotGate(gsl_vector_complex* wavefunction, int control, int 
     gsl_vector_complex* c_psi = gsl_vector_complex_alloc(wavefunction->size);
     gsl_vector_complex_set_zero(c_psi);
 
-    gsl_spmatrix *cnot = gsl_spmatrix_alloc(wavefunction->size, wavefunction->size);
+    gsl_matrix_complex *cnot = gsl_matrix_complex_alloc(wavefunction->size, wavefunction->size);
     
     for(int i = 0; i < wavefunction->size; i++){
         for(int j = 0; j < wavefunction->size; j++){
@@ -585,9 +474,10 @@ int main(){
     // wavefunction = cnotGate(wavefunction, 2, 1);
     // Putting into cat state.
 
-    for(int i = 0; i < floor(M_PI_4*sqrt(pow(2,N))); i++){ // Needs to be called "floor(pi/4*sqrt(2^N))"" times for optimum output roughly 2 in our case
-        wavefunction = groversBlock(wavefunction, 7); //Second argument is the basis state you want to be "right" in this case its |110>
+    for(int i = 0; i < floor(M_PI_4*sqrt(pow(2,N+1))); i++){ // Needs to be called "floor(pi/4*sqrt(2^N))"" times for optimum output roughly 2 in our case
+        wavefunction = groversBlock(wavefunction, 0); //Second argument is the basis state you want to be "right" in this case its |110>
     }
+    measureRegisterGate(wavefunction);
     print_wf(wavefunction);
     return 0;
 }

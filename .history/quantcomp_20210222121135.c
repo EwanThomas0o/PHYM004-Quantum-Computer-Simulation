@@ -301,7 +301,7 @@ double findElementHad(char* inta, char* intb, int qubit){
         if(inta[i] != intb[i] && i != qubit - 1){
             
             // Invokes Kronecker delta
-
+            
             return 0.0; 
 
         }
@@ -459,7 +459,7 @@ gsl_vector_complex* hadamardGate(gsl_vector_complex* wavefunction, int qubit){
 
 //  Arguments
 //  ---------
-// [1] Wavefunction -> Defines the state of the system with probability amplitudes of possible configurations
+// [1] Wavefunction ->Defines the state of the system with probability amplitudes of possible configurations
 // [2] qubit -> specifies which qubit the phase shift gate is operating on.
 // [3] phase -> the angle of rotation 
 
@@ -483,35 +483,25 @@ gsl_vector_complex* phaseShiftGate(gsl_vector_complex *wavefunction, int qubit, 
     }
     gsl_vector_complex* r_psi = gsl_vector_complex_alloc(wavefunction->size);
     gsl_vector_complex_set_zero(r_psi);
-    gsl_blas_zgemv(CblasNoTrans, GSL_COMPLEX_ONE, phaseGate, wavefunction, GSL_COMPLEX_ZERO, r_psi); //no sparse equivalent so must build one
+    gsl_blas_zgemv(CblasNoTrans, GSL_COMPLEX_ONE, phaseGate, wavefunction, GSL_COMPLEX_ZERO, r_psi);
     return r_psi;
 }
 
 // Oracle gate used in grovers quantum search algorithm. Argument answer is the "Correct question" mentioned
 // in paper
 gsl_vector_complex* oracleGate(gsl_vector_complex* wavefunction, int answer){
-    
     gsl_spmatrix* oracleGate = gsl_spmatrix_alloc(wavefunction->size, wavefunction->size);
-    
     spmatrixIdentity(oracleGate);
     gsl_spmatrix_set(oracleGate, answer-1, answer-1, -1); //Minus one as index from 0
     
     gsl_vector_complex* o_psi = gsl_vector_complex_alloc(wavefunction->size);
     o_psi = complexVecMultRealMat(wavefunction, oracleGate);
+    // gsl_vector_complex_set_zero(o_psi);
+    // gsl_blas_zgemv(CblasNoTrans, GSL_COMPLEX_ONE, oracleGate, wavefunction, GSL_COMPLEX_ZERO, o_psi);
 
     return swapsies(o_psi, wavefunction);
-
 }
-
 // Unity matrix of size 2^N*2^N with -1 in the 0,0th element
-//
-// Arguments
-// ---------
-// [1] wavefunction -> Defines the state of the system with probability amplitudes of possible configurations
-//
-// Returns
-// -------
-// [1] wavefunction -> wavefunction after muliplication with j gate
 gsl_vector_complex* jGate(gsl_vector_complex* wavefunction){
     gsl_matrix_complex* jGate = gsl_spalloc(wavefunction->size, wavefunction->size);
     spmatrixIdentity(jGate);
@@ -523,16 +513,6 @@ gsl_vector_complex* jGate(gsl_vector_complex* wavefunction){
     return swapsies(j_psi, wavefunction);
 }
 
-// An ensemble of gates that are used within grovers block
-
-// Arguments
-// ---------
-// [1] wavefunction -> Defines the state of the system with probability amplitudes of possible configurations
-// [2] Answer -> The right choice in grovers alg
-
-// Returns
-// -------
-// [1] wavefunction -> wavefunction after muliplication with j gate
 gsl_vector_complex* groversBlock(gsl_vector_complex* wavefunction, int answer){
     gsl_vector_complex* b_psi = gsl_vector_complex_alloc(wavefunction->size);
     gsl_vector_complex_set_zero(b_psi);
