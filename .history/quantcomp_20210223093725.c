@@ -40,7 +40,6 @@ License: Public Domain
  22/02/21       0.1.4  using vector views etc to improve usability and speed (no need for memcpy)
  22/02/21       0.1.5  Sparse matrices implemented, Need to create complex sparse multiplier
  22/02/21        ""    Some progress making complex sp matrix multiplier, not working 100% yet tho
- 23/02/21        ""    Change matrices to ints (rather than doubles to save memory)
 */
 
 #include <stdio.h>
@@ -70,9 +69,9 @@ void qubit_error(){
     exit(1);
 }
 
-gsl_vector_complex* myMulFunc(const CBLAS_TRANSPOSE_t TransA,
-                 gsl_spmatrix_complex *A, gsl_vector_complex *x,
-                 gsl_vector_complex *y)
+int myMulFunc(const CBLAS_TRANSPOSE_t TransA, const double alpha,
+                gsl_spmatrix_complex *A, const gsl_vector_complex *x,
+                 const double beta, gsl_vector_complex *y)
 {
   const size_t M = A->size1;
   const size_t L = A->size2;
@@ -80,22 +79,21 @@ gsl_vector_complex* myMulFunc(const CBLAS_TRANSPOSE_t TransA,
   if ((TransA == CblasNoTrans && L != x->size) ||
       (TransA == CblasTrans && M != x->size))
     {
-        return NULL;
-      //GSL_ERROR("invalid length of x vector", GSL_EBADLEN);
+      GSL_ERROR("invalid length of x vector", GSL_EBADLEN);
     }
   else if ((TransA == CblasNoTrans && M != y->size) ||
            (TransA == CblasTrans && L != y->size))
     {
-        return NULL; 
-        //GSL_ERROR("invalid length of y vector", GSL_EBADLEN);
+      GSL_ERROR("invalid length of y vector", GSL_EBADLEN);
     }
   else
     {
-      size_t incX;
+      size_t j;
+      size_t incX, incY;
       size_t lenX, lenY;
-      double *X, *Y;
-      double *Ad;
-      int *Ai, *Aj;
+      gsl_complex *X, *Y;
+      gsl_complex *Ad;
+      int *Ap, *Ai, *Aj;
       int p;
 
       if (TransA == CblasNoTrans)
@@ -109,13 +107,66 @@ gsl_vector_complex* myMulFunc(const CBLAS_TRANSPOSE_t TransA,
           lenY = L;
         }
 
-      /* form y := op(A)*x */
-      Ad = A->data;
-      X = x->data;
-      incX = x->stride;
-      Y = y->data;
+      /* form y := beta*y */
 
-      if (GSL_SPMATRIX_ISTRIPLET(A))
+      Y =(gsl_complex*) y->data;
+      incY = y->stride;
+
+      if (beta == 0.0)
+        {
+          size_t jy = 0;
+          for (j = 0; j < lenY; ++j)
+            {
+              Y[jy] = GSL_COMPLEX_ZERO;
+              jy += incY;
+            }
+        }
+      else if (beta != 1.0)
+        {
+          size_t jy = 0;
+          for (j = 0; j < lenY; ++j)
+            {
+              Y[jy] = gsl_complex_mul(gsl_complex_rect(beta,0), Y[jy]);
+              jy += incY;
+            }
+        }
+
+      if (alpha == 0.0)
+        return GSL_SUCCESS;
+
+      /* form y := alpha*op(A)*x + y */
+      Ap = A->p;
+      Ad = (gsl_complex*)A->data;
+      X = (gsl_complex*)x->data;
+      incX = x->stride;
+
+      if ((GSL_SPMATRIX_ISCCS(A) && (TransA == CblasNoTrans)) ||
+          (GSL_SPMATRIX_ISCRS(A) && (TransA == CblasTrans)))
+        {
+          Ai = A->i;
+
+          for (j = 0; j < lenX; ++j)
+            {
+              for (p = Ap[j]; p < Ap[j + 1]; ++p)
+                {
+                  Y[Ai[p] * incY] = gsl_complex_add(Y[Ai[p] * incY], gsl_complex_mul( gsl_complex_rect(alpha,0), gsl_complex_mul(Ad[p], X[j * incX])));
+                }
+            }
+        }
+      else if ((GSL_SPMATRIX_ISCCS(A) && (TransA == CblasTrans)) ||
+               (GSL_SPMATRIX_ISCRS(A) && (TransA == CblasNoTrans)))
+        {
+          Ai = A->i;
+
+          for (j = 0; j < lenY; ++j)
+            {
+              for (p = Ap[j]; p < Ap[j + 1]; ++p)
+                {
+                  Y[j * incY] = gsl_complex_add(Y[j * incY], gsl_complex_mul(gsl_complex_rect(alpha,0), gsl_complex_mul(Ad[p], X[Ai[p] * incX])));
+                }
+            }
+        }
+      else if (GSL_SPMATRIX_ISTRIPLET(A))
         {
           if (TransA == CblasNoTrans)
             {
@@ -130,23 +181,15 @@ gsl_vector_complex* myMulFunc(const CBLAS_TRANSPOSE_t TransA,
 
           for (p = 0; p < (int) A->nz; ++p)
             {
-            double ar = Ad[2*Ai[p]];
-            double ai = Ad[2*Ai[p]+1];
-
-            double xr = X[2*p*incX];
-            double xi = X[2*p*incX+1];
-
-            gsl_vector_complex_set(y, Aj[p], gsl_complex_rect((ar * xr - ai * xi), (ar * xi + ai * xr)) );
-
+                Y[Ai[p] * incY] = gsl_complex_add(Y[Ai[p] * incY], gsl_complex_mul( gsl_complex_rect(alpha,0), gsl_complex_mul(Ad[p], X[j * incX])));
             }
         }
       else
         {
-          return NULL;
-          //GSL_ERROR("unsupported matrix type", GSL_EINVAL);
+          GSL_ERROR("unsupported matrix type", GSL_EINVAL);
         }
 
-      return y;
+      return GSL_SUCCESS;
     }
 }
 
@@ -303,13 +346,13 @@ gsl_spmatrix* spmatrixIdentity(gsl_spmatrix* matrix){
 //  Arguments
 //  ---------
 // [1] matrix -> The matrix that is to be printed
-void print_matrix(gsl_spmatrix_complex* matrix){
+void print_matrix(gsl_matrix_complex* matrix){
 
     for(int i = 0; i<matrix->size1;i++){
     
         for(int j = 0; j < matrix->size2; j++){
     
-            printf("%.3lg\t", GSL_REAL(gsl_spmatrix_complex_get(matrix, i, j)));
+            printf("%.3lg\t", GSL_REAL(gsl_matrix_complex_get(matrix, i, j)));
     
         }printf("\n");
     
@@ -413,28 +456,20 @@ double findElementHad(char* inta, char* intb, int qubit){
 //  ---------
 //  [1] The value for the abth element of the corresponding phase matrix
 gsl_complex findElementPhase(char* inta, char* intb, int qubit, double phi){
-    
     // Phase gate for single qubit used to calculate tensor product
     gsl_matrix_complex *phase_single = gsl_matrix_complex_alloc(BASIS, BASIS);
     gsl_matrix_complex_set_identity(phase_single);
     gsl_matrix_complex_set(phase_single,1,1, gsl_complex_polar(1,phi));
 
     gsl_complex value = gsl_complex_rect(1,0);
-
     for(int i = 0; i < N; i++){
-
         if(inta[i] != intb[i] && i != qubit - 1){
-
             return GSL_COMPLEX_ZERO; // Invokes Kronecker delta
-        
         }
-        
         value =  gsl_matrix_complex_get(phase_single, inta[qubit-1] - '0', intb[qubit -1] - '0');
 
     }
-    
     gsl_matrix_complex_free(phase_single);
-    
     return value;
 }
 
@@ -575,8 +610,7 @@ gsl_vector_complex* phaseShiftGate(gsl_vector_complex *wavefunction, int qubit, 
     }
     gsl_vector_complex* r_psi = gsl_vector_complex_alloc(wavefunction->size);
 
-    print_matrix(phaseGate);
-    myMulFunc(CblasNoTrans, phaseGate, wavefunction, r_psi); //no sparse equivalent so must build one
+    myMulFunc(CblasNoTrans, 1.0, phaseGate, wavefunction, 0.0, r_psi); //no sparse equivalent so must build one
     
     return swapsies(r_psi, wavefunction);
 }
@@ -698,10 +732,10 @@ int main(){
     // wavefunction = cnotGate(wavefunction, 2, 1);
     // Putting into cat state.
 
-    // for(int i = 0; i < floor(M_PI_4*sqrt(pow(2,N))); i++){ // Needs to be called "floor(pi/4*sqrt(2^N))"" times for optimum output roughly 2 in our case
-    //     wavefunction = groversBlock(wavefunction, 7); //Second argument is the basis state you want to be "right" in this case its |110>
-    // }
-     wavefunction = phaseShiftGate(wavefunction, 3,  3.14159);
+    for(int i = 0; i < floor(M_PI_4*sqrt(pow(2,N))); i++){ // Needs to be called "floor(pi/4*sqrt(2^N))"" times for optimum output roughly 2 in our case
+        wavefunction = groversBlock(wavefunction, 7); //Second argument is the basis state you want to be "right" in this case its |110>
+    }
+    // wavefunction = phaseShiftGate(wavefunction, 1,  3.14159);
 
     print_wf(wavefunction);
     return 0;

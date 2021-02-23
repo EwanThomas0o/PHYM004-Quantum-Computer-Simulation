@@ -70,7 +70,7 @@ void qubit_error(){
     exit(1);
 }
 
-gsl_vector_complex* myMulFunc(const CBLAS_TRANSPOSE_t TransA,
+int myMulFunc(const CBLAS_TRANSPOSE_t TransA,
                  gsl_spmatrix_complex *A, gsl_vector_complex *x,
                  gsl_vector_complex *y)
 {
@@ -80,14 +80,12 @@ gsl_vector_complex* myMulFunc(const CBLAS_TRANSPOSE_t TransA,
   if ((TransA == CblasNoTrans && L != x->size) ||
       (TransA == CblasTrans && M != x->size))
     {
-        return NULL;
-      //GSL_ERROR("invalid length of x vector", GSL_EBADLEN);
+      GSL_ERROR("invalid length of x vector", GSL_EBADLEN);
     }
   else if ((TransA == CblasNoTrans && M != y->size) ||
            (TransA == CblasTrans && L != y->size))
     {
-        return NULL; 
-        //GSL_ERROR("invalid length of y vector", GSL_EBADLEN);
+      GSL_ERROR("invalid length of y vector", GSL_EBADLEN);
     }
   else
     {
@@ -142,11 +140,10 @@ gsl_vector_complex* myMulFunc(const CBLAS_TRANSPOSE_t TransA,
         }
       else
         {
-          return NULL;
-          //GSL_ERROR("unsupported matrix type", GSL_EINVAL);
+          GSL_ERROR("unsupported matrix type", GSL_EINVAL);
         }
 
-      return y;
+      return GSL_SUCCESS;
     }
 }
 
@@ -303,13 +300,13 @@ gsl_spmatrix* spmatrixIdentity(gsl_spmatrix* matrix){
 //  Arguments
 //  ---------
 // [1] matrix -> The matrix that is to be printed
-void print_matrix(gsl_spmatrix_complex* matrix){
+void print_matrix(gsl_matrix_complex* matrix){
 
     for(int i = 0; i<matrix->size1;i++){
     
         for(int j = 0; j < matrix->size2; j++){
     
-            printf("%.3lg\t", GSL_REAL(gsl_spmatrix_complex_get(matrix, i, j)));
+            printf("%.3lg\t", GSL_REAL(gsl_matrix_complex_get(matrix, i, j)));
     
         }printf("\n");
     
@@ -575,7 +572,6 @@ gsl_vector_complex* phaseShiftGate(gsl_vector_complex *wavefunction, int qubit, 
     }
     gsl_vector_complex* r_psi = gsl_vector_complex_alloc(wavefunction->size);
 
-    print_matrix(phaseGate);
     myMulFunc(CblasNoTrans, phaseGate, wavefunction, r_psi); //no sparse equivalent so must build one
     
     return swapsies(r_psi, wavefunction);
@@ -701,7 +697,7 @@ int main(){
     // for(int i = 0; i < floor(M_PI_4*sqrt(pow(2,N))); i++){ // Needs to be called "floor(pi/4*sqrt(2^N))"" times for optimum output roughly 2 in our case
     //     wavefunction = groversBlock(wavefunction, 7); //Second argument is the basis state you want to be "right" in this case its |110>
     // }
-     wavefunction = phaseShiftGate(wavefunction, 3,  3.14159);
+    // wavefunction = phaseShiftGate(wavefunction, 1,  3.14159);
 
     print_wf(wavefunction);
     return 0;
