@@ -579,11 +579,9 @@ gsl_vector_complex* phaseShiftGate(gsl_vector_complex *wavefunction, int qubit, 
     for(int i = 0; i < wavefunction->size; i++){
         for(int j = 0; j < wavefunction->size; j++){
             gsl_complex val = findElementPhase(intToBinary(i), intToBinary(j), qubit, phase); //This is causing some errors
-            if(GSL_REAL(val) == 0 && GSL_IMAG(val) == 0){
-                /* Do Nothing */
-            }
-            else{
+            if(GSL_REAL(val) != 0 && GSL_IMAG(val) != 0){
                 gsl_spmatrix_complex_set(phaseGate, i , j, val);
+
             }
         }
     }
