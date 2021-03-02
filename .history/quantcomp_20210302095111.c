@@ -566,7 +566,7 @@ gsl_vector_complex* hadamardGate(gsl_vector_complex* wavefunction, int qubit){
 //  Returns
 //  ---------
 //  [1] Wavefunction after entire register has been acted upon by desired phase shift gate
-gsl_vector_complex* phaseShiftGate(gsl_vector_complex *wavefunction, int qubit, double phase){ // NEEDS COMPLEX SPARSE MULTIPLIER!
+gsl_vector_complex* phaseShiftGate(gsl_vector_complex *wavefunction, int qubit, float phase){ // NEEDS COMPLEX SPARSE MULTIPLIER!
     if(qubit > N){
         printf("Please operate the gate on a valid qubit\n");
         exit(0);
@@ -578,18 +578,16 @@ gsl_vector_complex* phaseShiftGate(gsl_vector_complex *wavefunction, int qubit, 
     for(int i = 0; i < wavefunction->size; i++){
         for(int j = 0; j < wavefunction->size; j++){
             gsl_complex val = findElementPhase(intToBinary(i), intToBinary(j), qubit, phase); //This is causing some errors
-            if(GSL_REAL(val) == 0 && GSL_IMAG(val) == 0){
-
-            }
-            else{
-                gsl_spmatrix_complex_set(phaseGate, i , j, val);
-            }
+            gsl_spmatrix_complex_set(phaseGate, i , j, val);
         }
     }
     gsl_vector_complex* r_psi = gsl_vector_complex_alloc(wavefunction->size);
 
     print_matrix(phaseGate);
     myMulFunc(CblasNoTrans, phaseGate, wavefunction, r_psi); //no sparse equivalent so must build one
+    
+    print_wf(r_psi);
+    print_wf(wavefunction);
     
     return r_psi;
 }
@@ -711,7 +709,7 @@ int main(){
     //     wavefunction = groversBlock(wavefunction, 7); //Second argument is the basis state you want to be "right" in this case its |110>
     // }
 
-    wavefunction = phaseShiftGate(wavefunction, 3,  3.14159);
+    phaseShiftGate(wavefunction, 3,  3.14159);
     print_wf(wavefunction);
 
 

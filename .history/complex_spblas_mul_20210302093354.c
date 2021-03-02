@@ -19,9 +19,6 @@
 #define FUNCTION 
 #define TYPE
 
-#define N 5
-#define BASIS 2
-
 /*
 gsl_spblas_dgemv()
   Multiply a sparse matrix and a vector
@@ -38,15 +35,15 @@ int myMulFunc(const CBLAS_TRANSPOSE_t TransA,
                  gsl_vector_complex *y)
 {
   const size_t M = A->size1;
-  const size_t L = A->size2;
+  const size_t N = A->size2;
 
-  if ((TransA == CblasNoTrans && L != x->size) ||
+  if ((TransA == CblasNoTrans && N != x->size) ||
       (TransA == CblasTrans && M != x->size))
     {
       GSL_ERROR("invalid length of x vector", GSL_EBADLEN);
     }
   else if ((TransA == CblasNoTrans && M != y->size) ||
-           (TransA == CblasTrans && L != y->size))
+           (TransA == CblasTrans && N != y->size))
     {
       GSL_ERROR("invalid length of y vector", GSL_EBADLEN);
     }
@@ -62,13 +59,13 @@ int myMulFunc(const CBLAS_TRANSPOSE_t TransA,
 
       if (TransA == CblasNoTrans)
         {
-          lenX = L;
+          lenX = N;
           lenY = M;
         }
       else
         {
           lenX = M;
-          lenY = L;
+          lenY = N;
         }
 
       /* form y := op(A)*x */
@@ -98,8 +95,8 @@ int myMulFunc(const CBLAS_TRANSPOSE_t TransA,
 
             double xr = X[2*p*incX];
             double xi = X[2*p*incX+1];
-            // printf("Multiplying %.3lg with %.3lg and %.3lg with %.3lg for real part of element\n", ar, xr, ai, xi);
-            // printf("Multiplying %.3lg with %.3lg and %.3lg with %.3lg for imag part of element\n", ar, xi, ai, xr);
+            printf("Multiplying %.3lg with %.3lg and %.3lg with %.3lg for real part of element\n", ar, xr, ai, xi);
+            printf("Multiplying %.3lg with %.3lg and %.3lg with %.3lg for imag part of element\n", ar, xi, ai, xr);
             gsl_vector_complex_set(y, Aj[p], gsl_complex_rect((ar * xr - ai * xi), (ar * xi + ai * xr)) );
 
             }
@@ -112,26 +109,6 @@ int myMulFunc(const CBLAS_TRANSPOSE_t TransA,
       return 0;
     }
 } /* gsl_spblas_dgemv() */
-char* intToBinary(int a){
-
-    int bin = 0;
-
-    int remainder, temp = 1;
-
-    while(a != 0){
-
-        remainder = a % 2;
-        a /= 2;
-        bin += remainder*temp;
-        temp *= 10;
-    }
-    char *bin_str = (char *) malloc(N*sizeof(char));
-
-    sprintf(bin_str, "%03d", bin);   
-
-    return bin_str;
-
-}
 
 gsl_vector_complex* initWavefunctionEqualProb(int states){ //Initialising wf to "Equal Probability" of all states
     
@@ -144,69 +121,9 @@ gsl_vector_complex* initWavefunctionEqualProb(int states){ //Initialising wf to 
     return wavefunction;
 }
 
-void print_matrix(gsl_spmatrix_complex* matrix){
-
-    for(int i = 0; i < matrix->size1;i++){
-    
-        for(int j = 0; j < matrix->size2; j++){
-    
-            printf("%.3lg + %.3lgi\t", GSL_REAL(gsl_spmatrix_complex_get(matrix, i, j)), GSL_IMAG(gsl_spmatrix_complex_get(matrix, i, j)));
-    
-        }printf("\n");
-    
-    }
-}
-gsl_complex findElementPhase(char* inta, char* intb, int qubit, double phi){
-    
-    // Phase gate for single qubit used to calculate tensor product
-    gsl_matrix_complex *phase_single = gsl_matrix_complex_alloc(BASIS, BASIS);
-    gsl_matrix_complex_set_identity(phase_single);
-    gsl_matrix_complex_set(phase_single,1,1, gsl_complex_polar(1,phi));
-
-    gsl_complex value = gsl_complex_rect(1,0);
-
-    for(int i = 0; i < N; i++){
-
-        if(inta[i] != intb[i] && i != qubit - 1){
-
-            return GSL_COMPLEX_ZERO; // Invokes Kronecker delta
-        
-        }
-        
-        value =  gsl_matrix_complex_get(phase_single, inta[qubit-1] - '0', intb[qubit -1] - '0');
-
-    }
-    
-    gsl_matrix_complex_free(phase_single);
-    
-    return value;
-}
-gsl_vector_complex* phaseShiftGate(gsl_vector_complex *wavefunction, int qubit, float phase){ // NEEDS COMPLEX SPARSE MULTIPLIER!
-    if(qubit > N){
-        printf("Please operate the gate on a valid qubit\n");
-        exit(0);
-    }
-    // Will beome the NxN matrix for operation on whole register
-    gsl_spmatrix_complex *phaseGate = gsl_spmatrix_complex_alloc(wavefunction->size, wavefunction->size);
-    gsl_vector_complex* r_psi = gsl_vector_complex_alloc(wavefunction->size);
-    
-
-    for(int i = 0; i < wavefunction->size; i++){
-        for(int j = 0; j < wavefunction->size; j++){
-            gsl_complex val = findElementPhase(intToBinary(i), intToBinary(j), qubit, phase); //This is causing some errors
-            gsl_spmatrix_complex_set(phaseGate, i, j, val);
-            
-        }
-    }
-    // gsl_spmatrix_complex_fprintf(stdout, phaseGate, "%lg");
-    myMulFunc(CblasNoTrans, phaseGate, wavefunction, r_psi); //no sparse equivalent so must build one
-    
-    return r_psi;
-}
-
 int main(){
     
-    int states = 8;
+    int states = 5;
 
     gsl_vector_complex* vector = gsl_vector_complex_alloc(states);
     gsl_spmatrix_complex* matrix = gsl_spmatrix_complex_alloc(states, states);
@@ -214,40 +131,40 @@ int main(){
     int i,j = 0;
     while( i < states){
       while( j < states){
-        if (j % 2 == 1 && i % 2 ==1){
-          gsl_spmatrix_complex_set(matrix, i, j, gsl_complex_rect(-1,0));
-        }
-        else
-        {
-          gsl_spmatrix_complex_set(matrix, i, j, gsl_complex_rect(1,0));
-        }
+        gsl_spmatrix_complex_set(matrix, i, j, gsl_complex_rect(1,0));
         i++;
         j++;
       }
     }
     gsl_vector_complex* vector2 = gsl_vector_complex_alloc(states);
 
+
+    gsl_spmatrix_complex_set(matrix, 0,0, gsl_complex_rect(1,0));
+    gsl_spmatrix_complex_set(matrix, 1,1, gsl_complex_rect(1,0));
+    gsl_spmatrix_complex_set(matrix, 4,2, gsl_complex_rect(3,4));
+
+
     gsl_vector_complex_set(vector, 0, gsl_complex_rect(2,4));
     gsl_vector_complex_set(vector, 1, gsl_complex_rect(1,5));
     gsl_vector_complex_set(vector, 3, gsl_complex_rect(2,6));
 
-    // vector2 = phaseShiftGate(vector, 3, 3.14159); // There's something wrong with my phase shift gate
-    myMulFunc(CblasNoTrans, matrix, vector, vector2);
+    
 
 
-    for(int j = 0; j < vector->size; j++){
-        printf("%lg + %lgi\n", GSL_REAL(gsl_vector_complex_get(vector, j)), GSL_IMAG(gsl_vector_complex_get(vector, j)));
-    }
+    // myMulFunc(CblasNoTrans, matrix, vector, vector2);
+
+    // for(int i = 0; i < matrix->nz; i++){
+    //     printf("%lg + %lgi\n", matrix->data[2*i], matrix->data[2*i+1]);
+    // }
+
 
     for(int j = 0; j < vector2->size; j++){
         printf("%lg + %lgi\n", GSL_REAL(gsl_vector_complex_get(vector2, j)), GSL_IMAG(gsl_vector_complex_get(vector2, j)));
     }
 
-    // for(int k = 0; k < 2*matrix->nz; k++){
-    //   printf("%lg\n", matrix->data[k]);
+    // for(int l = 0; l < vector2->size; l++){
+    //   printf("%lg\n", GSL_REAL(gsl_vector_complex_get(vector2, l)));
     // }
-
-    // print_matrix(matrix);
 
     return 0;
     //complex numbers in sp matricies are not stored as complex data types! but they are split up into an array of doubles!

@@ -206,33 +206,33 @@ gsl_vector_complex* phaseShiftGate(gsl_vector_complex *wavefunction, int qubit, 
 
 int main(){
     
-    int states = 8;
+    int states = 4;
 
     gsl_vector_complex* vector = gsl_vector_complex_alloc(states);
     gsl_spmatrix_complex* matrix = gsl_spmatrix_complex_alloc(states, states);
     
-    int i,j = 0;
-    while( i < states){
-      while( j < states){
-        if (j % 2 == 1 && i % 2 ==1){
-          gsl_spmatrix_complex_set(matrix, i, j, gsl_complex_rect(-1,0));
-        }
-        else
-        {
-          gsl_spmatrix_complex_set(matrix, i, j, gsl_complex_rect(1,0));
-        }
-        i++;
-        j++;
-      }
-    }
+    // int i,j = 0;
+    // while( i < states){
+    //   while( j < states){
+    //     if (j % 2 == 1 && i % 2 ==1){
+    //       gsl_spmatrix_complex_set(matrix, i, j, gsl_complex_rect(-1,0));
+    //     }
+    //     else
+    //     {
+    //       gsl_spmatrix_complex_set(matrix, i, j, gsl_complex_rect(1,0));
+    //     }
+    //     i++;
+    //     j++;
+    //   }
+    // }
     gsl_vector_complex* vector2 = gsl_vector_complex_alloc(states);
 
     gsl_vector_complex_set(vector, 0, gsl_complex_rect(2,4));
     gsl_vector_complex_set(vector, 1, gsl_complex_rect(1,5));
     gsl_vector_complex_set(vector, 3, gsl_complex_rect(2,6));
 
-    // vector2 = phaseShiftGate(vector, 3, 3.14159); // There's something wrong with my phase shift gate
-    myMulFunc(CblasNoTrans, matrix, vector, vector2);
+    vector2 = phaseShiftGate(vector, 3, 3.14159); // There's something wrong with my phase shift gate
+    // myMulFunc(CblasNoTrans, matrix, vector, vector2);
 
 
     for(int j = 0; j < vector->size; j++){

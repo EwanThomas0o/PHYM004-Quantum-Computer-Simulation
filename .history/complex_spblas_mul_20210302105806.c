@@ -195,10 +195,8 @@ gsl_vector_complex* phaseShiftGate(gsl_vector_complex *wavefunction, int qubit, 
         for(int j = 0; j < wavefunction->size; j++){
             gsl_complex val = findElementPhase(intToBinary(i), intToBinary(j), qubit, phase); //This is causing some errors
             gsl_spmatrix_complex_set(phaseGate, i, j, val);
-            
         }
     }
-    // gsl_spmatrix_complex_fprintf(stdout, phaseGate, "%lg");
     myMulFunc(CblasNoTrans, phaseGate, wavefunction, r_psi); //no sparse equivalent so must build one
     
     return r_psi;
@@ -206,7 +204,7 @@ gsl_vector_complex* phaseShiftGate(gsl_vector_complex *wavefunction, int qubit, 
 
 int main(){
     
-    int states = 8;
+    int states = 4;
 
     gsl_vector_complex* vector = gsl_vector_complex_alloc(states);
     gsl_spmatrix_complex* matrix = gsl_spmatrix_complex_alloc(states, states);
@@ -231,8 +229,8 @@ int main(){
     gsl_vector_complex_set(vector, 1, gsl_complex_rect(1,5));
     gsl_vector_complex_set(vector, 3, gsl_complex_rect(2,6));
 
-    // vector2 = phaseShiftGate(vector, 3, 3.14159); // There's something wrong with my phase shift gate
-    myMulFunc(CblasNoTrans, matrix, vector, vector2);
+    vector2 = phaseShiftGate(vector, 3, 3.14159); // There's something wrong with my phase shift gate
+    //myMulFunc(CblasNoTrans, matrix, vector, vector2);
 
 
     for(int j = 0; j < vector->size; j++){

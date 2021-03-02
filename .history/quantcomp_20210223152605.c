@@ -40,8 +40,7 @@ License: Public Domain
  22/02/21       0.1.4  using vector views etc to improve usability and speed (no need for memcpy)
  22/02/21       0.1.5  Sparse matrices implemented, Need to create complex sparse multiplier
  22/02/21        ""    Some progress making complex sp matrix multiplier, not working 100% yet tho
- 23/02/21        ""    Change matrices to ints (rather than doubles to save memory) ALMOST THERE FGS
- 1/03/21         ""    Handbuild complex sparse matrix multiplier seems to be working in test program but sets wf to zero here...
+ 23/02/21        ""    Change matrices to ints (rather than doubles to save memory)
 */
 
 #include <stdio.h>
@@ -70,11 +69,7 @@ void qubit_error(){
     printf("Please operate the gate on a valid qubit\n");
     exit(1);
 }
-void print_wf(gsl_vector_complex* wavefunction){
-    for (int i = 0; i < wavefunction->size; i++){
-        printf("%lg + %lgi\n", GSL_REAL(gsl_vector_complex_get(wavefunction, i)), GSL_IMAG(gsl_vector_complex_get(wavefunction, i)));
-    }
-}
+
 gsl_vector_complex* myMulFunc(const CBLAS_TRANSPOSE_t TransA,
                  gsl_spmatrix_complex *A, gsl_vector_complex *x,
                  gsl_vector_complex *y)
@@ -140,9 +135,6 @@ gsl_vector_complex* myMulFunc(const CBLAS_TRANSPOSE_t TransA,
 
             double xr = X[2*p*incX];
             double xi = X[2*p*incX+1];
-
-            // printf("Multiplying %.3lg with %.3lg and %.3lg with %.3lg for real part of element\n", ar, xr, ai, xi);
-            // printf("Multiplying %.3lg with %.3lg and %.3lg with %lg for imag part of element\n", ar, xi, ai, xr);
 
             gsl_vector_complex_set(y, Aj[p], gsl_complex_rect((ar * xr - ai * xi), (ar * xi + ai * xr)) );
 
@@ -313,11 +305,11 @@ gsl_spmatrix* spmatrixIdentity(gsl_spmatrix* matrix){
 // [1] matrix -> The matrix that is to be printed
 void print_matrix(gsl_spmatrix_complex* matrix){
 
-    for(int i = 0; i < matrix->size1;i++){
+    for(int i = 0; i<matrix->size1;i++){
     
         for(int j = 0; j < matrix->size2; j++){
     
-            printf("%.3lg + %.3lgi\t", GSL_REAL(gsl_spmatrix_complex_get(matrix, i, j)), GSL_IMAG(gsl_spmatrix_complex_get(matrix, i, j)));
+            printf("%.3lg\t", GSL_REAL(gsl_spmatrix_complex_get(matrix, i, j)));
     
         }printf("\n");
     
@@ -566,7 +558,7 @@ gsl_vector_complex* hadamardGate(gsl_vector_complex* wavefunction, int qubit){
 //  Returns
 //  ---------
 //  [1] Wavefunction after entire register has been acted upon by desired phase shift gate
-gsl_vector_complex* phaseShiftGate(gsl_vector_complex *wavefunction, int qubit, double phase){ // NEEDS COMPLEX SPARSE MULTIPLIER!
+gsl_vector_complex* phaseShiftGate(gsl_vector_complex *wavefunction, int qubit, float phase){ // NEEDS COMPLEX SPARSE MULTIPLIER!
     if(qubit > N){
         printf("Please operate the gate on a valid qubit\n");
         exit(0);
@@ -578,12 +570,7 @@ gsl_vector_complex* phaseShiftGate(gsl_vector_complex *wavefunction, int qubit, 
     for(int i = 0; i < wavefunction->size; i++){
         for(int j = 0; j < wavefunction->size; j++){
             gsl_complex val = findElementPhase(intToBinary(i), intToBinary(j), qubit, phase); //This is causing some errors
-            if(GSL_REAL(val) == 0 && GSL_IMAG(val) == 0){
-
-            }
-            else{
-                gsl_spmatrix_complex_set(phaseGate, i , j, val);
-            }
+            gsl_spmatrix_complex_set(phaseGate, i , j, val);
         }
     }
     gsl_vector_complex* r_psi = gsl_vector_complex_alloc(wavefunction->size);
@@ -591,7 +578,7 @@ gsl_vector_complex* phaseShiftGate(gsl_vector_complex *wavefunction, int qubit, 
     print_matrix(phaseGate);
     myMulFunc(CblasNoTrans, phaseGate, wavefunction, r_psi); //no sparse equivalent so must build one
     
-    return r_psi;
+    return swapsies(r_psi, wavefunction);
 }
 
 // Oracle gate used in grovers quantum search algorithm. Argument answer is the "Correct question" mentioned
@@ -694,7 +681,11 @@ gsl_vector_complex* cnotGate(gsl_vector_complex* wavefunction, int control, int 
 // Returns
 // -------
 // void
-
+void print_wf(gsl_vector_complex* wavefunction){
+    for (int i = 0; i < wavefunction->size; i++){
+        printf("%lg + %lgi\n", gsl_vector_complex_get(wavefunction, i).dat[0], gsl_vector_complex_get(wavefunction, i).dat[1]);
+    }
+}
 
 int main(){
     int states = (int)pow(BASIS, N);
@@ -710,11 +701,10 @@ int main(){
     // for(int i = 0; i < floor(M_PI_4*sqrt(pow(2,N))); i++){ // Needs to be called "floor(pi/4*sqrt(2^N))"" times for optimum output roughly 2 in our case
     //     wavefunction = groversBlock(wavefunction, 7); //Second argument is the basis state you want to be "right" in this case its |110>
     // }
-
-    wavefunction = phaseShiftGate(wavefunction, 3,  3.14159);
     print_wf(wavefunction);
+    
+     wavefunction = phaseShiftGate(wavefunction, 3,  3.14159);
 
-
-
+    print_wf(wavefunction);
     return 0;
 }

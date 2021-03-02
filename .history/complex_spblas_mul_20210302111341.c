@@ -231,8 +231,8 @@ int main(){
     gsl_vector_complex_set(vector, 1, gsl_complex_rect(1,5));
     gsl_vector_complex_set(vector, 3, gsl_complex_rect(2,6));
 
-    // vector2 = phaseShiftGate(vector, 3, 3.14159); // There's something wrong with my phase shift gate
-    myMulFunc(CblasNoTrans, matrix, vector, vector2);
+    vector2 = phaseShiftGate(vector, 3, 3.14159); // There's something wrong with my phase shift gate
+    // myMulFunc(CblasNoTrans, matrix, vector, vector2);
 
 
     for(int j = 0; j < vector->size; j++){

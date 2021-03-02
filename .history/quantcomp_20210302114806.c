@@ -711,7 +711,7 @@ int main(){
     //     wavefunction = groversBlock(wavefunction, 7); //Second argument is the basis state you want to be "right" in this case its |110>
     // }
 
-    wavefunction = phaseShiftGate(wavefunction, 3,  3.14159);
+    wavefunction = phaseShiftGate(wavefunction, 3,  1.4);
     print_wf(wavefunction);
 
 

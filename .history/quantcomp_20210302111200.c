@@ -578,12 +578,7 @@ gsl_vector_complex* phaseShiftGate(gsl_vector_complex *wavefunction, int qubit, 
     for(int i = 0; i < wavefunction->size; i++){
         for(int j = 0; j < wavefunction->size; j++){
             gsl_complex val = findElementPhase(intToBinary(i), intToBinary(j), qubit, phase); //This is causing some errors
-            if(GSL_REAL(val) == 0 && GSL_IMAG(val) == 0){
-
-            }
-            else{
-                gsl_spmatrix_complex_set(phaseGate, i , j, val);
-            }
+            gsl_spmatrix_complex_set(phaseGate, i , j, val);
         }
     }
     gsl_vector_complex* r_psi = gsl_vector_complex_alloc(wavefunction->size);
@@ -711,7 +706,7 @@ int main(){
     //     wavefunction = groversBlock(wavefunction, 7); //Second argument is the basis state you want to be "right" in this case its |110>
     // }
 
-    wavefunction = phaseShiftGate(wavefunction, 3,  3.14159);
+    wavefunction = phaseShiftGate(wavefunction, 3,  1.4);
     print_wf(wavefunction);
 
 
