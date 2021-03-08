@@ -62,7 +62,7 @@ License: Public Domain
 #include <gsl/gsl_spblas.h>
 
 #define BASIS 2
-#define N 2 // Number of qubits defined
+#define N 3 // Number of qubits defined
 #define STATES_MAX 1024 //max of 10 qubits 
 
 struct timeval tv;
@@ -222,7 +222,7 @@ char* intToBinary(int a){
     }
     char *bin_str = (char *) malloc(N*sizeof(char));
 
-    sprintf(bin_str, "%02d", bin);   
+    sprintf(bin_str, "%03d", bin);   
 
     return bin_str;
 
@@ -527,7 +527,7 @@ double findElementCnot(char* row, char* col, int control_qubit, int target_qubit
 //  [1] The value of the row-columnth element of the corresponding cphase gate
 gsl_complex findElementCphase(char* row, char* col, int control_qubit, int target_qubit, int num_qbits, double phase){
     // Defining the two qubit cphase gate that we will draw values from
-    gsl_spmatrix_complex *cphase = gsl_spmatrix_complex_alloc(BASIS*BASIS, BASIS*BASIS);
+    gsl_matrix *cphase = gsl_spmatrix_complex_alloc(BASIS*BASIS, BASIS*BASIS);
     
     gsl_spmatrix_complex_set_zero(cphase);
     gsl_spmatrix_complex_set(cphase, 0, 0, GSL_COMPLEX_ONE);
@@ -571,9 +571,8 @@ gsl_complex findElementCphase(char* row, char* col, int control_qubit, int targe
     long col_index = strtol(str2, NULL, 2);
    
     gsl_complex value = gsl_spmatrix_complex_get(cphase, row_index, col_index);
-
    
-    gsl_spmatrix_complex_free(cphase);
+    gsl_matrix_free(cphase);
    
     return value;
 }
@@ -582,13 +581,13 @@ gsl_vector_complex* CphaseGate(gsl_vector_complex* wavefunction, int control, in
     /* Will need to only put val if val is non-zero due to sparse nature, need to use myMulFunc in order to multiply
     complex matrix by complex vector */
 
-    gsl_spmatrix_complex* cphasegate = gsl_spmatrix_complex_alloc(wavefunction->size, wavefunction->size);
+    gsl_spmatrix* cphasegate = gsl_spmatrix_complex_alloc(wavefunction->size, wavefunction->size);
+
     for(int i = 0; i < wavefunction->size; i++){
         for(int j = 0; j < wavefunction->size; j++){
-            gsl_complex val = findElementCphase(intToBinary(i), intToBinary(j), control, target, N, phase);
+            gsl_complex val = findElementCphase(intToBinary(i), intToBinary(j), control, target, phase);
             if(GSL_REAL(val) == 0 && GSL_IMAG(val) == 0){
                 /* Do Nothing */
-                
             }
             else{
                 gsl_spmatrix_complex_set(cphasegate, i , j, val);
@@ -790,10 +789,6 @@ gsl_vector_complex* cnotGate(gsl_vector_complex* wavefunction, int control, int 
 // -------
 // void
 
-void shors(){
-
-}
-
 
 int main(){
     int states = (int)pow(BASIS, N);
@@ -801,16 +796,16 @@ int main(){
     //Putting system into equal super position of superposition all 2^N basis'
     wavefunction = hadamardGate(wavefunction, 1);
     wavefunction = hadamardGate(wavefunction, 2); 
-    // wavefunction = hadamardGate(wavefunction, 3);
-    // wavefunction = cnotGate(wavefunction, 1,2 );
-    wavefunction = CphaseGate(wavefunction, 2, 1, M_PI);
+    wavefunction = hadamardGate(wavefunction, 3);
+    // wavefunction = cnotGate(wavefunction, 2, 3);
+    // wavefunction = cnotGate(wavefunction, 2, 1);
     // Putting into cat state.
 
     // for(int i = 0; i < floor(M_PI_4*sqrt(pow(2,N))); i++){ // Needs to be called "floor(pi/4*sqrt(2^N))"" times for optimum output roughly 2 in our case
     //     wavefunction = groversBlock(wavefunction, 7); //Second argument is the basis state you want to be "right" in this case its |110>
     // }
 
-    // wavefunction = phaseShiftGate(wavefunction, 3,  3.14159);
+    wavefunction = phaseShiftGate(wavefunction, 3,  3.14159);
     print_wf(wavefunction);
     measureRegisterGate(wavefunction);
 

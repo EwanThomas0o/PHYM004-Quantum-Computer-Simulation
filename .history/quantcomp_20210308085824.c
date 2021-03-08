@@ -222,7 +222,7 @@ char* intToBinary(int a){
     }
     char *bin_str = (char *) malloc(N*sizeof(char));
 
-    sprintf(bin_str, "%02d", bin);   
+    sprintf(bin_str, "%03d", bin);   
 
     return bin_str;
 
@@ -790,10 +790,6 @@ gsl_vector_complex* cnotGate(gsl_vector_complex* wavefunction, int control, int 
 // -------
 // void
 
-void shors(){
-
-}
-
 
 int main(){
     int states = (int)pow(BASIS, N);
@@ -803,7 +799,7 @@ int main(){
     wavefunction = hadamardGate(wavefunction, 2); 
     // wavefunction = hadamardGate(wavefunction, 3);
     // wavefunction = cnotGate(wavefunction, 1,2 );
-    wavefunction = CphaseGate(wavefunction, 2, 1, M_PI);
+    wavefunction = CphaseGate(wavefunction, 1, 2, M_PI);
     // Putting into cat state.
 
     // for(int i = 0; i < floor(M_PI_4*sqrt(pow(2,N))); i++){ // Needs to be called "floor(pi/4*sqrt(2^N))"" times for optimum output roughly 2 in our case

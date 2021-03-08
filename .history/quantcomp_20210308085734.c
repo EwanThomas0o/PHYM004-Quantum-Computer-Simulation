@@ -222,7 +222,7 @@ char* intToBinary(int a){
     }
     char *bin_str = (char *) malloc(N*sizeof(char));
 
-    sprintf(bin_str, "%02d", bin);   
+    sprintf(bin_str, "%03d", bin);   
 
     return bin_str;
 
@@ -789,10 +789,6 @@ gsl_vector_complex* cnotGate(gsl_vector_complex* wavefunction, int control, int 
 // Returns
 // -------
 // void
-
-void shors(){
-
-}
 
 
 int main(){

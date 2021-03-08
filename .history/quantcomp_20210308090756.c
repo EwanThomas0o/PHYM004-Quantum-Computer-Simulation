@@ -790,10 +790,6 @@ gsl_vector_complex* cnotGate(gsl_vector_complex* wavefunction, int control, int 
 // -------
 // void
 
-void shors(){
-
-}
-
 
 int main(){
     int states = (int)pow(BASIS, N);
