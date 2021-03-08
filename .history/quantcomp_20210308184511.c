@@ -575,7 +575,6 @@ gsl_vector_complex* findElementFofx(int control, int a, int C, gsl_vector_comple
 
                 printf("%s\n", binFprime);
                 
-                /* THE PROBLEM IS HEEEREEEE
                 char *l = malloc(7);
                 strncpy(l, binK, 3);
                 
@@ -584,7 +583,7 @@ gsl_vector_complex* findElementFofx(int control, int a, int C, gsl_vector_comple
                 strncat(l, binFprime, 4);
                 
                 printf("%s\n\n", l);
-                */
+                
                 int j = (int)strtol(l, NULL, 2);
                 // printf("%d\n", j);
                 gsl_spmatrix_set(amodx, j, k, 1.0);

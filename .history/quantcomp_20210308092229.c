@@ -63,7 +63,7 @@ License: Public Domain
 #include <gsl/gsl_spblas.h>
 
 #define BASIS 2
-#define N 7 // Number of qubits defined
+#define N 2 // Number of qubits defined
 #define STATES_MAX 1024 //max of 10 qubits 
 
 struct timeval tv;
@@ -200,16 +200,6 @@ gsl_vector_complex* initWavefunctionEqualProb(int states){ //Initialising wf to 
     return wavefunction;
 }
 
-gsl_vector_complex* initWavefunctionShors(int states){ //Initialising wf to "Equal Probability" of all states
-    
-    gsl_vector_complex* wavefunction = NULL;
-
-    wavefunction = gsl_vector_complex_alloc(states);
-
-    gsl_vector_complex_set(wavefunction, 1, GSL_COMPLEX_ONE);
-    return wavefunction;
-}
-
 // Takes an integer and return binary representation in string format
 //  Arguments
 //  ---------
@@ -233,7 +223,7 @@ char* intToBinary(int a){
     }
     char *bin_str = (char *) malloc(N*sizeof(char));
 
-    sprintf(bin_str, "%07d", bin);   
+    sprintf(bin_str, "%02d", bin);   
 
     return bin_str;
 
@@ -523,83 +513,6 @@ double findElementCnot(char* row, char* col, int control_qubit, int target_qubit
     return value;
 }
 
-gsl_vector_complex* findElementFofx(int control, int a, int C, gsl_vector_complex* wavefunction){ // only need to cycle through rows as permutation matrix
-    gsl_vector_complex* newState = gsl_vector_complex_alloc(wavefunction->size);
-
-    double A;
-    double A0 = (double) (a % C);
-    double A1 = (double) ((int)pow((double)a, 2.0) % C);
-    double A2 = (double) ((int)pow((double)a, 4.0) % C);
-
-    if (control == 3)
-    {
-        A = A0;
-    }
-    if (control == 2)
-    {
-        A = A1;
-    }
-    if (control == 1)
-    {
-        A = A2;
-    }
-    
-    gsl_spmatrix* amodx = gsl_spmatrix_alloc(128, 128);
-
-    for(int k = 0; k < amodx->size2; k++){
-        char* binK = intToBinary(k);
-        if(binK[control-1] - '0' == 0){
-
-            gsl_spmatrix_set(amodx, k, k, 1.0);
-
-        }
-        if (binK[control-1] - '0' != 0) //after this point things get messy, can be seen for each control qubit
-        {
-            
-            char* f = malloc(4); //Check for errors in malloc here
-            if(f == NULL){
-                printf("Malloc Error");
-                return NULL;
-            }  
-            strncpy(f, binK+3, 4); //taking the substring m3m2m1m0 from l2l1l0m3m2m1m0
-                        
-            if(((int)strtol(f, NULL, 2)) >= C){
-                gsl_spmatrix_set(amodx, k, k, 1.0);
-            
-            }
-            else if(binK[control-1] - '0' != 0 && (int)strtol(f, NULL, 2) < C)
-            {
-                int fprime = (int)A*strtol(f, NULL, 2) % C; // f' = f*A*mod(C) 
-                printf("%d\n", fprime);
-                char * binFprime = intToBinary(fprime);
-
-                printf("%s\n", binFprime);
-                
-                /* THE PROBLEM IS HEEEREEEE
-                char *l = malloc(7);
-                strncpy(l, binK, 3);
-                
-                printf("%s\n", l);
-                
-                strncat(l, binFprime, 4);
-                
-                printf("%s\n\n", l);
-                */
-                int j = (int)strtol(l, NULL, 2);
-                // printf("%d\n", j);
-                gsl_spmatrix_set(amodx, j, k, 1.0);
-                free(l);
-            }
-            free(binK);
-        }
-    }
-    gsl_spmatrix_fprintf(stdout, amodx, "%g");
-    newState = complexVecMultRealMat(wavefunction, amodx);
-
-    gsl_spmatrix_free(amodx);
-    return swapsies(newState, wavefunction);
-}
-
 //  This function calculates values of the cphase matrix for a system of arbitrary size in an element-wise method.
 
 //  Arguments
@@ -673,11 +586,8 @@ gsl_vector_complex* CphaseGate(gsl_vector_complex* wavefunction, int control, in
     gsl_spmatrix_complex* cphasegate = gsl_spmatrix_complex_alloc(wavefunction->size, wavefunction->size);
     for(int i = 0; i < wavefunction->size; i++){
         for(int j = 0; j < wavefunction->size; j++){
-           
             gsl_complex val = findElementCphase(intToBinary(i), intToBinary(j), control, target, N, phase);
-           
             if(GSL_REAL(val) == 0 && GSL_IMAG(val) == 0){
-                
                 /* Do Nothing */
                 
             }
@@ -881,7 +791,7 @@ gsl_vector_complex* cnotGate(gsl_vector_complex* wavefunction, int control, int 
 // -------
 // void
 
-// Given a composite number, i.e. the product of two primes, Shors alg is able to factorise this composite number faster than any classic algorithm. Use a high degree of encapsulation here.
+// Given a composite number, i.e. the product of two primes, Shors alg is able to factorise this composite number faster than any classic algorithm
 //
 // Arguments
 // ---------
@@ -889,99 +799,26 @@ gsl_vector_complex* cnotGate(gsl_vector_complex* wavefunction, int control, int 
 //
 // Returns
 // -------
-// [1] make a struct that return two numbers maybe?? could be a gsl imaginary number? Could be homemade
-
-int isPower(int number){
-    
-    if (number % 2 == 0) // Checking if number is even
-    {
-        return 2;
-    }
-    
-    for(int i = 3; i < number / 3; i++){
-        
-        double n = log(number) / log(i);
-        
-        if(ceil(n) == n){ //Checking if power of a smaller number
-            return pow(i,n);
-        }
-    }
-    return 1;
-}
-// Utilising Euclids algorithm to find GCD
-int greatestCommonDivisor(int n1, int n2){
-
-    if(n2 != 0){
-        return greatestCommonDivisor(n2, n1 % n2); //Call until n2 is set to zero
-    }
-    else
-    {
-        return n1;
-    }
-}
-
-int shors(int composite_number){
-    
-    int isp = isPower(composite_number);
-    if(isp != 1){
-    
-        return isp;
-    
-    }
-    
-    // if not a factor of two or a power of another number, pick a random number between 1 and composite_number
-    gsl_rng * r = gsl_rng_alloc (gsl_rng_mt19937); // High quality random number generator
-
-    unsigned long int seed = tv.tv_usec; // Seed depends on time of day so repeates every 24 hours.  
-    gsl_rng_set(r, seed);
-    
-    int rand = 0;
-    
-    while (rand < 2)
-    {
-        rand = gsl_rng_uniform_int(r, composite_number); // goes until rand is in range 1 < rand < C
-    }
-
-    gsl_rng_free(r);
-
-    if(greatestCommonDivisor(rand, composite_number) > 1){
-        return greatestCommonDivisor(rand, composite_number);
-    }
-// Now we have our "a",  we can now carry out the quantum part of shors algorithm
+// [1] make a struct that return two numbers maybe?? could be a gsl imaginary number?
+void shors(int composite_number){
 
 }
 
 
 int main(){
     int states = (int)pow(BASIS, N);
-    gsl_vector_complex* wavefunction = initWavefunctionShors(states);
+    gsl_vector_complex* wavefunction = initWavefunctionSpinDown(states);
     //Putting system into equal super position of superposition all 2^N basis'
     wavefunction = hadamardGate(wavefunction, 1);
     wavefunction = hadamardGate(wavefunction, 2); 
-    wavefunction = hadamardGate(wavefunction, 3);
+    // wavefunction = hadamardGate(wavefunction, 3);
     // wavefunction = cnotGate(wavefunction, 1,2 );
-    // wavefunction = CphaseGate(wavefunction, 2, 1, M_PI_4);
+    wavefunction = CphaseGate(wavefunction, 2, 1, M_PI);
+    // Putting into cat state.
 
     // for(int i = 0; i < floor(M_PI_4*sqrt(pow(2,N))); i++){ // Needs to be called "floor(pi/4*sqrt(2^N))"" times for optimum output roughly 2 in our case
     //     wavefunction = groversBlock(wavefunction, 7); //Second argument is the basis state you want to be "right" in this case its |110>
     // }
-    wavefunction = findElementFofx(3, 7, 15, wavefunction);
-    wavefunction = findElementFofx(2, 7, 15, wavefunction);
-    wavefunction = findElementFofx(1, 7, 15, wavefunction);
-
-// // IQFT block
-    wavefunction = hadamardGate(wavefunction, 1);
-    wavefunction = CphaseGate(wavefunction, 1, 2, M_PI_2);
-    wavefunction = CphaseGate(wavefunction, 1, 3, M_PI_4);
-    wavefunction = hadamardGate(wavefunction, 2);
-    wavefunction = CphaseGate(wavefunction, 2, 3, M_PI_2);
-    wavefunction = hadamardGate(wavefunction, 3);
-
-
-
-
-
-
 
     // wavefunction = phaseShiftGate(wavefunction, 3,  3.14159);
     print_wf(wavefunction);

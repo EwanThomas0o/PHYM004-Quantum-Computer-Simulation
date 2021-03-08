@@ -548,52 +548,33 @@ gsl_vector_complex* findElementFofx(int control, int a, int C, gsl_vector_comple
 
     for(int k = 0; k < amodx->size2; k++){
         char* binK = intToBinary(k);
-        if(binK[control-1] - '0' == 0){
+        printf("%dn", binK[control-1]);
+        if(binK[control-1] == 48){
 
-            gsl_spmatrix_set(amodx, k, k, 1.0);
+            gsl_spmatrix_set(amodx, k, k, 1);
 
-        }
-        if (binK[control-1] - '0' != 0) //after this point things get messy, can be seen for each control qubit
+        }else
         {
-            
             char* f = malloc(4); //Check for errors in malloc here
-            if(f == NULL){
-                printf("Malloc Error");
-                return NULL;
-            }  
             strncpy(f, binK+3, 4); //taking the substring m3m2m1m0 from l2l1l0m3m2m1m0
                         
             if(((int)strtol(f, NULL, 2)) >= C){
-                gsl_spmatrix_set(amodx, k, k, 1.0);
+                gsl_spmatrix_set(amodx, k, k, 1);
             
             }
-            else if(binK[control-1] - '0' != 0 && (int)strtol(f, NULL, 2) < C)
+            else
             {
-                int fprime = (int)A*strtol(f, NULL, 2) % C; // f' = f*A*mod(C) 
-                printf("%d\n", fprime);
+                int fprime = (int) A*(int)strtol(f, NULL, 10) % C; // f' = f*Amod(C) 
                 char * binFprime = intToBinary(fprime);
-
-                printf("%s\n", binFprime);
-                
-                /* THE PROBLEM IS HEEEREEEE
                 char *l = malloc(7);
                 strncpy(l, binK, 3);
-                
-                printf("%s\n", l);
-                
                 strncat(l, binFprime, 4);
-                
-                printf("%s\n\n", l);
-                */
                 int j = (int)strtol(l, NULL, 2);
-                // printf("%d\n", j);
-                gsl_spmatrix_set(amodx, j, k, 1.0);
-                free(l);
+                gsl_spmatrix_set(amodx, j, k, 1);
             }
-            free(binK);
         }
     }
-    gsl_spmatrix_fprintf(stdout, amodx, "%g");
+    // gsl_spmatrix_fprintf(stdout, amodx, "%g");
     newState = complexVecMultRealMat(wavefunction, amodx);
 
     gsl_spmatrix_free(amodx);
@@ -970,12 +951,12 @@ int main(){
     wavefunction = findElementFofx(1, 7, 15, wavefunction);
 
 // // IQFT block
-    wavefunction = hadamardGate(wavefunction, 1);
-    wavefunction = CphaseGate(wavefunction, 1, 2, M_PI_2);
-    wavefunction = CphaseGate(wavefunction, 1, 3, M_PI_4);
-    wavefunction = hadamardGate(wavefunction, 2);
-    wavefunction = CphaseGate(wavefunction, 2, 3, M_PI_2);
-    wavefunction = hadamardGate(wavefunction, 3);
+//     wavefunction = hadamardGate(wavefunction, 1);
+//     wavefunction = CphaseGate(wavefunction, 1, 2, M_PI_2);
+//     wavefunction = CphaseGate(wavefunction, 1, 3, M_PI_4);
+//     wavefunction = hadamardGate(wavefunction, 2);
+//     wavefunction = CphaseGate(wavefunction, 2, 3, M_PI_2);
+//     wavefunction = hadamardGate(wavefunction, 3);
 
 
 

@@ -200,16 +200,6 @@ gsl_vector_complex* initWavefunctionEqualProb(int states){ //Initialising wf to 
     return wavefunction;
 }
 
-gsl_vector_complex* initWavefunctionShors(int states){ //Initialising wf to "Equal Probability" of all states
-    
-    gsl_vector_complex* wavefunction = NULL;
-
-    wavefunction = gsl_vector_complex_alloc(states);
-
-    gsl_vector_complex_set(wavefunction, 1, GSL_COMPLEX_ONE);
-    return wavefunction;
-}
-
 // Takes an integer and return binary representation in string format
 //  Arguments
 //  ---------
@@ -526,78 +516,51 @@ double findElementCnot(char* row, char* col, int control_qubit, int target_qubit
 gsl_vector_complex* findElementFofx(int control, int a, int C, gsl_vector_complex* wavefunction){ // only need to cycle through rows as permutation matrix
     gsl_vector_complex* newState = gsl_vector_complex_alloc(wavefunction->size);
 
-    double A;
-    double A0 = (double) (a % C);
-    double A1 = (double) ((int)pow((double)a, 2.0) % C);
-    double A2 = (double) ((int)pow((double)a, 4.0) % C);
-
-    if (control == 3)
-    {
-        A = A0;
-    }
-    if (control == 2)
-    {
-        A = A1;
-    }
-    if (control == 1)
-    {
-        A = A2;
-    }
+    double A = (int)pow((double)a, (double)control) % C;
     
-    gsl_spmatrix* amodx = gsl_spmatrix_alloc(128, 128);
+    gsl_spmatrix_int* amodx = gsl_spmatrix_alloc(wavefunction->size, wavefunction->size);
 
     for(int k = 0; k < amodx->size2; k++){
+        
         char* binK = intToBinary(k);
-        if(binK[control-1] - '0' == 0){
+        
+        if(binK[control] == 0){
 
-            gsl_spmatrix_set(amodx, k, k, 1.0);
+            gsl_spmatrix_int_set(amodx, k, k, 1);
 
         }
-        if (binK[control-1] - '0' != 0) //after this point things get messy, can be seen for each control qubit
+        else
         {
-            
             char* f = malloc(4); //Check for errors in malloc here
-            if(f == NULL){
-                printf("Malloc Error");
-                return NULL;
-            }  
             strncpy(f, binK+3, 4); //taking the substring m3m2m1m0 from l2l1l0m3m2m1m0
-                        
-            if(((int)strtol(f, NULL, 2)) >= C){
-                gsl_spmatrix_set(amodx, k, k, 1.0);
+            
+            if ((int)strtol(f, NULL, 2) >= C){
+            
+                gsl_spmatrix_int_set(amodx, k, k, 1);
             
             }
-            else if(binK[control-1] - '0' != 0 && (int)strtol(f, NULL, 2) < C)
+            else
             {
-                int fprime = (int)A*strtol(f, NULL, 2) % C; // f' = f*A*mod(C) 
-                printf("%d\n", fprime);
-                char * binFprime = intToBinary(fprime);
+               int fprime = (int) A*(int)strtol(f, NULL, 10) % C; // f' = f*Amod(C) 
+               char * binFprime = intToBinary(fprime);
+               char *l = malloc(7);
+               strncpy(l, binK, 3);
+               strcat(l, fprime);
+               int j = (int)strtol(l, NULL, 10 );
 
-                printf("%s\n", binFprime);
-                
-                /* THE PROBLEM IS HEEEREEEE
-                char *l = malloc(7);
-                strncpy(l, binK, 3);
-                
-                printf("%s\n", l);
-                
-                strncat(l, binFprime, 4);
-                
-                printf("%s\n\n", l);
-                */
-                int j = (int)strtol(l, NULL, 2);
-                // printf("%d\n", j);
-                gsl_spmatrix_set(amodx, j, k, 1.0);
-                free(l);
+               gsl_spmatrix_int_set(amodx, j, k, 1);
+
+               free(l);
+               free(binFprime);
             }
-            free(binK);
+            
         }
+        free(binK);
     }
-    gsl_spmatrix_fprintf(stdout, amodx, "%g");
-    newState = complexVecMultRealMat(wavefunction, amodx);
 
-    gsl_spmatrix_free(amodx);
-    return swapsies(newState, wavefunction);
+
+gsl_spmatrix_int_free(amodx);
+return swapsies(newState, wavefunction);
 }
 
 //  This function calculates values of the cphase matrix for a system of arbitrary size in an element-wise method.
@@ -673,11 +636,8 @@ gsl_vector_complex* CphaseGate(gsl_vector_complex* wavefunction, int control, in
     gsl_spmatrix_complex* cphasegate = gsl_spmatrix_complex_alloc(wavefunction->size, wavefunction->size);
     for(int i = 0; i < wavefunction->size; i++){
         for(int j = 0; j < wavefunction->size; j++){
-           
             gsl_complex val = findElementCphase(intToBinary(i), intToBinary(j), control, target, N, phase);
-           
             if(GSL_REAL(val) == 0 && GSL_IMAG(val) == 0){
-                
                 /* Do Nothing */
                 
             }
@@ -954,37 +914,21 @@ int shors(int composite_number){
 
 int main(){
     int states = (int)pow(BASIS, N);
-    gsl_vector_complex* wavefunction = initWavefunctionShors(states);
+    gsl_vector_complex* wavefunction = initWavefunctionSpinDown(states);
     //Putting system into equal super position of superposition all 2^N basis'
     wavefunction = hadamardGate(wavefunction, 1);
     wavefunction = hadamardGate(wavefunction, 2); 
     wavefunction = hadamardGate(wavefunction, 3);
     // wavefunction = cnotGate(wavefunction, 1,2 );
     // wavefunction = CphaseGate(wavefunction, 2, 1, M_PI_4);
+    // Putting into cat state.
 
     // for(int i = 0; i < floor(M_PI_4*sqrt(pow(2,N))); i++){ // Needs to be called "floor(pi/4*sqrt(2^N))"" times for optimum output roughly 2 in our case
     //     wavefunction = groversBlock(wavefunction, 7); //Second argument is the basis state you want to be "right" in this case its |110>
     // }
-    wavefunction = findElementFofx(3, 7, 15, wavefunction);
-    wavefunction = findElementFofx(2, 7, 15, wavefunction);
-    wavefunction = findElementFofx(1, 7, 15, wavefunction);
-
-// // IQFT block
-    wavefunction = hadamardGate(wavefunction, 1);
-    wavefunction = CphaseGate(wavefunction, 1, 2, M_PI_2);
-    wavefunction = CphaseGate(wavefunction, 1, 3, M_PI_4);
-    wavefunction = hadamardGate(wavefunction, 2);
-    wavefunction = CphaseGate(wavefunction, 2, 3, M_PI_2);
-    wavefunction = hadamardGate(wavefunction, 3);
-
-
-
-
-
-
 
     // wavefunction = phaseShiftGate(wavefunction, 3,  3.14159);
-    print_wf(wavefunction);
+    // print_wf(wavefunction);
     measureRegisterGate(wavefunction);
 
 

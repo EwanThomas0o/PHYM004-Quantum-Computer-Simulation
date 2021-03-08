@@ -550,50 +550,39 @@ gsl_vector_complex* findElementFofx(int control, int a, int C, gsl_vector_comple
         char* binK = intToBinary(k);
         if(binK[control-1] - '0' == 0){
 
-            gsl_spmatrix_set(amodx, k, k, 1.0);
+            gsl_spmatrix_set(amodx, k, k, 1);
 
         }
-        if (binK[control-1] - '0' != 0) //after this point things get messy, can be seen for each control qubit
+        if (binK[control-1] - '0' != 0)
         {
-            
             char* f = malloc(4); //Check for errors in malloc here
             if(f == NULL){
                 printf("Malloc Error");
                 return NULL;
-            }  
+            }
             strncpy(f, binK+3, 4); //taking the substring m3m2m1m0 from l2l1l0m3m2m1m0
                         
+
             if(((int)strtol(f, NULL, 2)) >= C){
                 gsl_spmatrix_set(amodx, k, k, 1.0);
             
             }
-            else if(binK[control-1] - '0' != 0 && (int)strtol(f, NULL, 2) < C)
+            else if( (int)strtol(f, NULL, 2) < C)
             {
-                int fprime = (int)A*strtol(f, NULL, 2) % C; // f' = f*A*mod(C) 
-                printf("%d\n", fprime);
+                int fprime = (int) A*(int)strtol(f, NULL, 2) % C; // f' = f*Amod(C) 
+                // printf("%d\n", fprime);
                 char * binFprime = intToBinary(fprime);
-
-                printf("%s\n", binFprime);
-                
-                /* THE PROBLEM IS HEEEREEEE
                 char *l = malloc(7);
                 strncpy(l, binK, 3);
-                
-                printf("%s\n", l);
-                
                 strncat(l, binFprime, 4);
-                
-                printf("%s\n\n", l);
-                */
+                // printf("%s\n", binFprime);
                 int j = (int)strtol(l, NULL, 2);
-                // printf("%d\n", j);
+                printf("%d\n", j);
                 gsl_spmatrix_set(amodx, j, k, 1.0);
-                free(l);
             }
-            free(binK);
         }
     }
-    gsl_spmatrix_fprintf(stdout, amodx, "%g");
+    // gsl_spmatrix_fprintf(stdout, amodx, "%g");
     newState = complexVecMultRealMat(wavefunction, amodx);
 
     gsl_spmatrix_free(amodx);
