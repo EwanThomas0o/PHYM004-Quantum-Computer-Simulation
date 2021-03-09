@@ -45,7 +45,6 @@ License: Public Domain
  2/03/21        0.1.6  Phase gate now works! Was setting nz elements in spmatrix to 0!
  8/03/21        0.2.0  CPhase working. Now on to implementing the non-quantum section of Shor's Alg
  9/03/21         ""    Working on step 4 of shors algorithm still. Some bugs need fixing.
- 9/03/21        0.3.0  Output of x~ is now correct for a=7, C=15, N=7
 */
 
 #include <stdio.h>
@@ -74,34 +73,11 @@ void qubit_error(){
     printf("Please operate the gate on a valid qubit\n");
     exit(1);
 }
-// Simply prints the probability amplitudes of each state.
-//
-// Arguments
-// ---------
-// [1] Wavefunction -> Contains probability amplitudes to be printed.
-// 
-// Returns
-// -------
-// void
 void print_wf(gsl_vector_complex* wavefunction){
     for (int i = 0; i < wavefunction->size; i++){
         printf("%lg + %lgi\n", GSL_REAL(gsl_vector_complex_get(wavefunction, i)), GSL_IMAG(gsl_vector_complex_get(wavefunction, i)));
     }
 }
-// Hand built function based on cblas functions to multiply non sparse complex matrix and vecotrs and function used to
-// multiply sparse matrices in COO format. Possible extensions in the future could be to allow this func to manage CCS and CRS 
-// formated matrices
-//
-// Argumnents
-// ----------
-// [1] CBLAS_TRANSPOSE_t -> is the matrix to be transposed or not, legacy feature.
-// [2] A -> sparse complex matrix to be multiplied
-// [3] x -> complex vector to be multiplied
-// [4] y -> Where the procuct of A and x is stored.
-//
-// Returns
-// -------
-// [1] y -> The product of the matrix A and vector x
 gsl_vector_complex* myMulFunc(const CBLAS_TRANSPOSE_t TransA,
                  gsl_spmatrix_complex *A, gsl_vector_complex *x,
                  gsl_vector_complex *y)
@@ -321,7 +297,7 @@ gsl_vector_complex* complexVecMultRealMat(gsl_vector_complex* vector, gsl_spmatr
 
     return mv;
 }
-// Get unitary matrix in sparse format COO
+// get unitary matrix in sparse format COO
 //
 // Arguments
 // ---------
@@ -810,6 +786,9 @@ gsl_vector_complex* phaseShiftGate(gsl_vector_complex *wavefunction, int qubit, 
     return r_psi;
 }
 
+
+
+
 // Oracle gate used in grovers quantum search algorithm. Argument answer is the "Correct question" mentioned
 // in paper
 gsl_vector_complex* oracleGate(gsl_vector_complex* wavefunction, int answer){
@@ -901,6 +880,16 @@ gsl_vector_complex* cnotGate(gsl_vector_complex* wavefunction, int control, int 
     return swapsies(c_psi, wavefunction);
 }
 
+// Simply prints the probability amplitudes of each state.
+//
+// Arguments
+// ---------
+// [1] Wavefunction -> Contains probability amplitudes to be printed.
+// 
+// Returns
+// -------
+// void
+
 // Given a composite number, i.e. the product of two primes, Shors alg is able to factorise this composite number faster than any classic algorithm. Use a high degree of encapsulation here.
 //
 // Arguments
@@ -928,17 +917,7 @@ int isPower(int number){
     }
     return 1;
 }
-
-// Utilising Euclids algorithm (recursive) to find GCD
-//
-// Arguments
-// ---------
-// [1] n1 -> number 1
-// [2] n2 -> number 2
-//
-// Returns
-// -------
-// [1] greatest common divisor of n1 and n2
+// Utilising Euclids algorithm to find GCD
 int greatestCommonDivisor(int n1, int n2){
 
     if(n2 != 0){
@@ -950,17 +929,6 @@ int greatestCommonDivisor(int n1, int n2){
     }
 }
 
-// This function finds the prime factors of a number defined as the product of two primes. It does this in time complexity faster than any classical
-// could achieve
-//
-// Arguments
-// ---------
-// [1] Wavefunction -> Contains probability amplitudes to be printed.
-// [2] composite_number -> A number that is the product of two primes. i.e 15 is a small composite number.
-//
-// Returns
-// -------
-// [1] maybe a struct containing two numbers again? maybe a complex number as this is a dtype that stores two doubles/ints
 int shors(gsl_vector_complex* wavefunction, int composite_number){
     
     int isp = isPower(composite_number);
@@ -984,12 +952,11 @@ int shors(gsl_vector_complex* wavefunction, int composite_number){
     }
 
     gsl_rng_free(r);
-    // Now we have our "a",  we can now carry out the quantum part of shors algorithm
 
     if(greatestCommonDivisor(rand, composite_number) > 1){
         return greatestCommonDivisor(rand, composite_number);
     }
-    // Finding the period p
+    
     wavefunction = hadamardGate(wavefunction, 1);
     wavefunction = hadamardGate(wavefunction, 2); 
     wavefunction = hadamardGate(wavefunction, 3);
@@ -999,7 +966,7 @@ int shors(gsl_vector_complex* wavefunction, int composite_number){
     wavefunction = amodcGate(2, rand, composite_number, wavefunction);
     wavefunction = amodcGate(1, rand, composite_number, wavefunction);
 
-    // IQFT block
+//  IQFT block
     wavefunction = hadamardGate(wavefunction, 1);
     wavefunction = CphaseGate(wavefunction, 1, 2, M_PI_2);
     wavefunction = CphaseGate(wavefunction, 1, 3, M_PI_4);
@@ -1007,13 +974,9 @@ int shors(gsl_vector_complex* wavefunction, int composite_number){
     wavefunction = CphaseGate(wavefunction, 2, 3, M_PI_2);
     wavefunction = hadamardGate(wavefunction, 3);
 
-    // Measure the wavefunction to collapse is and observe the IQFT of x    
-    measureRegisterGate(wavefunction);
-
-
-
     return 0;
 
+// Now we have our "a",  we can now carry out the quantum part of shors algorithm
 
 }
 

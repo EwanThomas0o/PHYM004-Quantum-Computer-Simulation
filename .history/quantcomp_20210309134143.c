@@ -45,7 +45,6 @@ License: Public Domain
  2/03/21        0.1.6  Phase gate now works! Was setting nz elements in spmatrix to 0!
  8/03/21        0.2.0  CPhase working. Now on to implementing the non-quantum section of Shor's Alg
  9/03/21         ""    Working on step 4 of shors algorithm still. Some bugs need fixing.
- 9/03/21        0.3.0  Output of x~ is now correct for a=7, C=15, N=7
 */
 
 #include <stdio.h>
@@ -74,34 +73,11 @@ void qubit_error(){
     printf("Please operate the gate on a valid qubit\n");
     exit(1);
 }
-// Simply prints the probability amplitudes of each state.
-//
-// Arguments
-// ---------
-// [1] Wavefunction -> Contains probability amplitudes to be printed.
-// 
-// Returns
-// -------
-// void
 void print_wf(gsl_vector_complex* wavefunction){
     for (int i = 0; i < wavefunction->size; i++){
         printf("%lg + %lgi\n", GSL_REAL(gsl_vector_complex_get(wavefunction, i)), GSL_IMAG(gsl_vector_complex_get(wavefunction, i)));
     }
 }
-// Hand built function based on cblas functions to multiply non sparse complex matrix and vecotrs and function used to
-// multiply sparse matrices in COO format. Possible extensions in the future could be to allow this func to manage CCS and CRS 
-// formated matrices
-//
-// Argumnents
-// ----------
-// [1] CBLAS_TRANSPOSE_t -> is the matrix to be transposed or not, legacy feature.
-// [2] A -> sparse complex matrix to be multiplied
-// [3] x -> complex vector to be multiplied
-// [4] y -> Where the procuct of A and x is stored.
-//
-// Returns
-// -------
-// [1] y -> The product of the matrix A and vector x
 gsl_vector_complex* myMulFunc(const CBLAS_TRANSPOSE_t TransA,
                  gsl_spmatrix_complex *A, gsl_vector_complex *x,
                  gsl_vector_complex *y)
@@ -321,7 +297,7 @@ gsl_vector_complex* complexVecMultRealMat(gsl_vector_complex* vector, gsl_spmatr
 
     return mv;
 }
-// Get unitary matrix in sparse format COO
+// get unitary matrix in sparse format COO
 //
 // Arguments
 // ---------
@@ -809,6 +785,9 @@ gsl_vector_complex* phaseShiftGate(gsl_vector_complex *wavefunction, int qubit, 
     
     return r_psi;
 }
+
+
+
 
 // Oracle gate used in grovers quantum search algorithm. Argument answer is the "Correct question" mentioned
 // in paper
