@@ -1092,6 +1092,8 @@ int main(){
     wavefunction = hadamardGate(wavefunction, 3);
 
     // wavefunction = phaseShiftGate(wavefunction, 3,  3.14159);
+    printf("Jade\n");
     measureRegisterGate(wavefunction);
+    readsXReg(wavefunction);
     return 0;
 }

@@ -957,30 +957,6 @@ int greatestCommonDivisor(int n1, int n2){
 // -------
 // [1] maybe a struct containing two numbers again? maybe a complex number as this is a dtype that stores two doubles/ints
 
-char* reverseString(const char* string){
-    
-    char* rev;
-    int begin, end, count;
-    
-    count = strlen(string);
-
-    rev = malloc(count);
-
-    end = count - 1;
-
-    for(begin = 0; begin < count; begin++)
-    {
-        rev[begin] = string[end];
-        end--;
-    }
-
-    rev[begin] = '\0';
-
-
-
-    return rev; 
-}
-
 int readsXReg(gsl_vector_complex* wavefunction){
     //Wavefunction needs to be collapsed in order for this to work properly! Add a measure gate just to be sure it is collapsed
 
@@ -989,17 +965,13 @@ int readsXReg(gsl_vector_complex* wavefunction){
     // After wf is collapsed we measure which state it's in, turn this number into binary, then read the first 3 digits in reverse
     // and convert back into base 10 to find the fourier trans of x
     state = measureRegisterGate(wavefunction);
-
-    
-    binXTransformed = malloc(3); // use xmalloc??
+     binXTransformed = malloc(3); // use xmalloc??
     if(binXTransformed == NULL){
         printf("Malloc failed");
     }
 
     strlcpy(binXTransformed, state, 4); // 4 to include terminating charecter for security as apposed to strncpy()
-    
     // Need to reverse binXTransformed
-    binXTransformed = reverseString(binXTransformed);
 
     printf("%s\n", binXTransformed);
     
@@ -1092,6 +1064,8 @@ int main(){
     wavefunction = hadamardGate(wavefunction, 3);
 
     // wavefunction = phaseShiftGate(wavefunction, 3,  3.14159);
+    print_wf(wavefunction);
     measureRegisterGate(wavefunction);
+    readsXReg(wavefunction);
     return 0;
 }

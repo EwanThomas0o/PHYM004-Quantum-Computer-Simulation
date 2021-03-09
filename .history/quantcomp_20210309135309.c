@@ -370,7 +370,7 @@ void print_matrix(gsl_spmatrix_complex* matrix){
 //  Arguments
 //  ---------
 // [1] Wavefunction -> Defines the state of the system with probability amplitudes of possible configurations
-char* measureRegisterGate(gsl_vector_complex* wavefunction){
+void measureRegisterGate(gsl_vector_complex* wavefunction){
     int states = (int) wavefunction->size;
     double probabilities[states];
     
@@ -400,7 +400,7 @@ char* measureRegisterGate(gsl_vector_complex* wavefunction){
     gsl_ran_discrete_free(lookup);
     gsl_rng_free(r);
     
-    return intToBinary(t);
+    return;
 
 }
 
@@ -591,27 +591,31 @@ gsl_vector_complex* amodcGate(int control, int a, int C, gsl_vector_complex* wav
             }  
             strlcpy(f, binK+3, 4+1); // Taking the substring m3m2m1m0 from l2l1l0m3m2m1m0
                         
-            if(  (int)strtol(f, NULL, 2)  >= C){
-               
+            if(((int)strtol(f, NULL, 2)) >= C){
                 gsl_spmatrix_set(amodx, k, k, 1.0);
             
             }
             else if(binK[control-1] - '0' != 0 && (int)strtol(f, NULL, 2) < C)
             {
                 int fprime = (int)A*strtol(f, NULL, 2) % C; // f' = f*A*mod(C) 
-
+                printf("f' = %d\n", fprime);
                 char* binFprime = malloc(N); // a char is one byte
-
                 binFprime = intToBinary(fprime);
-
-                char *l = malloc(N);
+                printf("binF' = %s\n", binFprime);
                 
+                //THE PROBLEM IS HEEEREEEE
+                printf("bink = %s\n", binK);
+                char *l = malloc(N);
                 strlcpy(l, binK, 3+1);
+                
+                printf("l2l1l0 = %s\n", l);
                 
                 strncat(l, binFprime+3, 4);
                 
+                printf("binj = %s\n\n", l);
+                
                 int j = (int)strtol(l, NULL, 2);
-
+                printf("j = %d\n", j);
                 gsl_spmatrix_set(amodx, j, k, 1.0);
                 
                 free(l);
@@ -622,6 +626,7 @@ gsl_vector_complex* amodcGate(int control, int a, int C, gsl_vector_complex* wav
 
         }
     }
+    gsl_spmatrix_fprintf(stdout, amodx, "%g");
     newState = complexVecMultRealMat(wavefunction, amodx);
 
     gsl_spmatrix_free(amodx);
@@ -908,12 +913,12 @@ gsl_vector_complex* cnotGate(gsl_vector_complex* wavefunction, int control, int 
 
 int isPower(int number){
     
-    if (number % 2 == 0) // Checking if number is even or power of two
+    if (number % 2 == 0) // Checking if number is even
     {
         return 2;
     }
     
-    for(int i = 3; i < (int)(number / 3); i++){ //Starting with seeing if 3^n == number for a whole number n, then to 4^n etc
+    for(int i = 3; i < number / 3; i++){
         
         double n = log(number) / log(i);
         
@@ -956,63 +961,8 @@ int greatestCommonDivisor(int n1, int n2){
 // Returns
 // -------
 // [1] maybe a struct containing two numbers again? maybe a complex number as this is a dtype that stores two doubles/ints
-
-char* reverseString(const char* string){
-    
-    char* rev;
-    int begin, end, count;
-    
-    count = strlen(string);
-
-    rev = malloc(count);
-
-    end = count - 1;
-
-    for(begin = 0; begin < count; begin++)
-    {
-        rev[begin] = string[end];
-        end--;
-    }
-
-    rev[begin] = '\0';
-
-
-
-    return rev; 
-}
-
-int readsXReg(gsl_vector_complex* wavefunction){
-    //Wavefunction needs to be collapsed in order for this to work properly! Add a measure gate just to be sure it is collapsed
-
-    char* state;
-    char* binXTransformed;
-    // After wf is collapsed we measure which state it's in, turn this number into binary, then read the first 3 digits in reverse
-    // and convert back into base 10 to find the fourier trans of x
-    state = measureRegisterGate(wavefunction);
-
-    
-    binXTransformed = malloc(3); // use xmalloc??
-    if(binXTransformed == NULL){
-        printf("Malloc failed");
-    }
-
-    strlcpy(binXTransformed, state, 4); // 4 to include terminating charecter for security as apposed to strncpy()
-    
-    // Need to reverse binXTransformed
-    binXTransformed = reverseString(binXTransformed);
-
-    printf("%s\n", binXTransformed);
-    
-    int xTilde = (int)strtol(binXTransformed, NULL, 2);
-    
-    printf("%d\n", xTilde);
-    
-    return xTilde;
-
-}
 int shors(gsl_vector_complex* wavefunction, int composite_number){
     
-    // Step 1
     int isp = isPower(composite_number);
     if(isp != 1){
     
@@ -1020,19 +970,19 @@ int shors(gsl_vector_complex* wavefunction, int composite_number){
     
     }
     
-    // Step 2
     // if not a factor of two or a power of another number, pick a random number between 1 and composite_number
     gsl_rng * r = gsl_rng_alloc (gsl_rng_mt19937); // High quality random number generator
 
     unsigned long int seed = tv.tv_usec; // Seed depends on time of day so repeates every 24 hours.  
-
     gsl_rng_set(r, seed);
     
     int rand = 0;
+    
     while (rand < 2)
     {
         rand = gsl_rng_uniform_int(r, composite_number); // Goes until rand is in range 1 < rand < C
     }
+
     gsl_rng_free(r);
     // Now we have our "a",  we can now carry out the quantum part of shors algorithm
 
@@ -1040,19 +990,17 @@ int shors(gsl_vector_complex* wavefunction, int composite_number){
         return greatestCommonDivisor(rand, composite_number);
     }
     // Finding the period p
-    for(int xQubitHad = 1; xQubitHad <= 3; xQubitHad++){
-     
-        wavefunction = hadamardGate(wavefunction, xQubitHad);
+    wavefunction = hadamardGate(wavefunction, 1);
+    wavefunction = hadamardGate(wavefunction, 2); 
+    wavefunction = hadamardGate(wavefunction, 3);
     
-    }
     // Multiplying f register by f(x)
-    for(int xQubitCGate = 3; xQubitCGate >= 1; xQubitCGate--){
-    
-    wavefunction = amodcGate(xQubitCGate, rand, composite_number, wavefunction);
-    
-    }
-    // IQFT block--------------------------------------------
-    wavefunction = hadamardGate(wavefunction, 1); 
+    wavefunction = amodcGate(3, rand, composite_number, wavefunction);
+    wavefunction = amodcGate(2, rand, composite_number, wavefunction);
+    wavefunction = amodcGate(1, rand, composite_number, wavefunction);
+
+    // IQFT block
+    wavefunction = hadamardGate(wavefunction, 1);
     wavefunction = CphaseGate(wavefunction, 1, 2, M_PI_2);
     wavefunction = CphaseGate(wavefunction, 1, 3, M_PI_4);
     wavefunction = hadamardGate(wavefunction, 2);
@@ -1062,7 +1010,11 @@ int shors(gsl_vector_complex* wavefunction, int composite_number){
     // Measure the wavefunction to collapse is and observe the IQFT of x    
     measureRegisterGate(wavefunction);
 
+
+
     return 0;
+
+
 }
 
 
@@ -1091,7 +1043,17 @@ int main(){
     wavefunction = CphaseGate(wavefunction, 2, 3, M_PI_2);
     wavefunction = hadamardGate(wavefunction, 3);
 
+
+
+
+
+
+
     // wavefunction = phaseShiftGate(wavefunction, 3,  3.14159);
+    print_wf(wavefunction);
     measureRegisterGate(wavefunction);
+
+
+
     return 0;
 }

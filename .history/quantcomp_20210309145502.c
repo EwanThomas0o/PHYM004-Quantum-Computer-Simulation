@@ -591,27 +591,31 @@ gsl_vector_complex* amodcGate(int control, int a, int C, gsl_vector_complex* wav
             }  
             strlcpy(f, binK+3, 4+1); // Taking the substring m3m2m1m0 from l2l1l0m3m2m1m0
                         
-            if(  (int)strtol(f, NULL, 2)  >= C){
-               
+            if(((int)strtol(f, NULL, 2)) >= C){
                 gsl_spmatrix_set(amodx, k, k, 1.0);
             
             }
             else if(binK[control-1] - '0' != 0 && (int)strtol(f, NULL, 2) < C)
             {
                 int fprime = (int)A*strtol(f, NULL, 2) % C; // f' = f*A*mod(C) 
-
+                printf("f' = %d\n", fprime);
                 char* binFprime = malloc(N); // a char is one byte
-
                 binFprime = intToBinary(fprime);
-
-                char *l = malloc(N);
+                printf("binF' = %s\n", binFprime);
                 
+                //THE PROBLEM IS HEEEREEEE
+                printf("bink = %s\n", binK);
+                char *l = malloc(N);
                 strlcpy(l, binK, 3+1);
+                
+                printf("l2l1l0 = %s\n", l);
                 
                 strncat(l, binFprime+3, 4);
                 
+                printf("binj = %s\n\n", l);
+                
                 int j = (int)strtol(l, NULL, 2);
-
+                printf("j = %d\n", j);
                 gsl_spmatrix_set(amodx, j, k, 1.0);
                 
                 free(l);
@@ -622,6 +626,7 @@ gsl_vector_complex* amodcGate(int control, int a, int C, gsl_vector_complex* wav
 
         }
     }
+    gsl_spmatrix_fprintf(stdout, amodx, "%g");
     newState = complexVecMultRealMat(wavefunction, amodx);
 
     gsl_spmatrix_free(amodx);
@@ -957,56 +962,22 @@ int greatestCommonDivisor(int n1, int n2){
 // -------
 // [1] maybe a struct containing two numbers again? maybe a complex number as this is a dtype that stores two doubles/ints
 
-char* reverseString(const char* string){
-    
-    char* rev;
-    int begin, end, count;
-    
-    count = strlen(string);
-
-    rev = malloc(count);
-
-    end = count - 1;
-
-    for(begin = 0; begin < count; begin++)
-    {
-        rev[begin] = string[end];
-        end--;
-    }
-
-    rev[begin] = '\0';
-
-
-
-    return rev; 
-}
-
 int readsXReg(gsl_vector_complex* wavefunction){
     //Wavefunction needs to be collapsed in order for this to work properly! Add a measure gate just to be sure it is collapsed
 
-    char* state;
-    char* binXTransformed;
+    char* state = measureRegisterGate(wavefunction);
     // After wf is collapsed we measure which state it's in, turn this number into binary, then read the first 3 digits in reverse
     // and convert back into base 10 to find the fourier trans of x
-    state = measureRegisterGate(wavefunction);
-
-    
-    binXTransformed = malloc(3); // use xmalloc??
+    char* binXTransformed = malloc(3); // use xmalloc??
     if(binXTransformed == NULL){
         printf("Malloc failed");
     }
-
-    strlcpy(binXTransformed, state, 4); // 4 to include terminating charecter for security as apposed to strncpy()
-    
+    strlcpy(binXTransformed, state, 3); // 4 to include terminating charecter for security as apposed to strncpy()
     // Need to reverse binXTransformed
-    binXTransformed = reverseString(binXTransformed);
 
     printf("%s\n", binXTransformed);
-    
     int xTilde = (int)strtol(binXTransformed, NULL, 2);
-    
     printf("%d\n", xTilde);
-    
     return xTilde;
 
 }
@@ -1092,6 +1063,8 @@ int main(){
     wavefunction = hadamardGate(wavefunction, 3);
 
     // wavefunction = phaseShiftGate(wavefunction, 3,  3.14159);
+    print_wf(wavefunction);
     measureRegisterGate(wavefunction);
+    readsXReg(wavefunction);
     return 0;
 }

@@ -1093,5 +1093,6 @@ int main(){
 
     // wavefunction = phaseShiftGate(wavefunction, 3,  3.14159);
     measureRegisterGate(wavefunction);
+    readsXReg(wavefunction);
     return 0;
 }

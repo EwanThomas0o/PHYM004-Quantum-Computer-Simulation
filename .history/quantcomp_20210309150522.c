@@ -976,9 +976,9 @@ char* reverseString(const char* string){
 
     rev[begin] = '\0';
 
-
-
     return rev; 
+
+
 }
 
 int readsXReg(gsl_vector_complex* wavefunction){
@@ -999,7 +999,6 @@ int readsXReg(gsl_vector_complex* wavefunction){
     strlcpy(binXTransformed, state, 4); // 4 to include terminating charecter for security as apposed to strncpy()
     
     // Need to reverse binXTransformed
-    binXTransformed = reverseString(binXTransformed);
 
     printf("%s\n", binXTransformed);
     
@@ -1092,6 +1091,8 @@ int main(){
     wavefunction = hadamardGate(wavefunction, 3);
 
     // wavefunction = phaseShiftGate(wavefunction, 3,  3.14159);
+    print_wf(wavefunction);
     measureRegisterGate(wavefunction);
+    readsXReg(wavefunction);
     return 0;
 }
