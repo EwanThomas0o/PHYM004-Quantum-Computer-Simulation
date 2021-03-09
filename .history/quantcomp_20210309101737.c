@@ -548,24 +548,21 @@ gsl_vector_complex* findElementFofx(int control, int a, int C, gsl_vector_comple
     gsl_spmatrix* amodx = gsl_spmatrix_alloc(128, 128);
 
     for(int k = 0; k < amodx->size2; k++){
-        
         char* binK = intToBinary(k);
-        
         if(binK[control-1] - '0' == 0){
 
             gsl_spmatrix_set(amodx, k, k, 1.0);
 
         }
-
-        if (binK[control-1] - '0' != 0)
+        if (binK[control-1] - '0' != 0) //after this point things get messy, can be seen for each control qubit
         {
             
-            char* f = malloc(4);
+            char* f = malloc(4); //Check for errors in malloc here
             if(f == NULL){
                 printf("Malloc Error");
                 return NULL;
             }  
-            strlcpy(f, binK+3, 4+1); // Taking the substring m3m2m1m0 from l2l1l0m3m2m1m0
+            strlcpy(f, binK+3, 4+1); //taking the substring m3m2m1m0 from l2l1l0m3m2m1m0
                         
             if(((int)strtol(f, NULL, 2)) >= C){
                 gsl_spmatrix_set(amodx, k, k, 1.0);

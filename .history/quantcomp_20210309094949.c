@@ -548,24 +548,21 @@ gsl_vector_complex* findElementFofx(int control, int a, int C, gsl_vector_comple
     gsl_spmatrix* amodx = gsl_spmatrix_alloc(128, 128);
 
     for(int k = 0; k < amodx->size2; k++){
-        
         char* binK = intToBinary(k);
-        
         if(binK[control-1] - '0' == 0){
 
             gsl_spmatrix_set(amodx, k, k, 1.0);
 
         }
-
-        if (binK[control-1] - '0' != 0)
+        if (binK[control-1] - '0' != 0) //after this point things get messy, can be seen for each control qubit
         {
             
-            char* f = malloc(4);
+            char* f = malloc(4); //Check for errors in malloc here
             if(f == NULL){
                 printf("Malloc Error");
                 return NULL;
             }  
-            strlcpy(f, binK+3, 4+1); // Taking the substring m3m2m1m0 from l2l1l0m3m2m1m0
+            strncpy(f, binK+3, 4); //taking the substring m3m2m1m0 from l2l1l0m3m2m1m0
                         
             if(((int)strtol(f, NULL, 2)) >= C){
                 gsl_spmatrix_set(amodx, k, k, 1.0);
@@ -574,29 +571,27 @@ gsl_vector_complex* findElementFofx(int control, int a, int C, gsl_vector_comple
             else if(binK[control-1] - '0' != 0 && (int)strtol(f, NULL, 2) < C)
             {
                 int fprime = (int)A*strtol(f, NULL, 2) % C; // f' = f*A*mod(C) 
-                printf("f' = %d\n", fprime);
+                printf("%d\n", fprime);
                 char* binFprime = malloc(N); // a char is one byte
                 binFprime = intToBinary(fprime);
-                printf("binF' = %s\n", binFprime);
+                printf("%s\n", binFprime);
                 
                 //THE PROBLEM IS HEEEREEEE
-                printf("bink = %s\n", binK);
-                char *l = malloc(N);
-                strlcpy(l, binK, 3+1);
+                printf("%s\n", binK);
+                char *l = malloc(7);
+                strncpy(l, binK, 3);
                 
-                printf("l2l1l0 = %s\n", l);
+                printf("%s\n", l);
                 
                 strncat(l, binFprime+3, 4);
                 
-                printf("binj = %s\n\n", l);
+                printf("%s\n\n", l);
                 
                 int j = (int)strtol(l, NULL, 2);
-                printf("j = %d\n", j);
+                // printf("%d\n", j);
                 gsl_spmatrix_set(amodx, j, k, 1.0);
-                
                 free(l);
                 free(binFprime);
-                free(f);
             }
             free(binK);
 
