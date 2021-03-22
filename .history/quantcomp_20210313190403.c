@@ -650,7 +650,7 @@ gsl_vector_complex* amodcGate(int control, int a, int C, gsl_vector_complex* wav
         gsl_spmatrix_free(amodx);
         fclose(fp2);
     }
-    if(control == 3){
+    if(control == 1){
         FILE *fp3;
         fp3 = fopen("amodc_matrix3.txt", "w+");
         gsl_spmatrix_fprintf(fp3,amodx, "%g");

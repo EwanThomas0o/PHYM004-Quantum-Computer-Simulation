@@ -636,29 +636,11 @@ gsl_vector_complex* amodcGate(int control, int a, int C, gsl_vector_complex* wav
         }
     }
     newState = complexVecMultRealMat(wavefunction, amodx);
-    if(control == 1){
-        FILE *fp1;
-        fp1 = fopen("amodc_matrix1.txt", "w+");
-        gsl_spmatrix_fprintf(fp1,amodx, "%g");
-        gsl_spmatrix_free(amodx);
-        fclose(fp1);
-    }
-    if(control == 2){
-        FILE *fp2;
-        fp2 = fopen("amodc_matrix2.txt", "w+");
-        gsl_spmatrix_fprintf(fp2,amodx, "%g");
-        gsl_spmatrix_free(amodx);
-        fclose(fp2);
-    }
-    if(control == 3){
-        FILE *fp3;
-        fp3 = fopen("amodc_matrix3.txt", "w+");
-        gsl_spmatrix_fprintf(fp3,amodx, "%g");
-        gsl_spmatrix_free(amodx);
-        fclose(fp3);
-    }
+   FILE *fp;
+   fp = fopen("amodc_matrix.txt", "w+");
+    gsl_spmatrix_fwrite(fp,amodx);
+    gsl_spmatrix_free(amodx);
     return swapsies(newState, wavefunction);
-
 }
 
 //  This function calculates values of the cphase matrix for a system of arbitrary size in an element-wise method.

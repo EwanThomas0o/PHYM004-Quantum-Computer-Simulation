@@ -636,29 +636,9 @@ gsl_vector_complex* amodcGate(int control, int a, int C, gsl_vector_complex* wav
         }
     }
     newState = complexVecMultRealMat(wavefunction, amodx);
-    if(control == 1){
-        FILE *fp1;
-        fp1 = fopen("amodc_matrix1.txt", "w+");
-        gsl_spmatrix_fprintf(fp1,amodx, "%g");
-        gsl_spmatrix_free(amodx);
-        fclose(fp1);
-    }
-    if(control == 2){
-        FILE *fp2;
-        fp2 = fopen("amodc_matrix2.txt", "w+");
-        gsl_spmatrix_fprintf(fp2,amodx, "%g");
-        gsl_spmatrix_free(amodx);
-        fclose(fp2);
-    }
-    if(control == 3){
-        FILE *fp3;
-        fp3 = fopen("amodc_matrix3.txt", "w+");
-        gsl_spmatrix_fprintf(fp3,amodx, "%g");
-        gsl_spmatrix_free(amodx);
-        fclose(fp3);
-    }
-    return swapsies(newState, wavefunction);
 
+    gsl_spmatrix_free(amodx);
+    return swapsies(newState, wavefunction);
 }
 
 //  This function calculates values of the cphase matrix for a system of arbitrary size in an element-wise method.
@@ -1217,18 +1197,18 @@ int main(){
     int states = (int)pow(BASIS, N);
     gsl_vector_complex* wavefunction = initWavefunctionShors(states);
     //Putting system into equal super position of superposition all 2^N basis'
-    wavefunction = hadamardGate(wavefunction, 1);
-    wavefunction = hadamardGate(wavefunction, 2); 
-    wavefunction = hadamardGate(wavefunction, 3);
+    // wavefunction = hadamardGate(wavefunction, 1);
+    // wavefunction = hadamardGate(wavefunction, 2); 
+    // wavefunction = hadamardGate(wavefunction, 3);
 //     // wavefunction = cnotGate(wavefunction, 1,2 );
 //     // wavefunction = CphaseGate(wavefunction, 2, 1, M_PI_4);
 
 //     // for(int i = 0; i < floor(M_PI_4*sqrt(pow(2,N))); i++){ // Needs to be called "floor(pi/4*sqrt(2^N))"" times for optimum output roughly 2 in our case
 //     //     wavefunction = groversBlock(wavefunction, 7); //Second argument is the basis state you want to be "right" in this case its |110>
 //     // }
-    wavefunction = amodcGate(3, 7, 15, wavefunction);
-    wavefunction = amodcGate(2, 7, 15, wavefunction);
-    wavefunction = amodcGate(1, 7, 15, wavefunction);
+    // wavefunction = amodcGate(3, 2, 15, wavefunction);
+    // wavefunction = amodcGate(2, 2, 15, wavefunction);
+    // wavefunction = amodcGate(1, 2, 15, wavefunction);
 
 // // // IQFT block
     // wavefunction = hadamardGate(wavefunction, 1);
@@ -1239,9 +1219,8 @@ int main(){
     // wavefunction = hadamardGate(wavefunction, 3);
 
 //     // wavefunction = phaseShiftGate(wavefunction, 3,  3.14159);
-    // shors(wavefunction, 15);
+    shors(wavefunction, 15);
     // print_wf(wavefunction);
     // readsXReg(wavefunction);
-    measureRegisterGate(wavefunction);
     return 0;
 }

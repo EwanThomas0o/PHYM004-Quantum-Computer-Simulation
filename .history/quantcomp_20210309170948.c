@@ -1,7 +1,7 @@
 /* Title: Quantum Computer Simulation PHYM004
 Author: Ewan-James Thomas
 File_name: quantcomp.c
-License: Public Domain & GNU licensing 
+License: Public Domain & GSL licensing 
 */
 
 /****************** PHYM004 PR2: Quantum Computer Simulation ******************/
@@ -12,16 +12,15 @@ License: Public Domain & GNU licensing
 // Usage
 // -----
 //  All gates apart from measure_register return type wavefunction and so the wavefunction of the entire
-//  system must be updates with each gate call .
+// system must be updates with each gate call .
 // 
-//  Compiled with make file by using command "make quant -q 5" on command line. -q flag defines number of qubits.
-//  NOTE: Shor's Alg only works with 7 qubits
-//  Then execute the binary file with "make do"
+//  Compiled with make file by using command "make quant" on command line. Then execute the binary file with 
+// "./quant" to yield output
 // Example
 // -------
 //
 /*      UPDATES
- Date         Version  Comments 
+ Date         Version  Comments  #P.x.y means pending 
  ----         -------  --------
  13/01/21       0.0.1  Create file with intention to work on part 1: Building a quantum register
  14/01/21       0.0.2  Quantum register of 3 qubits created. Now working on quantum gates for register
@@ -47,9 +46,6 @@ License: Public Domain & GNU licensing
  8/03/21        0.2.0  CPhase working. Now on to implementing the non-quantum section of Shor's Alg
  9/03/21         ""    Working on step 4 of shors algorithm still. Some bugs need fixing.
  9/03/21        0.3.0  Output of x~ is now correct for a=7, C=15, N=7
- 10/03/21       0.4.0  Now working on non-quantum steps, getting denominator from x-tilde and trying to find real period
- 11/03/21       0.4.1  Added a few functions to assist with finding the period, no success yet
- 12/03/21       0.5.0  Can use quantum method to factor :)
 */
 
 #include <stdio.h>
@@ -71,15 +67,8 @@ License: Public Domain & GNU licensing
 #define BASIS 2
 #define N 7 // Number of qubits defined
 #define STATES_MAX 1024 //max of 10 qubits 
-#define L 3
-#define M 4
 
 struct timeval tv;
-
-typedef struct primeFactors{
-    int a;
-    int b;
-}primeFactors;
 
 void qubit_error(){
     printf("Please operate the gate on a valid qubit\n");
@@ -117,17 +106,17 @@ gsl_vector_complex* myMulFunc(const CBLAS_TRANSPOSE_t TransA,
                  gsl_spmatrix_complex *A, gsl_vector_complex *x,
                  gsl_vector_complex *y)
 {
-  const size_t P = A->size1;
-  const size_t K = A->size2;
+  const size_t M = A->size1;
+  const size_t L = A->size2;
 
-  if ((TransA == CblasNoTrans && K != x->size) ||
-      (TransA == CblasTrans && P != x->size))
+  if ((TransA == CblasNoTrans && L != x->size) ||
+      (TransA == CblasTrans && M != x->size))
     {
         return NULL;
       //GSL_ERROR("invalid length of x vector", GSL_EBADLEN);
     }
-  else if ((TransA == CblasNoTrans && P != y->size) ||
-           (TransA == CblasTrans && K != y->size))
+  else if ((TransA == CblasNoTrans && M != y->size) ||
+           (TransA == CblasTrans && L != y->size))
     {
         return NULL; 
         //GSL_ERROR("invalid length of y vector", GSL_EBADLEN);
@@ -143,13 +132,13 @@ gsl_vector_complex* myMulFunc(const CBLAS_TRANSPOSE_t TransA,
 
       if (TransA == CblasNoTrans)
         {
-          lenX = K;
-          lenY = P;
+          lenX = L;
+          lenY = M;
         }
       else
         {
-          lenX = P;
-          lenY = K;
+          lenX = M;
+          lenY = L;
         }
 
       /* form y := op(A)*x */
@@ -231,12 +220,10 @@ gsl_vector_complex* initWavefunctionEqualProb(int states){ //Initialising wf to 
 
     wavefunction = gsl_vector_complex_alloc(states);
 
-    gsl_vector_complex_set_all(wavefunction , gsl_complex_rect(1/sqrt(pow(BASIS, N)), 0));
+    gsl_vector_complex_set_all(wavefunction , gsl_complex_rect(1/sqrt(8), 0));
 
     return wavefunction;
 }
-
-//
 
 gsl_vector_complex* initWavefunctionShors(int states){ //Initialising wf to "Equal Probability" of all states
     
@@ -636,29 +623,9 @@ gsl_vector_complex* amodcGate(int control, int a, int C, gsl_vector_complex* wav
         }
     }
     newState = complexVecMultRealMat(wavefunction, amodx);
-    if(control == 1){
-        FILE *fp1;
-        fp1 = fopen("amodc_matrix1.txt", "w+");
-        gsl_spmatrix_fprintf(fp1,amodx, "%g");
-        gsl_spmatrix_free(amodx);
-        fclose(fp1);
-    }
-    if(control == 2){
-        FILE *fp2;
-        fp2 = fopen("amodc_matrix2.txt", "w+");
-        gsl_spmatrix_fprintf(fp2,amodx, "%g");
-        gsl_spmatrix_free(amodx);
-        fclose(fp2);
-    }
-    if(control == 3){
-        FILE *fp3;
-        fp3 = fopen("amodc_matrix3.txt", "w+");
-        gsl_spmatrix_fprintf(fp3,amodx, "%g");
-        gsl_spmatrix_free(amodx);
-        fclose(fp3);
-    }
-    return swapsies(newState, wavefunction);
 
+    gsl_spmatrix_free(amodx);
+    return swapsies(newState, wavefunction);
 }
 
 //  This function calculates values of the cphase matrix for a system of arbitrary size in an element-wise method.
@@ -726,10 +693,6 @@ gsl_complex findElementCphase(char* row, char* col, int control_qubit, int targe
    
     return value;
 }
-
-
-
-
 gsl_vector_complex* CphaseGate(gsl_vector_complex* wavefunction, int control, int target, double phase){
 
     /* Will need to only put val if val is non-zero due to sparse nature, need to use myMulFunc in order to multiply
@@ -1038,85 +1001,54 @@ int readsXReg(gsl_vector_complex* wavefunction){
     // Need to reverse binXTransformed
     binXTransformed = reverseString(binXTransformed);
 
-    // printf("%s\n", binXTransformed);
+    printf("%s\n", binXTransformed);
     
     int xTilde = (int)strtol(binXTransformed, NULL, 2);
     
-    printf("x tilde = %d\n", xTilde);
+    printf("%d\n", xTilde);
     
     return xTilde;
 
 }
-
-primeFactors decimalToFraction(double number){
-
-    primeFactors ints;
-
-    double intVal = floor(number);
-    double decVal = number - intVal;
-    double pVal = 1000000000;
-    int gcd = greatestCommonDivisor(round(decVal * pVal), pVal);
-
-   double num = round(decVal * pVal) / gcd;
-
-   double deno = pVal / gcd;
-
-   ints.a = intVal * deno + num; //top
-   ints.b = deno; //bottom
-
-   return ints;
-}
-
-// Return
-// ------
-// [1] 0 if p is not suitable, in this case go back and pick a new a!
-// [2] 1 if p is all good for usage
-int testP(int a, int p, int C){
-
-    double congruence = (double)(((int)pow((double)a, (double)p/2)) % C);
-    double minusOneCongruence = -1 % C;
-    // printf("%lg", congruence);
+int shors(gsl_vector_complex* wavefunction, int composite_number){
     
-    if(p % 2 == 0 /*is even*/ && congruence != minusOneCongruence /* ensuring a^p/2 != -1 mod(C)*/ ){
-        return 1;
-    }
-    else
-    {
-        return 0;
+    // Step 1
+    int isp = isPower(composite_number);
+    if(isp != 1){
+    
+        return isp;
+    
     }
     
-}
-
-int getRand(int compositeNumber){
+    // Step 2
+    // if not a factor of two or a power of another number, pick a random number between 1 and composite_number
     gsl_rng * r = gsl_rng_alloc (gsl_rng_mt19937); // High quality random number generator
 
-    gettimeofday(&tv,NULL);
     unsigned long int seed = tv.tv_usec; // Seed depends on time of day so repeates every 24 hours.  
-    
+
     gsl_rng_set(r, seed);
     
     int rand = 0;
     while (rand < 2)
     {
-        rand = gsl_rng_uniform_int(r, compositeNumber); // Goes until rand is in range 1 < rand < C
+        rand = gsl_rng_uniform_int(r, composite_number); // Goes until rand is in range 1 < rand < C
     }
-    printf("rand %d\n", rand);
     gsl_rng_free(r);
-    
-    return rand;
-}
+    // Now we have our "a",  we can now carry out the quantum part of shors algorithm
 
-gsl_vector_complex* shorsBlock(gsl_vector_complex* wavefunction, int rand, int compositeNumber){
-    // Applying hadamard gates to the x register
-    for(int xQubitHad = 1; xQubitHad < M; xQubitHad++){
+    if(greatestCommonDivisor(rand, composite_number) > 1){
+        return greatestCommonDivisor(rand, composite_number);
+    }
+    // Finding the period p
+    for(int xQubitHad = 1; xQubitHad <= 3; xQubitHad++){
      
         wavefunction = hadamardGate(wavefunction, xQubitHad);
     
     }
     // Multiplying f register by f(x)
-    for(int xQubitCGate = L; xQubitCGate > 0; xQubitCGate--){
+    for(int xQubitCGate = 3; xQubitCGate >= 1; xQubitCGate--){
     
-        wavefunction = amodcGate(xQubitCGate, rand, compositeNumber, wavefunction);
+    wavefunction = amodcGate(xQubitCGate, rand, composite_number, wavefunction);
     
     }
     // IQFT block--------------------------------------------
@@ -1127,89 +1059,10 @@ gsl_vector_complex* shorsBlock(gsl_vector_complex* wavefunction, int rand, int c
     wavefunction = CphaseGate(wavefunction, 2, 3, M_PI_2);
     wavefunction = hadamardGate(wavefunction, 3);
 
-    return wavefunction;
+    // Measure the wavefunction to collapse is and observe the IQFT of x    
+    measureRegisterGate(wavefunction);
 
-}
-
-primeFactors shors(gsl_vector_complex* wavefunction, int compositeNumber){
-    
-    primeFactors factors;
-    factors.a = 0;
-    factors.b = 0;
-
-    // Step 1
-    int isp = isPower(compositeNumber);
-    if(isp != 1){
-        factors.a = isp;
-        factors.b = (int) compositeNumber / isp;
-        printf("factor a = %d \n factor b = %d", factors.a, factors.b);
-        return factors;
-    
-    }
-    
-    // Step 2
-    // if not a factor of two or a power of another number, pick a random number between 1 and compositeNumber
-    int rand = getRand(compositeNumber);
-    // Now we have our "a",  we can now carry out the quantum part of shors algorithm
-    int gcf = greatestCommonDivisor(rand, compositeNumber);
-    
-    if( gcf > 1){
-        factors.a = gcf;
-        factors.b = (int)compositeNumber/gcf;
-        printf("factor a = %d \nfactor b = %d\n", factors.a, factors.b);
-
-        return factors;
-    }
-    // Finding the period p
-    wavefunction = shorsBlock(wavefunction, rand, compositeNumber);
-    // Measure the wavefunction to collapse is and observe the IQFT of x  
-    // print_wf(wavefunction);  
-    double omega = (double) readsXReg(wavefunction) / pow(2,L);
-    // need an if omega = 0 to reset as cannot obtain a period guess from this as not expressable as a fraction.
-    printf("omega try 1 = %lg\n", omega);
-    //Now we need to get p from omega! omega = s/p, and then try some factors of s/p i.e. if omega = 0.5 then omega = 1/2 = 2/4 = 4/8, so we try 2,4,8 to fit aP con 1 mod c
-    // Remember we need the smallest value of p that satisfies this rule!
-    
-    // Hopefully this while will ensure we never measure a zero on the x reg. The 0 contains no infomation about the period
-    int i = 2;
-    while(omega == 0){
-        wavefunction = shorsBlock(wavefunction, rand, compositeNumber);
-        omega = (double) readsXReg(wavefunction) / pow(2,L);
-        printf("omega try %d = %lg\n",i, omega);
-        i++;
-    }
-
-    // omega = 0.75 = 3/4 = 6/8 
-    // omega = 0.25 = 1/4 = 2/8
-    // Now we have an omega in the form s/p, we try the values of p proposed.
-    int p = decimalToFraction(omega).b; //Extract the denominator from the fraction
-    printf("Denominator = %d\n", p);
-    // Checking for true period
-    for (size_t i = 1; i < N; i++)
-    {
-        double periodTrial = i*p;
-        double k = (double)((int)pow((double)rand, periodTrial) % compositeNumber); //Won't this always give me an int and hence ciel(k) always = k??
-        double oneCongruence = 1 % compositeNumber;
-
-        printf("Check to see if 1 mod(15) = a^p mod(15)\nk  = %lg and 1mod(15) = %lg", k, oneCongruence);
-        
-        if(k == oneCongruence) //How we check for congruence, ensuring we have the right period!
-        {
-            int test = testP(rand, periodTrial, compositeNumber);
-            printf("test =%d\n", test);
-            if(test == 1){
-                factors.a = greatestCommonDivisor( pow(rand, (periodTrial)/2) + 1, compositeNumber);
-                factors.b = greatestCommonDivisor( pow(rand, (periodTrial)/2) - 1, compositeNumber);
-                printf("a = %d b = %d\n", factors.a, factors.b);
-                return factors;
-            }
-            else
-            {
-            //find another a
-            }
-        }        
-    }
-    return factors;
+    return 0;
 }
 
 
@@ -1220,28 +1073,25 @@ int main(){
     wavefunction = hadamardGate(wavefunction, 1);
     wavefunction = hadamardGate(wavefunction, 2); 
     wavefunction = hadamardGate(wavefunction, 3);
-//     // wavefunction = cnotGate(wavefunction, 1,2 );
-//     // wavefunction = CphaseGate(wavefunction, 2, 1, M_PI_4);
+    // wavefunction = cnotGate(wavefunction, 1,2 );
+    // wavefunction = CphaseGate(wavefunction, 2, 1, M_PI_4);
 
-//     // for(int i = 0; i < floor(M_PI_4*sqrt(pow(2,N))); i++){ // Needs to be called "floor(pi/4*sqrt(2^N))"" times for optimum output roughly 2 in our case
-//     //     wavefunction = groversBlock(wavefunction, 7); //Second argument is the basis state you want to be "right" in this case its |110>
-//     // }
+    // for(int i = 0; i < floor(M_PI_4*sqrt(pow(2,N))); i++){ // Needs to be called "floor(pi/4*sqrt(2^N))"" times for optimum output roughly 2 in our case
+    //     wavefunction = groversBlock(wavefunction, 7); //Second argument is the basis state you want to be "right" in this case its |110>
+    // }
     wavefunction = amodcGate(3, 7, 15, wavefunction);
     wavefunction = amodcGate(2, 7, 15, wavefunction);
     wavefunction = amodcGate(1, 7, 15, wavefunction);
 
-// // // IQFT block
-    // wavefunction = hadamardGate(wavefunction, 1);
-    // wavefunction = CphaseGate(wavefunction, 1, 2, M_PI_2);
-    // wavefunction = CphaseGate(wavefunction, 1, 3, M_PI_4);
-    // wavefunction = hadamardGate(wavefunction, 2);
-    // wavefunction = CphaseGate(wavefunction, 2, 3, M_PI_2);
-    // wavefunction = hadamardGate(wavefunction, 3);
+// // IQFT block
+    wavefunction = hadamardGate(wavefunction, 1);
+    wavefunction = CphaseGate(wavefunction, 1, 2, M_PI_2);
+    wavefunction = CphaseGate(wavefunction, 1, 3, M_PI_4);
+    wavefunction = hadamardGate(wavefunction, 2);
+    wavefunction = CphaseGate(wavefunction, 2, 3, M_PI_2);
+    wavefunction = hadamardGate(wavefunction, 3);
 
-//     // wavefunction = phaseShiftGate(wavefunction, 3,  3.14159);
-    // shors(wavefunction, 15);
-    // print_wf(wavefunction);
-    // readsXReg(wavefunction);
+    // wavefunction = phaseShiftGate(wavefunction, 3,  3.14159);
     measureRegisterGate(wavefunction);
     return 0;
 }

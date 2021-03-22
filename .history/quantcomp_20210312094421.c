@@ -231,7 +231,7 @@ gsl_vector_complex* initWavefunctionEqualProb(int states){ //Initialising wf to 
 
     wavefunction = gsl_vector_complex_alloc(states);
 
-    gsl_vector_complex_set_all(wavefunction , gsl_complex_rect(1/sqrt(pow(BASIS, N)), 0));
+    gsl_vector_complex_set_all(wavefunction , gsl_complex_rect(1/sqrt(8), 0));
 
     return wavefunction;
 }
@@ -636,29 +636,9 @@ gsl_vector_complex* amodcGate(int control, int a, int C, gsl_vector_complex* wav
         }
     }
     newState = complexVecMultRealMat(wavefunction, amodx);
-    if(control == 1){
-        FILE *fp1;
-        fp1 = fopen("amodc_matrix1.txt", "w+");
-        gsl_spmatrix_fprintf(fp1,amodx, "%g");
-        gsl_spmatrix_free(amodx);
-        fclose(fp1);
-    }
-    if(control == 2){
-        FILE *fp2;
-        fp2 = fopen("amodc_matrix2.txt", "w+");
-        gsl_spmatrix_fprintf(fp2,amodx, "%g");
-        gsl_spmatrix_free(amodx);
-        fclose(fp2);
-    }
-    if(control == 3){
-        FILE *fp3;
-        fp3 = fopen("amodc_matrix3.txt", "w+");
-        gsl_spmatrix_fprintf(fp3,amodx, "%g");
-        gsl_spmatrix_free(amodx);
-        fclose(fp3);
-    }
-    return swapsies(newState, wavefunction);
 
+    gsl_spmatrix_free(amodx);
+    return swapsies(newState, wavefunction);
 }
 
 //  This function calculates values of the cphase matrix for a system of arbitrary size in an element-wise method.
@@ -1102,12 +1082,10 @@ int getRand(int compositeNumber){
     }
     printf("rand %d\n", rand);
     gsl_rng_free(r);
-    
     return rand;
 }
 
-gsl_vector_complex* shorsBlock(gsl_vector_complex* wavefunction, int rand, int compositeNumber){
-    // Applying hadamard gates to the x register
+gsl_vector_complex* shorsBlock(gsl_vector_complex* wavefunction, int compositeNumber){
     for(int xQubitHad = 1; xQubitHad < M; xQubitHad++){
      
         wavefunction = hadamardGate(wavefunction, xQubitHad);
@@ -1161,7 +1139,8 @@ primeFactors shors(gsl_vector_complex* wavefunction, int compositeNumber){
         return factors;
     }
     // Finding the period p
-    wavefunction = shorsBlock(wavefunction, rand, compositeNumber);
+  
+
     // Measure the wavefunction to collapse is and observe the IQFT of x  
     // print_wf(wavefunction);  
     double omega = (double) readsXReg(wavefunction) / pow(2,L);
@@ -1171,14 +1150,32 @@ primeFactors shors(gsl_vector_complex* wavefunction, int compositeNumber){
     // Remember we need the smallest value of p that satisfies this rule!
     
     // Hopefully this while will ensure we never measure a zero on the x reg. The 0 contains no infomation about the period
-    int i = 2;
     while(omega == 0){
-        wavefunction = shorsBlock(wavefunction, rand, compositeNumber);
+        int i = 2;
+        gsl_vector_complex_set_zero(wavefunction);
+        gsl_vector_complex_set(wavefunction, 1, GSL_COMPLEX_ONE); //reset to shor state
+        for(int xQubitHad = 1; xQubitHad < M; xQubitHad++){
+     
+            wavefunction = hadamardGate(wavefunction, xQubitHad);
+        }
+        
+        for(int xQubitCGate = L; xQubitCGate > 0; xQubitCGate--){
+    
+            wavefunction = amodcGate(xQubitCGate, rand, compositeNumber, wavefunction); // we use the same number until we don't measure a 0
+    
+        }
+
+        wavefunction = hadamardGate(wavefunction, 1);
+        wavefunction = CphaseGate(wavefunction, 1, 2, M_PI_2);
+        wavefunction = CphaseGate(wavefunction, 1, 3, M_PI_4);
+        wavefunction = hadamardGate(wavefunction, 2);
+        wavefunction = CphaseGate(wavefunction, 2, 3, M_PI_2);
+        wavefunction = hadamardGate(wavefunction, 3);
+
         omega = (double) readsXReg(wavefunction) / pow(2,L);
         printf("omega try %d = %lg\n",i, omega);
         i++;
     }
-
     // omega = 0.75 = 3/4 = 6/8 
     // omega = 0.25 = 1/4 = 2/8
     // Now we have an omega in the form s/p, we try the values of p proposed.
@@ -1217,18 +1214,18 @@ int main(){
     int states = (int)pow(BASIS, N);
     gsl_vector_complex* wavefunction = initWavefunctionShors(states);
     //Putting system into equal super position of superposition all 2^N basis'
-    wavefunction = hadamardGate(wavefunction, 1);
-    wavefunction = hadamardGate(wavefunction, 2); 
-    wavefunction = hadamardGate(wavefunction, 3);
+    // wavefunction = hadamardGate(wavefunction, 1);
+    // wavefunction = hadamardGate(wavefunction, 2); 
+    // wavefunction = hadamardGate(wavefunction, 3);
 //     // wavefunction = cnotGate(wavefunction, 1,2 );
 //     // wavefunction = CphaseGate(wavefunction, 2, 1, M_PI_4);
 
 //     // for(int i = 0; i < floor(M_PI_4*sqrt(pow(2,N))); i++){ // Needs to be called "floor(pi/4*sqrt(2^N))"" times for optimum output roughly 2 in our case
 //     //     wavefunction = groversBlock(wavefunction, 7); //Second argument is the basis state you want to be "right" in this case its |110>
 //     // }
-    wavefunction = amodcGate(3, 7, 15, wavefunction);
-    wavefunction = amodcGate(2, 7, 15, wavefunction);
-    wavefunction = amodcGate(1, 7, 15, wavefunction);
+    // wavefunction = amodcGate(3, 2, 15, wavefunction);
+    // wavefunction = amodcGate(2, 2, 15, wavefunction);
+    // wavefunction = amodcGate(1, 2, 15, wavefunction);
 
 // // // IQFT block
     // wavefunction = hadamardGate(wavefunction, 1);
@@ -1239,9 +1236,8 @@ int main(){
     // wavefunction = hadamardGate(wavefunction, 3);
 
 //     // wavefunction = phaseShiftGate(wavefunction, 3,  3.14159);
-    // shors(wavefunction, 15);
+    shors(wavefunction, 15);
     // print_wf(wavefunction);
     // readsXReg(wavefunction);
-    measureRegisterGate(wavefunction);
     return 0;
 }
