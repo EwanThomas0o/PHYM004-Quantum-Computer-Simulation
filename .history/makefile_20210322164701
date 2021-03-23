@@ -3,8 +3,8 @@ CFLAGS = -Wall -g -lgsl -lcblas
 
 all: test
 
-quantcomp.o: quantcomp.c quantcomp.h
-	$(CC) -c quantcomp.c
+quant.o: quantcomp.c quantcomp.h
+	$(CC) $(CFLAGS) -c quantcomp.c
 do:
 	./quant
 	

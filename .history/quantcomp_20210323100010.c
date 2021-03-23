@@ -53,7 +53,6 @@ License: Public Domain & GNU licensing
  22/03/21       1.0.0  Implemented xmalloc (malloc wrapper)
  22/03/21       1.0.0  Comments on all fucntions informing user of usage.
  22/03/21       1.0.0  Reason for getting 1 and 15 is bc testP must be wrong see step 5 in paper
- 23/03/21       1.1.0  Pass wavefunction and gates by reference to swapsies so constantly updating wf
 */
 
 #include <stdio.h>
@@ -936,7 +935,7 @@ void groversBlock(gsl_vector_complex* wavefunction, int answer){
 // Returns
 // -------
 // [1] Wavefunction -> Wavefunction after manipulation by the cnot gate
-void cnotGate(gsl_vector_complex* wavefunction, int control, int target){
+gsl_vector_complex* cnotGate(gsl_vector_complex* wavefunction, int control, int target){
     gsl_vector_complex* c_psi = gsl_vector_complex_alloc(wavefunction->size);
     gsl_vector_complex_set_zero(c_psi);
 
@@ -948,7 +947,7 @@ void cnotGate(gsl_vector_complex* wavefunction, int control, int target){
         }
     }
     c_psi = complexVecMultRealMat(wavefunction, cnot);
-    swapsies(c_psi, wavefunction);
+    return swapsies(c_psi, wavefunction);
 }
 
 // Given a composite number, i.e. the product of two primes, Shors alg is able to factorise this composite number faster than any classic algorithm. Use a high degree of encapsulation here.
@@ -1230,7 +1229,7 @@ primeFactors shors(gsl_vector_complex* wavefunction, int compositeNumber){
         return factors;
     }
     // Finding the period p
-    shorsBlock(wavefunction, rand, compositeNumber);
+    wavefunction = shorsBlock(wavefunction, rand, compositeNumber);
     // Measure the wavefunction to collapse is and observe the IQFT of x  
     // print_wf(wavefunction);  
     double omega = (double) readsXReg(wavefunction) / pow(2,L);
@@ -1242,7 +1241,7 @@ primeFactors shors(gsl_vector_complex* wavefunction, int compositeNumber){
     // Hopefully this while will ensure we never measure a zero on the x reg. The 0 contains no infomation about the period
     int i = 2;
     while(omega == 0){
-        shorsBlock(wavefunction, rand, compositeNumber);
+        wavefunction = shorsBlock(wavefunction, rand, compositeNumber);
         omega = (double) readsXReg(wavefunction) / pow(2,L);
         printf("omega try %d = %lg\n",i, omega);
         i++;

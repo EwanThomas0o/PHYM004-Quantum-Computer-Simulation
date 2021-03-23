@@ -52,8 +52,6 @@ License: Public Domain & GNU licensing
  12/03/21       0.5.0  Can use quantum method to factor :)
  22/03/21       1.0.0  Implemented xmalloc (malloc wrapper)
  22/03/21       1.0.0  Comments on all fucntions informing user of usage.
- 22/03/21       1.0.0  Reason for getting 1 and 15 is bc testP must be wrong see step 5 in paper
- 23/03/21       1.1.0  Pass wavefunction and gates by reference to swapsies so constantly updating wf
 */
 
 #include <stdio.h>
@@ -71,7 +69,6 @@ License: Public Domain & GNU licensing
 #include <gsl/gsl_math.h>
 #include <gsl/gsl_spmatrix.h>
 #include <gsl/gsl_spblas.h>
-#include "quantcomp.h"
 
 #define BASIS 2
 #define N 7 // Number of qubits defined
@@ -114,7 +111,7 @@ void qubit_error(){
 void print_wf(gsl_vector_complex* wavefunction){
     for (int i = 0; i < wavefunction->size; i++){
         printf("%lg + %lgi\n", GSL_REAL(gsl_vector_complex_get(wavefunction, i)), GSL_IMAG(gsl_vector_complex_get(wavefunction, i)));
-    }printf("\n");
+    }
 }
 // Hand built function based on cblas functions to multiply non sparse complex matrix and vecotrs and function used to
 // multiply sparse matrices in COO format. Possible extensions in the future could be to allow this func to manage CCS and CRS 
@@ -295,7 +292,7 @@ char* intToBinary(int a){
     }
     char *bin_str = (char *) xmalloc(N*sizeof(char));
 
-    sprintf(bin_str, "%02d", bin);   
+    sprintf(bin_str, "%07d", bin);   
 
     return bin_str;
 
@@ -311,11 +308,21 @@ char* intToBinary(int a){
 // Returns
 // -------
 // [1] An updated wavefunction of type gsl_vector_complex
-void swapsies(gsl_vector_complex* new_state, gsl_vector_complex* wavefunction){
+gsl_vector_complex* swapsies(gsl_vector_complex* new_state, gsl_vector_complex* wavefunction){
     //update the old wf with the new 
+    gsl_vector_complex** ptr1 = &new_state;
 
-    gsl_vector_complex_swap(new_state, wavefunction);
+    gsl_vector_complex** ptr2 = &wavefunction;
+
+    gsl_vector_complex* temp;
+
+    temp = *ptr1;
+    *ptr1 = *ptr2;
+    *ptr2 = temp;
+
     gsl_vector_complex_free(new_state);
+
+    return wavefunction;
 }
 
 // A function that alllows one to multiply a complex vector and a real sparse matrix, involves splitting vector into two "views"
@@ -586,7 +593,7 @@ double findElementCnot(char* row, char* col, int control_qubit, int target_qubit
 // Returns
 // -------
 // [1] -> updated wavefunction after multiplying by f(x)
-void amodcGate(int control, int a, int C, gsl_vector_complex* wavefunction){ // only need to cycle through rows as permutation matrix
+gsl_vector_complex* amodcGate(int control, int a, int C, gsl_vector_complex* wavefunction){ // only need to cycle through rows as permutation matrix
     gsl_vector_complex* newState = gsl_vector_complex_alloc(wavefunction->size);
 
     double A;
@@ -657,7 +664,7 @@ void amodcGate(int control, int a, int C, gsl_vector_complex* wavefunction){ // 
         }
     }
     newState = complexVecMultRealMat(wavefunction, amodx);
-    swapsies(newState, wavefunction);
+    return swapsies(newState, wavefunction);
 
 }
 
@@ -738,7 +745,7 @@ gsl_complex findElementCphase(char* row, char* col, int control_qubit, int targe
 // Returns
 // -------
 // [1] -> wavefunction -> updated wavefunction
-void CphaseGate(gsl_vector_complex* wavefunction, int control, int target, double phase){
+gsl_vector_complex* CphaseGate(gsl_vector_complex* wavefunction, int control, int target, double phase){
 
     /* Will need to only put val if val is non-zero due to sparse nature, need to use myMulFunc in order to multiply
     complex matrix by complex vector */
@@ -764,7 +771,7 @@ void CphaseGate(gsl_vector_complex* wavefunction, int control, int target, doubl
     myMulFunc(CblasNoTrans, cphasegate, wavefunction, r_psi); // complex sparse multiplier, works with COO only
 
     /* Maybe use the same block of memory for the matrix and vectors? */
-    swapsies(r_psi, wavefunction);
+    return swapsies(r_psi, wavefunction);
 
 }
 
@@ -780,7 +787,7 @@ void CphaseGate(gsl_vector_complex* wavefunction, int control, int target, doubl
 //  Returns
 //  ---------
 //  [1] Wavefunction after entire register has been acted on by desired hadamard gate.
-void hadamardGate(gsl_vector_complex* wavefunction, int qubit){
+gsl_vector_complex* hadamardGate(gsl_vector_complex* wavefunction, int qubit){
     
     if(qubit > N){
     
@@ -808,7 +815,7 @@ void hadamardGate(gsl_vector_complex* wavefunction, int qubit){
 
     h_psi = complexVecMultRealMat(wavefunction, hadamard);
     
-    swapsies(h_psi, wavefunction); ; //updates wf to new state using pointers rather than memcopy
+    return swapsies(h_psi, wavefunction); ; //updates wf to new state using pointers rather than memcopy
 }
 
 //  A phase gate does not alter the probabilites of finding the the system in a given state, 
@@ -824,7 +831,7 @@ void hadamardGate(gsl_vector_complex* wavefunction, int qubit){
 //  Returns
 //  ---------
 //  [1] Wavefunction after entire register has been acted upon by desired phase shift gate
-void phaseShiftGate(gsl_vector_complex *wavefunction, int qubit, double phase){
+gsl_vector_complex* phaseShiftGate(gsl_vector_complex *wavefunction, int qubit, double phase){
     if(qubit > N){
         printf("Please operate the gate on a valid qubit\n");
         exit(0);
@@ -849,7 +856,7 @@ void phaseShiftGate(gsl_vector_complex *wavefunction, int qubit, double phase){
     print_matrix(phaseGate);
     myMulFunc(CblasNoTrans, phaseGate, wavefunction, r_psi); // complex sparse multiplier, works with COO only
     
-    swapsies(r_psi, wavefunction);
+    return r_psi;
 }
 
 // Quantum oracle gate used in grovers quantum search algorithm. Argument answer is the "Correct question" mentioned
@@ -862,7 +869,7 @@ void phaseShiftGate(gsl_vector_complex *wavefunction, int qubit, double phase){
 // Returns
 // -------
 // [1] wavefunction -> updated wf 
-void oracleGate(gsl_vector_complex* wavefunction, int answer){
+gsl_vector_complex* oracleGate(gsl_vector_complex* wavefunction, int answer){
     
     gsl_spmatrix* oracleGate = gsl_spmatrix_alloc(wavefunction->size, wavefunction->size);
     
@@ -872,7 +879,7 @@ void oracleGate(gsl_vector_complex* wavefunction, int answer){
     gsl_vector_complex* o_psi = gsl_vector_complex_alloc(wavefunction->size);
     o_psi = complexVecMultRealMat(wavefunction, oracleGate);
 
-    swapsies(o_psi, wavefunction);
+    return swapsies(o_psi, wavefunction);
 
 }
 
@@ -885,7 +892,7 @@ void oracleGate(gsl_vector_complex* wavefunction, int answer){
 // Returns
 // -------
 // [1] wavefunction -> wavefunction after muliplication with j gate
-void jGate(gsl_vector_complex* wavefunction){
+gsl_vector_complex* jGate(gsl_vector_complex* wavefunction){
     gsl_spmatrix* jGate = gsl_spmatrix_alloc(wavefunction->size, wavefunction->size);
     spmatrixIdentity(jGate);
     gsl_spmatrix_set(jGate, 0, 0, -1);
@@ -893,7 +900,7 @@ void jGate(gsl_vector_complex* wavefunction){
     gsl_vector_complex* j_psi = gsl_vector_complex_alloc(wavefunction->size);
     j_psi = complexVecMultRealMat(wavefunction, jGate);
 
-    swapsies(j_psi, wavefunction);
+    return swapsies(j_psi, wavefunction);
 }
 
 // An ensemble of gates that are used within grovers block
@@ -906,22 +913,22 @@ void jGate(gsl_vector_complex* wavefunction){
 // Returns
 // -------
 // [1] wavefunction -> wavefunction after muliplication with j gate
-void groversBlock(gsl_vector_complex* wavefunction, int answer){
+gsl_vector_complex* groversBlock(gsl_vector_complex* wavefunction, int answer){
     gsl_vector_complex* b_psi = gsl_vector_complex_alloc(wavefunction->size);
     gsl_vector_complex_set_zero(b_psi);
     //First operation in the block is to apply a quantum oracle gate
-    oracleGate(wavefunction, answer); 
+    b_psi = oracleGate(wavefunction, answer); 
     //Then we apply a hadamard gate to each gate
     for(int i = 1; i < N+1; i++){
-        hadamardGate(b_psi, i); // +1 bc had takes in canonical qubit number.       
+        b_psi = hadamardGate(b_psi, i); // +1 bc had takes in canonical qubit number.       
     }
     // Apply the j gate
-    jGate(b_psi);
+    b_psi = jGate(b_psi);
     // Finally a hadamard gate on each qubit again
     for(int j = 1; j < N+1; j++){
-        hadamardGate(b_psi, j);        
+        b_psi = hadamardGate(b_psi, j);        
     }
-    swapsies(b_psi, wavefunction);
+    return b_psi;
 }
 
 // The controlled-not gate operates on two qubits. The target and the control. If the control is |1>, the target quibit is flipped
@@ -936,7 +943,7 @@ void groversBlock(gsl_vector_complex* wavefunction, int answer){
 // Returns
 // -------
 // [1] Wavefunction -> Wavefunction after manipulation by the cnot gate
-void cnotGate(gsl_vector_complex* wavefunction, int control, int target){
+gsl_vector_complex* cnotGate(gsl_vector_complex* wavefunction, int control, int target){
     gsl_vector_complex* c_psi = gsl_vector_complex_alloc(wavefunction->size);
     gsl_vector_complex_set_zero(c_psi);
 
@@ -948,7 +955,7 @@ void cnotGate(gsl_vector_complex* wavefunction, int control, int target){
         }
     }
     c_psi = complexVecMultRealMat(wavefunction, cnot);
-    swapsies(c_psi, wavefunction);
+    return swapsies(c_psi, wavefunction);
 }
 
 // Given a composite number, i.e. the product of two primes, Shors alg is able to factorise this composite number faster than any classic algorithm. Use a high degree of encapsulation here.
@@ -1113,12 +1120,10 @@ primeFactors decimalToFraction(double decimalNum){
 int testP(int a, int p, int C){
 
     double congruence = (double)(((int)pow((double)a, (double)p/2)) % C);
-    printf("congruence = %lg\n", congruence);
-    double minusOneCongruence = 14;
+    double minusOneCongruence = -1 % C;
     // printf("%lg", congruence);
     
-    if((p % 2 == 0 /*is even*/ && congruence == minusOneCongruence) || (p % 2 != 0) /* ensuring a^p/2 != -1 mod(C)*/ ){
-        // If this is the case we need to pick a new "a" or rand, as i've called it in shors().
+    if(p % 2 == 0 /*is even*/ && congruence != minusOneCongruence /* ensuring a^p/2 != -1 mod(C)*/ ){
         return 1;
     }
     else
@@ -1149,7 +1154,7 @@ int getRand(int compositeNumber){
     {
         rand = gsl_rng_uniform_int(r, compositeNumber); // Goes until rand is in range 1 < rand < C
     }
-    // printf("rand %d\n", rand);
+    printf("rand %d\n", rand);
     gsl_rng_free(r);
     
     return rand;
@@ -1165,28 +1170,28 @@ int getRand(int compositeNumber){
 // Returns
 // -------
 // [1] wavefunction -> updated wavefunction 
-void shorsBlock(gsl_vector_complex* wavefunction, int rand, int compositeNumber){
+gsl_vector_complex* shorsBlock(gsl_vector_complex* wavefunction, int rand, int compositeNumber){
     // Applying hadamard gates to the x register
-    wavefunction = initWavefunctionShors(wavefunction->size);
     for(int xQubitHad = 1; xQubitHad < M; xQubitHad++){
      
-        hadamardGate(wavefunction, xQubitHad);
+        wavefunction = hadamardGate(wavefunction, xQubitHad);
     
     }
     // Multiplying f register by f(x)
     for(int xQubitCGate = L; xQubitCGate > 0; xQubitCGate--){
     
-        amodcGate(xQubitCGate, rand, compositeNumber, wavefunction);
+        wavefunction = amodcGate(xQubitCGate, rand, compositeNumber, wavefunction);
     
     }
     // IQFT block--------------------------------------------
-    hadamardGate(wavefunction, 1); 
-    CphaseGate(wavefunction, 1, 2, M_PI_2);
-    CphaseGate(wavefunction, 1, 3, M_PI_4);
-    hadamardGate(wavefunction, 2);
-    CphaseGate(wavefunction, 2, 3, M_PI_2);
-    hadamardGate(wavefunction, 3);
+    wavefunction = hadamardGate(wavefunction, 1); 
+    wavefunction = CphaseGate(wavefunction, 1, 2, M_PI_2);
+    wavefunction = CphaseGate(wavefunction, 1, 3, M_PI_4);
+    wavefunction = hadamardGate(wavefunction, 2);
+    wavefunction = CphaseGate(wavefunction, 2, 3, M_PI_2);
+    wavefunction = hadamardGate(wavefunction, 3);
 
+    return wavefunction;
 
 }
 
@@ -1230,7 +1235,7 @@ primeFactors shors(gsl_vector_complex* wavefunction, int compositeNumber){
         return factors;
     }
     // Finding the period p
-    shorsBlock(wavefunction, rand, compositeNumber);
+    wavefunction = shorsBlock(wavefunction, rand, compositeNumber);
     // Measure the wavefunction to collapse is and observe the IQFT of x  
     // print_wf(wavefunction);  
     double omega = (double) readsXReg(wavefunction) / pow(2,L);
@@ -1242,7 +1247,7 @@ primeFactors shors(gsl_vector_complex* wavefunction, int compositeNumber){
     // Hopefully this while will ensure we never measure a zero on the x reg. The 0 contains no infomation about the period
     int i = 2;
     while(omega == 0){
-        shorsBlock(wavefunction, rand, compositeNumber);
+        wavefunction = shorsBlock(wavefunction, rand, compositeNumber);
         omega = (double) readsXReg(wavefunction) / pow(2,L);
         printf("omega try %d = %lg\n",i, omega);
         i++;
@@ -1257,16 +1262,16 @@ primeFactors shors(gsl_vector_complex* wavefunction, int compositeNumber){
     for (size_t i = 1; i < N; i++)
     {
         double periodTrial = i*p;
-        printf("rand = %d\n", rand);
-        double k = (double)((int)pow((double)rand, periodTrial) % compositeNumber);
+        double k = (double)((int)pow((double)rand, periodTrial) % compositeNumber); //Won't this always give me an int and hence ciel(k) always = k??
         double oneCongruence = 1 % compositeNumber;
 
-        printf("Check to see if 1 mod(15) = %d^%lg mod(15)\nk  = %lg and 1 mod(15) = %lg\n",rand, periodTrial, k, oneCongruence);
+        printf("Check to see if 1 mod(15) = a^p mod(15)\nk  = %lg and 1mod(15) = %lg", k, oneCongruence);
         
         if(k == oneCongruence) //How we check for congruence, ensuring we have the right period.
         {
             int test = testP(rand, periodTrial, compositeNumber);
-            if(test == 0){
+            printf("test =%d\n", test);
+            if(test == 1){
                 factors.a = greatestCommonDivisor( pow(rand, (periodTrial)/2) + 1, compositeNumber);
                 factors.b = greatestCommonDivisor( pow(rand, (periodTrial)/2) - 1, compositeNumber);
                 printf("a = %d b = %d\n", factors.a, factors.b);
@@ -1278,39 +1283,38 @@ primeFactors shors(gsl_vector_complex* wavefunction, int compositeNumber){
             }
         }        
     }
-    return factors;
 }
 
 
-// int main(){
-//     int states = (int)pow(BASIS, N);
-//     gsl_vector_complex* wavefunction = initWavefunctionShors(states);
-//     //Putting system into equal super position of superposition all 2^N basis'
-//     // wavefunction = hadamardGate(wavefunction, 1);
-//     // wavefunction = hadamardGate(wavefunction, 2); 
-//     // wavefunction = hadamardGate(wavefunction, 3);
-// //     // wavefunction = cnotGate(wavefunction, 1,2 );
-// //     // wavefunction = CphaseGate(wavefunction, 2, 1, M_PI_4);
+int main(){
+    int states = (int)pow(BASIS, N);
+    gsl_vector_complex* wavefunction = initWavefunctionShors(states);
+    //Putting system into equal super position of superposition all 2^N basis'
+    wavefunction = hadamardGate(wavefunction, 1);
+    wavefunction = hadamardGate(wavefunction, 2); 
+    wavefunction = hadamardGate(wavefunction, 3);
+//     // wavefunction = cnotGate(wavefunction, 1,2 );
+//     // wavefunction = CphaseGate(wavefunction, 2, 1, M_PI_4);
 
-// //     // for(int i = 0; i < floor(M_PI_4*sqrt(pow(2,N))); i++){ // Needs to be called "floor(pi/4*sqrt(2^N))"" times for optimum output roughly 2 in our case
-// //     //     wavefunction = groversBlock(wavefunction, 7); //Second argument is the basis state you want to be "right" in this case its |110>
-// //     // }
-//     // wavefunction = amodcGate(3, 7, 15, wavefunction);
-//     // wavefunction = amodcGate(2, 7, 15, wavefunction);
-//     // wavefunction = amodcGate(1, 7, 15, wavefunction);
+//     // for(int i = 0; i < floor(M_PI_4*sqrt(pow(2,N))); i++){ // Needs to be called "floor(pi/4*sqrt(2^N))"" times for optimum output roughly 2 in our case
+//     //     wavefunction = groversBlock(wavefunction, 7); //Second argument is the basis state you want to be "right" in this case its |110>
+//     // }
+    wavefunction = amodcGate(3, 7, 15, wavefunction);
+    wavefunction = amodcGate(2, 7, 15, wavefunction);
+    wavefunction = amodcGate(1, 7, 15, wavefunction);
 
-// // // // IQFT block
-//     // wavefunction = hadamardGate(wavefunction, 1);
-//     // wavefunction = CphaseGate(wavefunction, 1, 2, M_PI_2);
-//     // wavefunction = CphaseGate(wavefunction, 1, 3, M_PI_4);
-//     // wavefunction = hadamardGate(wavefunction, 2);
-//     // wavefunction = CphaseGate(wavefunction, 2, 3, M_PI_2);
-//     // wavefunction = hadamardGate(wavefunction, 3);
+// // // IQFT block
+    // wavefunction = hadamardGate(wavefunction, 1);
+    // wavefunction = CphaseGate(wavefunction, 1, 2, M_PI_2);
+    // wavefunction = CphaseGate(wavefunction, 1, 3, M_PI_4);
+    // wavefunction = hadamardGate(wavefunction, 2);
+    // wavefunction = CphaseGate(wavefunction, 2, 3, M_PI_2);
+    // wavefunction = hadamardGate(wavefunction, 3);
 
-// //     // wavefunction = phaseShiftGate(wavefunction, 3,  3.14159);
-//     // shors(wavefunction, 15);
-//     // print_wf(wavefunction);
-//     // readsXReg(wavefunction);
-//     // measureRegisterGate(wavefunction);
-//     return 0;
-// }
+//     // wavefunction = phaseShiftGate(wavefunction, 3,  3.14159);
+    shors(wavefunction, 15);
+    // print_wf(wavefunction);
+    // readsXReg(wavefunction);
+    measureRegisterGate(wavefunction);
+    return 0;
+}

@@ -53,7 +53,6 @@ License: Public Domain & GNU licensing
  22/03/21       1.0.0  Implemented xmalloc (malloc wrapper)
  22/03/21       1.0.0  Comments on all fucntions informing user of usage.
  22/03/21       1.0.0  Reason for getting 1 and 15 is bc testP must be wrong see step 5 in paper
- 23/03/21       1.1.0  Pass wavefunction and gates by reference to swapsies so constantly updating wf
 */
 
 #include <stdio.h>

@@ -3,14 +3,14 @@ CFLAGS = -Wall -g -lgsl -lcblas
 
 all: test
 
-quantcomp.o: quantcomp.c quantcomp.h
-	$(CC) -c quantcomp.c
+quant.o: quantcomp.c quantcomp.h
+	$(CC) $(CFLAGS) -c quant.c
 do:
 	./quant
 	
 clean: 
 	rm quant
 
-test: test.c quantcomp.o
+test: test.c quant.o
 	$(CC) $(CFLAGS) -o $@ $^
 

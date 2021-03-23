@@ -4,7 +4,7 @@ CFLAGS = -Wall -g -lgsl -lcblas
 all: test
 
 quantcomp.o: quantcomp.c quantcomp.h
-	$(CC) -c quantcomp.c
+	$(CC) $(CFLAGS) -c quantcomp.c
 do:
 	./quant
 	

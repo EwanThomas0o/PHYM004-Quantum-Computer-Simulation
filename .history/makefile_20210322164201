@@ -1,0 +1,16 @@
+CC = gcc
+CFLAGS = -Wall -g -lgslcblas 
+
+all: test
+
+quant.o: quantcomp.c quantcomp.h
+	$(CC) $(CFLAGS) -c quant.c
+do:
+	./quant
+	
+clean: 
+	rm quant
+
+test: test.c quant.o
+	$(CC) $(CFLAGS) -o $@ $^
+

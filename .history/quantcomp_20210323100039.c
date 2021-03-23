@@ -53,7 +53,6 @@ License: Public Domain & GNU licensing
  22/03/21       1.0.0  Implemented xmalloc (malloc wrapper)
  22/03/21       1.0.0  Comments on all fucntions informing user of usage.
  22/03/21       1.0.0  Reason for getting 1 and 15 is bc testP must be wrong see step 5 in paper
- 23/03/21       1.1.0  Pass wavefunction and gates by reference to swapsies so constantly updating wf
 */
 
 #include <stdio.h>
@@ -1230,7 +1229,7 @@ primeFactors shors(gsl_vector_complex* wavefunction, int compositeNumber){
         return factors;
     }
     // Finding the period p
-    shorsBlock(wavefunction, rand, compositeNumber);
+    wavefunction = shorsBlock(wavefunction, rand, compositeNumber);
     // Measure the wavefunction to collapse is and observe the IQFT of x  
     // print_wf(wavefunction);  
     double omega = (double) readsXReg(wavefunction) / pow(2,L);
@@ -1242,7 +1241,7 @@ primeFactors shors(gsl_vector_complex* wavefunction, int compositeNumber){
     // Hopefully this while will ensure we never measure a zero on the x reg. The 0 contains no infomation about the period
     int i = 2;
     while(omega == 0){
-        shorsBlock(wavefunction, rand, compositeNumber);
+        wavefunction = shorsBlock(wavefunction, rand, compositeNumber);
         omega = (double) readsXReg(wavefunction) / pow(2,L);
         printf("omega try %d = %lg\n",i, omega);
         i++;
