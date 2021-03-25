@@ -1,42 +1,9 @@
-/****************** PHYM004 PR2: Quantum Computer Simulation -> Test environment ******************/
-// USAGE
-// -----
-// First use "make" to compile and link the header file
-// Then use "make do" to execute the binary
-//
-// Input 1 to run an analysis on Grover's algorithm
-// Input 2 to run shors Algorithm with 7 qubits
-// Input 3 to run code in the sandbox environment
-
-// Gate available in sandbox mode
-// ------------------------------
-// Hadamard Gate
-// Phase Gate
-// Oracle Gate
-// Grovers Block
-// Controlled not gate
-// Controlled phase gate
-// J gate
-
-// Utility functions available
-// ---------------------------
-// print_wf
-// measureRegisterGate
-
-// Getting Started
-// ---------------
-// declare your register as type "gsl_vector_complex*" and initialise with createRegister
-
-
-
 #include "quantcomp.h"
 #define GNUPLOT_EXE    "gnuplot"
 #define GNUPLOT_SCRIPT "grovers.script"
 #define GNUPLOT_DATA   "grovers_time.dat"
 #define USEC_IN_SEC 1000000
 #include <sys/time.h>
-
-static struct timeval stop, start;
 
 int main(){
 
@@ -46,7 +13,7 @@ int main(){
     printf("Mode 2 = Shor's Algorithm using 7 Qubits for the number 15\n");
     printf("Mode 3 = Sandbox mode which compiles code in the sandbox area\n");
     scanf("%d", &mode);
-    
+
     if(mode == 1)
     {
         char command[PATH_MAX];
@@ -106,7 +73,7 @@ int main(){
     }
     if(mode == 3)
     {   
-        // Example of grovers algorithm and printing probability amplitudes.
+        // Example of grovers algorithm
         gsl_vector_complex* reg = createRegister(3);
         groversAlgorithm(reg, 2);
         print_wf(reg);

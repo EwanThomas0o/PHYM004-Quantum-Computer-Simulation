@@ -18,15 +18,6 @@
 // Controlled phase gate
 // J gate
 
-// Utility functions available
-// ---------------------------
-// print_wf
-// measureRegisterGate
-
-// Getting Started
-// ---------------
-// declare your register as type "gsl_vector_complex*" and initialise with createRegister
-
 
 
 #include "quantcomp.h"
@@ -106,7 +97,7 @@ int main(){
     }
     if(mode == 3)
     {   
-        // Example of grovers algorithm and printing probability amplitudes.
+        // Example of grovers algorithm
         gsl_vector_complex* reg = createRegister(3);
         groversAlgorithm(reg, 2);
         print_wf(reg);
