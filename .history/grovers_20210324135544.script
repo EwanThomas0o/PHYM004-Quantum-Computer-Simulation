@@ -1,0 +1,7 @@
+xlabel "Number of qubits"
+ylabel "Time $\mu$s"
+f(x) =  a1*2**(x-a2)
+a1 = 1.0
+a2 = 2.0
+fit f(x) 'grovers_time.dat' via a1, a2
+plot 'grovers_time.dat', f(x)

@@ -1,0 +1,1819 @@
+
+
+*******************************************************************************
+Wed Mar 24 14:00:30 2021
+
+
+FIT:    data read from 'grovers_time.dat'
+        format = z
+        #datapoints = 8
+        residuals are weighted equally (unit weight)
+
+function used for fitting: f(x)
+	f(x) =  a1*2**(x-a2)
+fitted parameters initialized with current variable values
+
+iter      chisq       delta/lim  lambda   a1            a2           
+   0 3.6803393595e+14   0.00e+00  3.16e+01    1.000000e+00   2.000000e+00
+
+Current data point
+=========================
+#               = 1 out of 8
+x               = 76421.7        
+z               = 70             
+
+Current set of parameters
+=========================
+a1              = 76421.7        
+a2              = -211734        
+
+BREAK: Function evaluation yields NaN ("not a number")
+
+*******************************************************************************
+Wed Mar 24 14:01:53 2021
+
+
+FIT:    data read from 'grovers_time.dat' u 1:2
+        format = x:z
+        #datapoints = 8
+        residuals are weighted equally (unit weight)
+
+function used for fitting: f(x)
+	f(x) =  a1*2**(x-a2)
+fitted parameters initialized with current variable values
+
+iter      chisq       delta/lim  lambda   a1            a2           
+   0 2.3410846731e+14   0.00e+00  3.16e+01    1.000000e+00   2.000000e+00
+
+Current data point
+=========================
+#               = 1 out of 8
+x               = 61283.8        
+z               = 53             
+
+Current set of parameters
+=========================
+a1              = 61283.8        
+a2              = -169792        
+
+BREAK: Function evaluation yields NaN ("not a number")
+
+*******************************************************************************
+Wed Mar 24 14:30:26 2021
+
+
+FIT:    data read from 'grovers_time.dat' u 1:2
+        format = x:z
+        #datapoints = 8
+        residuals are weighted equally (unit weight)
+
+function used for fitting: f(x)
+	f(x) =  a1*(2**(x+a2))
+fitted parameters initialized with current variable values
+
+iter      chisq       delta/lim  lambda   a1            a2           
+   0 3.5366975694e+14   0.00e+00  1.80e+02    1.000000e+00   1.000000e+00
+
+Current data point
+=========================
+#               = 1 out of 8
+x               = 18438.8        
+z               = 83             
+
+Current set of parameters
+=========================
+a1              = 18438.8        
+a2              = 12785.5        
+
+BREAK: Function evaluation yields NaN ("not a number")
+
+*******************************************************************************
+Wed Mar 24 14:31:41 2021
+
+
+FIT:    data read from 'grovers_time.dat'
+        format = z
+        #datapoints = 8
+        residuals are weighted equally (unit weight)
+
+function used for fitting: f(x)
+	f(x) =  a1*(2**(x+a2))
+fitted parameters initialized with current variable values
+
+iter      chisq       delta/lim  lambda   a1            a2           
+   0 2.3778779308e+14   0.00e+00  1.80e+02    1.000000e+00   1.000000e+00
+
+Current data point
+=========================
+#               = 1 out of 8
+x               = 15349.6        
+z               = 59             
+
+Current set of parameters
+=========================
+a1              = 15349.6        
+a2              = 10643.5        
+
+BREAK: Function evaluation yields NaN ("not a number")
+
+*******************************************************************************
+Wed Mar 24 14:33:04 2021
+
+
+FIT:    data read from 'grovers_time.dat'
+        format = z
+        #datapoints = 8
+        residuals are weighted equally (unit weight)
+
+function used for fitting: f(x)
+	f(x) =  a1*x**2 + a2*x + b
+fitted parameters initialized with current variable values
+
+
+
+*******************************************************************************
+Wed Mar 24 14:34:04 2021
+
+
+FIT:    data read from 'grovers_time.dat'
+        format = z
+        #datapoints = 8
+        residuals are weighted equally (unit weight)
+
+function used for fitting: f(x)
+	f(x) =  a1*x**2 + a2*x + a3
+fitted parameters initialized with current variable values
+
+iter      chisq       delta/lim  lambda   a1            a2           
+   0 2.1054485755e+14   0.00e+00  2.37e+01    1.000000e+00   1.000000e+00
+   4 5.4729889892e+13  -1.29e-01  2.37e-03    3.652382e+05  -1.678762e+06
+
+After 4 iterations the fit converged.
+final sum of squares of residuals : 5.47299e+13
+rel. change during last iteration : -1.28962e-06
+
+degrees of freedom    (FIT_NDF)                        : 6
+rms of residuals      (FIT_STDFIT) = sqrt(WSSR/ndf)    : 3.02021e+06
+variance of residuals (reduced chisquare) = WSSR/ndf   : 9.12165e+12
+
+Final set of parameters            Asymptotic Standard Error
+=======================            ==========================
+a1              = 365238           +/- 1.301e+05    (35.63%)
+a2              = -1.67876e+06     +/- 8.534e+05    (50.83%)
+
+correlation matrix of the fit parameters:
+                a1     a2     
+a1              1.000 
+a2             -0.969  1.000 
+
+
+*******************************************************************************
+Wed Mar 24 14:36:18 2021
+
+
+FIT:    data read from 'grovers_time.dat'
+        format = z
+        #datapoints = 8
+        residuals are weighted equally (unit weight)
+
+function used for fitting: f(x)
+	f(x) =  a1*2**(x-a2)
+fitted parameters initialized with current variable values
+
+iter      chisq       delta/lim  lambda   a1            a2           
+   0 2.2395407015e+14   0.00e+00  4.50e+01    1.000000e+00   1.000000e+00
+
+Current data point
+=========================
+#               = 1 out of 8
+x               = 59349.5        
+z               = 56             
+
+Current set of parameters
+=========================
+a1              = 59349.5        
+a2              = -41122         
+
+BREAK: Function evaluation yields NaN ("not a number")
+
+*******************************************************************************
+Wed Mar 24 14:40:39 2021
+
+
+FIT:    data read from 'grovers_time.dat'
+        format = z
+        #datapoints = 8
+        residuals are weighted equally (unit weight)
+
+function used for fitting: f(x)
+	f(x) =  a1*2**(x-a2)
+fitted parameters initialized with current variable values
+
+iter      chisq       delta/lim  lambda   a1            a2           
+   0 2.5317208726e+14   0.00e+00  5.04e-02    1.000000e-01   1.000000e+01
+
+Current data point
+=========================
+#               = 1 out of 8
+x               = 979016         
+z               = 53             
+
+Current set of parameters
+=========================
+a1              = 979016         
+a2              = -6.76256e+08   
+
+BREAK: Function evaluation yields NaN ("not a number")
+
+*******************************************************************************
+Wed Mar 24 14:46:10 2021
+
+
+FIT:    data read from 'grovers_time.dat' using 1:2
+        format = x:z
+        #datapoints = 8
+        residuals are weighted equally (unit weight)
+
+function used for fitting: f(x)
+	f(x) =  a*2**(x-a)
+fitted parameters initialized with current variable values
+
+iter      chisq       delta/lim  lambda   a1            a2           
+   0 2.7497090257e+14   0.00e+00  0.00e+00    1.000000e+00   1.000000e+00
+BREAK: Singular matrix in Givens()
+
+*******************************************************************************
+Wed Mar 24 14:48:33 2021
+
+
+FIT:    data read from 'grovers_time.dat' using 1:2
+        format = x:z
+        #datapoints = 8
+        residuals are weighted equally (unit weight)
+
+function used for fitting: f(x)
+	f(x) =  a*2**(x-b)
+fitted parameters initialized with current variable values
+
+iter      chisq       delta/lim  lambda   a1            a2           
+   0 2.1374367135e+14   0.00e+00  0.00e+00    1.000000e+00   1.000000e+00
+BREAK: Singular matrix in Givens()
+
+*******************************************************************************
+Wed Mar 24 14:50:46 2021
+
+
+FIT:    data read from 'grovers_time.dat' using 1:2
+        format = x:z
+        #datapoints = 8
+        residuals are weighted equally (unit weight)
+
+function used for fitting: f(x)
+	f(x) =  a*x**2 + bx + c
+fitted parameters initialized with current variable values
+
+
+
+*******************************************************************************
+Wed Mar 24 14:51:51 2021
+
+
+FIT:    data read from 'grovers_time.dat' using 1:2
+        format = x:z
+        #datapoints = 8
+        residuals are weighted equally (unit weight)
+
+function used for fitting: f(x)
+	f(x) =  a*x**2 + b*x + c
+fitted parameters initialized with current variable values
+
+iter      chisq       delta/lim  lambda   a1            a2           
+   0 2.0804731101e+14   0.00e+00  0.00e+00    1.000000e+00   1.000000e+00
+BREAK: Singular matrix in Givens()
+
+*******************************************************************************
+Wed Mar 24 14:53:38 2021
+
+
+FIT:    data read from 'grovers_time.dat' using 1:2
+        format = x:z
+        #datapoints = 8
+        residuals are weighted equally (unit weight)
+
+function used for fitting: f(x)
+	f(x) =  a*x**2 + b*x + c
+fitted parameters initialized with current variable values
+
+iter      chisq       delta/lim  lambda   a             b             c            
+   0 2.1199318698e+14   0.00e+00  2.92e+01    1.000000e-01   1.000000e+01   1.000000e+00
+   5 4.1223470463e+13  -5.96e-03  2.92e-04    6.047152e+05  -4.112983e+06   5.182987e+06
+
+After 5 iterations the fit converged.
+final sum of squares of residuals : 4.12235e+13
+rel. change during last iteration : -5.96139e-08
+
+degrees of freedom    (FIT_NDF)                        : 5
+rms of residuals      (FIT_STDFIT) = sqrt(WSSR/ndf)    : 2.87136e+06
+variance of residuals (reduced chisquare) = WSSR/ndf   : 8.24469e+12
+
+Final set of parameters            Asymptotic Standard Error
+=======================            ==========================
+a               = 604715           +/- 2.215e+05    (36.63%)
+b               = -4.11298e+06     +/- 2.042e+06    (49.66%)
+c               = 5.18299e+06      +/- 4.006e+06    (77.29%)
+
+correlation matrix of the fit parameters:
+                a      b      c      
+a               1.000 
+b              -0.976  1.000 
+c               0.830 -0.918  1.000 
+
+
+*******************************************************************************
+Wed Mar 24 14:55:31 2021
+
+
+FIT:    data read from 'grovers_time.dat' using 1:2
+        format = x:z
+        #datapoints = 8
+        residuals are weighted equally (unit weight)
+
+function used for fitting: f(x)
+	f(x) =  a*2**(x-b)
+fitted parameters initialized with current variable values
+
+iter      chisq       delta/lim  lambda   a             b             c            
+   0 2.5942470720e+14   0.00e+00  4.11e-02    1.000000e-01   1.000000e+01   1.000000e+00
+
+Current data point
+=========================
+#               = 1 out of 8
+x               = 1.00739e+06    
+z               = 85             
+
+Current set of parameters
+=========================
+a               = 1.00739e+06    
+b               = -6.95853e+08   
+c               = 1              
+
+BREAK: Function evaluation yields NaN ("not a number")
+
+*******************************************************************************
+Wed Mar 24 14:56:54 2021
+
+
+FIT:    data read from 'grovers_time.dat' using 1:2
+        format = x:z
+        #datapoints = 8
+        residuals are weighted equally (unit weight)
+
+function used for fitting: f(x)
+	f(x) =  a*2**(x+b)
+fitted parameters initialized with current variable values
+
+iter      chisq       delta/lim  lambda   a             b             c            
+   0 2.2691862452e+14   0.00e+00  4.34e+04    1.000000e-01   1.000000e+01   1.000000e+00
+BREAK: Singular matrix in Invert_RtR
+
+*******************************************************************************
+Wed Mar 24 14:58:08 2021
+
+
+FIT:    data read from 'grovers_time.dat' using 1:2
+        format = x:z
+        #datapoints = 8
+        residuals are weighted equally (unit weight)
+
+function used for fitting: f(x)
+	f(x) =  a*2**x
+fitted parameters initialized with current variable values
+
+iter      chisq       delta/lim  lambda   a             b             c            
+   0 2.1465100600e+14   0.00e+00  6.03e+00    1.000000e-01   1.000000e+00   1.000000e+00
+BREAK: Singular matrix in Invert_RtR
+
+*******************************************************************************
+Wed Mar 24 14:59:40 2021
+
+
+FIT:    data read from 'grovers_time.dat' using 1:2
+        format = x:z
+        #datapoints = 8
+        residuals are weighted equally (unit weight)
+
+function used for fitting: f(x)
+	f(x) =  a*exp(x)
+fitted parameters initialized with current variable values
+
+iter      chisq       delta/lim  lambda   a             b             c            
+   0 2.0646927771e+14   0.00e+00  6.54e+01    1.000000e-01   1.000000e+00   1.000000e+00
+BREAK: Singular matrix in Invert_RtR
+
+*******************************************************************************
+Wed Mar 24 15:03:19 2021
+
+
+FIT:    data read from 'grovers_time.dat' using 1:2
+        format = x:z
+        #datapoints = 8
+        residuals are weighted equally (unit weight)
+
+function used for fitting: f(x)
+	f(x) =  a*2**(x-b)
+fitted parameters initialized with current variable values
+
+iter      chisq       delta/lim  lambda   a             b             c            
+   0 3.0458889359e+14   0.00e+00  0.00e+00    1.000000e+05   1.000000e+05   1.000000e+00
+BREAK: Singular matrix in Givens()
+
+*******************************************************************************
+Wed Mar 24 15:05:14 2021
+
+
+FIT:    data read from 'grovers_time.dat' using 1:2
+        format = x:z
+        #datapoints = 8
+        residuals are weighted equally (unit weight)
+
+function used for fitting: f(x)
+	f(x) =  a*2^(x-b)
+fitted parameters initialized with current variable values
+
+
+
+*******************************************************************************
+Wed Mar 24 15:06:44 2021
+
+
+FIT:    data read from 'grovers_time.dat' using 1:2
+        format = x:z
+        #datapoints = 8
+        residuals are weighted equally (unit weight)
+
+function used for fitting: f(x)
+	f(x) =  a*2**(x+b)
+fitted parameters initialized with current variable values
+
+iter      chisq       delta/lim  lambda   a             b             c            
+   0 7.0060560217e+13   0.00e+00  3.67e+06    1.000000e+05  -1.000000e+00   1.000000e+00
+BREAK: Singular matrix in Invert_RtR
+
+*******************************************************************************
+Wed Mar 24 15:09:08 2021
+
+
+FIT:    data read from 'grovers_time.dat' using 1:2
+        format = x:z
+        #datapoints = 8
+        residuals are weighted equally (unit weight)
+
+function used for fitting: f(x)
+	f(x) =  a*2**(x+b) + c
+fitted parameters initialized with current variable values
+
+iter      chisq       delta/lim  lambda   a             b             c            
+   0 3.7093678913e+13   0.00e+00  3.67e+06    1.000000e+05  -1.000000e+00   1.000000e+00
+   3 3.6499020364e+13  -1.89e-04  3.67e+03    9.642227e+04  -1.024745e+00   9.949567e-01
+
+After 3 iterations the fit converged.
+final sum of squares of residuals : 3.6499e+13
+rel. change during last iteration : -1.8942e-09
+
+degrees of freedom    (FIT_NDF)                        : 5
+rms of residuals      (FIT_STDFIT) = sqrt(WSSR/ndf)    : 2.70181e+06
+variance of residuals (reduced chisquare) = WSSR/ndf   : 7.2998e+12
+
+Final set of parameters            Asymptotic Standard Error
+=======================            ==========================
+a               = 96422.3          +/- 3.082e+17    (3.196e+14%)
+b               = -1.02474         +/- 4.613e+12    (4.502e+14%)
+c               = 0.994957         +/- 1.63e+06     (1.639e+08%)
+
+correlation matrix of the fit parameters:
+                a      b      c      
+a               1.000 
+b              -1.000  1.000 
+c              -0.673  0.673  1.000 
+
+
+*******************************************************************************
+Wed Mar 24 15:10:44 2021
+
+
+FIT:    data read from 'grovers_time.dat' using 1:2
+        format = x:z
+        #datapoints = 8
+        residuals are weighted equally (unit weight)
+
+function used for fitting: f(x)
+	f(x) =  a*exp(x+b) + c
+fitted parameters initialized with current variable values
+
+iter      chisq       delta/lim  lambda   a             b             c            
+   0 1.0826732397e+16   0.00e+00  3.40e+07    1.000000e+05  -1.000000e+00   1.000000e+00
+   5 1.2213143509e+13  -2.22e-02  3.40e+02    2.178808e+04  -1.611502e+00   6.546642e-01
+
+After 5 iterations the fit converged.
+final sum of squares of residuals : 1.22131e+13
+rel. change during last iteration : -2.21747e-07
+
+degrees of freedom    (FIT_NDF)                        : 5
+rms of residuals      (FIT_STDFIT) = sqrt(WSSR/ndf)    : 1.56289e+06
+variance of residuals (reduced chisquare) = WSSR/ndf   : 2.44263e+12
+
+Final set of parameters            Asymptotic Standard Error
+=======================            ==========================
+a               = 21788.1          +/- 3.74e+16     (1.716e+14%)
+b               = -1.6115          +/- 1.718e+12    (1.066e+14%)
+c               = 0.654664         +/- 7.493e+05    (1.145e+08%)
+
+correlation matrix of the fit parameters:
+                a      b      c      
+a               1.000 
+b              -1.000  1.000 
+c              -0.505  0.505  1.000 
+
+
+*******************************************************************************
+Wed Mar 24 16:28:09 2021
+
+
+FIT:    data read from 'grovers_time.dat' using 1:2
+        format = x:z
+        #datapoints = 8
+        residuals are weighted equally (unit weight)
+
+function used for fitting: f(x)
+	f(x) =  a*x(x+b) + c
+fitted parameters initialized with current variable values
+
+
+
+*******************************************************************************
+Wed Mar 24 16:29:50 2021
+
+
+FIT:    data read from 'grovers_time.dat' using 1:2
+        format = x:z
+        #datapoints = 8
+        residuals are weighted equally (unit weight)
+
+function used for fitting: f(x)
+	f(x) =  a*x**(x+b) + c
+fitted parameters initialized with current variable values
+
+iter      chisq       delta/lim  lambda   a             b             c            
+   0 4.4110981951e+22   0.00e+00  9.88e+10    1.000000e+05  -1.000000e+00   1.000000e+00
+ 150 1.2336692907e+11  -1.18e-03  9.88e+04    1.982346e+05  -5.777074e+00   1.000322e+00
+
+After 150 iterations the fit converged.
+final sum of squares of residuals : 1.23367e+11
+rel. change during last iteration : -1.18189e-08
+
+degrees of freedom    (FIT_NDF)                        : 5
+rms of residuals      (FIT_STDFIT) = sqrt(WSSR/ndf)    : 157078
+variance of residuals (reduced chisquare) = WSSR/ndf   : 2.46734e+10
+
+Final set of parameters            Asymptotic Standard Error
+=======================            ==========================
+a               = 198235           +/- 1.619e+05    (81.66%)
+b               = -5.77707         +/- 0.3941       (6.822%)
+c               = 1.00032          +/- 7.673e+04    (7.67e+06%)
+
+correlation matrix of the fit parameters:
+                a      b      c      
+a               1.000 
+b              -1.000  1.000 
+c              -0.617  0.614  1.000 
+
+
+*******************************************************************************
+Wed Mar 24 16:51:26 2021
+
+
+FIT:    data read from 'grovers_time.dat' using 1:2
+        format = x:z
+        #datapoints = 8
+        residuals are weighted equally (unit weight)
+
+function used for fitting: f(x)
+	f(x) =  a*x**(x+b) + c
+fitted parameters initialized with current variable values
+
+iter      chisq       delta/lim  lambda   a             b             c            
+   0 4.4112649474e+22   0.00e+00  9.88e+10    1.000000e+05  -1.000000e+00   1.000000e+00
+ 142 3.5837727617e+11  -9.35e-01  9.88e+03    2.518489e+05  -5.997195e+00   1.000098e+00
+
+After 142 iterations the fit converged.
+final sum of squares of residuals : 3.58377e+11
+rel. change during last iteration : -9.34915e-06
+
+degrees of freedom    (FIT_NDF)                        : 5
+rms of residuals      (FIT_STDFIT) = sqrt(WSSR/ndf)    : 267723
+variance of residuals (reduced chisquare) = WSSR/ndf   : 7.16755e+10
+
+Final set of parameters            Asymptotic Standard Error
+=======================            ==========================
+a               = 251849           +/- 2.964e+05    (117.7%)
+b               = -5.9972          +/- 0.5676       (9.464%)
+c               = 1.0001           +/- 1.261e+05    (1.261e+07%)
+
+correlation matrix of the fit parameters:
+                a      b      c      
+a               1.000 
+b              -1.000  1.000 
+c              -0.577  0.572  1.000 
+
+
+*******************************************************************************
+Wed Mar 24 16:53:42 2021
+
+
+FIT:    data read from 'grovers_time.dat' using 1:2
+        format = x:z
+        #datapoints = 8
+        residuals are weighted equally (unit weight)
+
+function used for fitting: f(x)
+	f(x) =  a*x**(x+b) + c
+fitted parameters initialized with current variable values
+
+iter      chisq       delta/lim  lambda   a             b             c            
+   0 4.4112016110e+22   0.00e+00  9.88e+10    1.000000e+05  -1.000000e+00   1.000000e+00
+ 137 5.4133032815e+11  -7.43e-01  9.88e+03    2.915436e+05  -6.024925e+00   1.000095e+00
+
+After 137 iterations the fit converged.
+final sum of squares of residuals : 5.4133e+11
+rel. change during last iteration : -7.42708e-06
+
+degrees of freedom    (FIT_NDF)                        : 5
+rms of residuals      (FIT_STDFIT) = sqrt(WSSR/ndf)    : 329038
+variance of residuals (reduced chisquare) = WSSR/ndf   : 1.08266e+11
+
+Final set of parameters            Asymptotic Standard Error
+=======================            ==========================
+a               = 291544           +/- 3.659e+05    (125.5%)
+b               = -6.02493         +/- 0.6052       (10.04%)
+c               = 1.00009          +/- 1.542e+05    (1.542e+07%)
+
+correlation matrix of the fit parameters:
+                a      b      c      
+a               1.000 
+b              -1.000  1.000 
+c              -0.571  0.566  1.000 
+
+
+*******************************************************************************
+Wed Mar 24 16:57:09 2021
+
+
+FIT:    data read from 'grovers_time.dat' using 1:2
+        format = x:z
+        #datapoints = 8
+        residuals are weighted equally (unit weight)
+
+function used for fitting: f(x)
+	f(x) =  a*x**(x+b) + c
+fitted parameters initialized with current variable values
+
+iter      chisq       delta/lim  lambda   a             b             c            
+   0 4.4111832408e+22   0.00e+00  9.88e+10    1.000000e+05  -1.000000e+00   1.000000e+00
+ 145 2.4284712418e+11  -6.73e-01  9.88e+03    2.357955e+05  -5.911312e+00   1.000070e+00
+
+After 145 iterations the fit converged.
+final sum of squares of residuals : 2.42847e+11
+rel. change during last iteration : -6.72641e-06
+
+degrees of freedom    (FIT_NDF)                        : 5
+rms of residuals      (FIT_STDFIT) = sqrt(WSSR/ndf)    : 220385
+variance of residuals (reduced chisquare) = WSSR/ndf   : 4.85694e+10
+
+Final set of parameters            Asymptotic Standard Error
+=======================            ==========================
+a               = 235795           +/- 2.394e+05    (101.5%)
+b               = -5.91131         +/- 0.4897       (8.284%)
+c               = 1.00007          +/- 1.054e+05    (1.054e+07%)
+
+correlation matrix of the fit parameters:
+                a      b      c      
+a               1.000 
+b              -1.000  1.000 
+c              -0.594  0.590  1.000 
+
+
+*******************************************************************************
+Wed Mar 24 17:00:45 2021
+
+
+FIT:    data read from 'grovers_time.dat' using 1:2
+        format = x:z
+        #datapoints = 8
+        residuals are weighted equally (unit weight)
+
+function used for fitting: f(x)
+	f(x) =  a*x**(x+b) + c
+fitted parameters initialized with current variable values
+
+iter      chisq       delta/lim  lambda   a             b             c            
+   0 4.4108603676e+22   0.00e+00  9.88e+10    1.000000e+05  -1.000000e+00   1.000000e+00
+ 139 5.5135091753e+11  -9.08e-02  9.88e+01    3.463791e+05  -5.926677e+00   1.402078e+00
+
+After 139 iterations the fit converged.
+final sum of squares of residuals : 5.51351e+11
+rel. change during last iteration : -9.07834e-07
+
+degrees of freedom    (FIT_NDF)                        : 5
+rms of residuals      (FIT_STDFIT) = sqrt(WSSR/ndf)    : 332070
+variance of residuals (reduced chisquare) = WSSR/ndf   : 1.1027e+11
+
+Final set of parameters            Asymptotic Standard Error
+=======================            ==========================
+a               = 346379           +/- 3.622e+05    (104.6%)
+b               = -5.92668         +/- 0.5044       (8.51%)
+c               = 1.40208          +/- 1.583e+05    (1.129e+07%)
+
+correlation matrix of the fit parameters:
+                a      b      c      
+a               1.000 
+b              -1.000  1.000 
+c              -0.591  0.587  1.000 
+
+
+*******************************************************************************
+Wed Mar 24 17:04:14 2021
+
+
+FIT:    data read from 'grovers_time.dat' using 1:2
+        format = x:z
+        #datapoints = 8
+        residuals are weighted equally (unit weight)
+
+function used for fitting: f(x)
+	f(x) =  a*x**(x+b) + c
+fitted parameters initialized with current variable values
+
+iter      chisq       delta/lim  lambda   a             b             c            
+   0 4.4112645572e+22   0.00e+00  9.88e+10    1.000000e+05  -1.000000e+00   1.000000e+00
+ 149 1.9170953763e+11  -2.39e-01  9.88e+03    2.101568e+05  -5.909977e+00   1.000066e+00
+
+After 149 iterations the fit converged.
+final sum of squares of residuals : 1.9171e+11
+rel. change during last iteration : -2.39051e-06
+
+degrees of freedom    (FIT_NDF)                        : 5
+rms of residuals      (FIT_STDFIT) = sqrt(WSSR/ndf)    : 195811
+variance of residuals (reduced chisquare) = WSSR/ndf   : 3.83419e+10
+
+Final set of parameters            Asymptotic Standard Error
+=======================            ==========================
+a               = 210157           +/- 2.126e+05    (101.2%)
+b               = -5.90998         +/- 0.488        (8.257%)
+c               = 1.00007          +/- 9.364e+04    (9.363e+06%)
+
+correlation matrix of the fit parameters:
+                a      b      c      
+a               1.000 
+b              -1.000  1.000 
+c              -0.595  0.590  1.000 
+
+
+*******************************************************************************
+Wed Mar 24 17:06:26 2021
+
+
+FIT:    data read from 'grovers_time.dat' using 1:2
+        format = x:z
+        #datapoints = 8
+        residuals are weighted equally (unit weight)
+
+function used for fitting: f(x)
+	f(x) =  a*x**(x+b) + c
+fitted parameters initialized with current variable values
+
+iter      chisq       delta/lim  lambda   a             b             c            
+   0 4.4112187143e+22   0.00e+00  9.88e+10    1.000000e+05  -1.000000e+00   1.000000e+00
+ 160 6.4224391514e+10  -2.06e-02  9.88e+04    1.525658e+05  -5.724691e+00   1.000963e+00
+
+After 160 iterations the fit converged.
+final sum of squares of residuals : 6.42244e+10
+rel. change during last iteration : -2.05945e-07
+
+degrees of freedom    (FIT_NDF)                        : 5
+rms of residuals      (FIT_STDFIT) = sqrt(WSSR/ndf)    : 113335
+variance of residuals (reduced chisquare) = WSSR/ndf   : 1.28449e+10
+
+Final set of parameters            Asymptotic Standard Error
+=======================            ==========================
+a               = 152566           +/- 1.133e+05    (74.29%)
+b               = -5.72469         +/- 0.3586       (6.264%)
+c               = 1.00096          +/- 5.573e+04    (5.568e+06%)
+
+correlation matrix of the fit parameters:
+                a      b      c      
+a               1.000 
+b              -1.000  1.000 
+c              -0.624  0.621  1.000 
+
+
+*******************************************************************************
+Wed Mar 24 17:10:31 2021
+
+
+FIT:    data read from 'grovers_time.dat' using 1:2
+        format = x:z
+        #datapoints = 8
+        residuals are weighted equally (unit weight)
+
+function used for fitting: f(x)
+	f(x) =  a*x**(x+b) + c
+fitted parameters initialized with current variable values
+
+iter      chisq       delta/lim  lambda   a             b             c            
+   0 4.4111949258e+22   0.00e+00  9.88e+10    1.000000e+05  -1.000000e+00   1.000000e+00
+ 159 4.8994651372e+10  -2.46e-02  9.88e+04    1.438791e+05  -5.681094e+00   1.000396e+00
+
+After 159 iterations the fit converged.
+final sum of squares of residuals : 4.89947e+10
+rel. change during last iteration : -2.45647e-07
+
+degrees of freedom    (FIT_NDF)                        : 5
+rms of residuals      (FIT_STDFIT) = sqrt(WSSR/ndf)    : 98989.5
+variance of residuals (reduced chisquare) = WSSR/ndf   : 9.79893e+09
+
+Final set of parameters            Asymptotic Standard Error
+=======================            ==========================
+a               = 143879           +/- 9.61e+04     (66.79%)
+b               = -5.68109         +/- 0.3224       (5.675%)
+c               = 1.0004           +/- 4.89e+04     (4.888e+06%)
+
+correlation matrix of the fit parameters:
+                a      b      c      
+a               1.000 
+b              -1.000  1.000 
+c              -0.628  0.626  1.000 
+
+
+*******************************************************************************
+Wed Mar 24 17:12:08 2021
+
+
+FIT:    data read from 'grovers_time.dat' using 1:2
+        format = x:z
+        #datapoints = 8
+        residuals are weighted equally (unit weight)
+
+function used for fitting: f(x)
+	f(x) =  a*x**(x+b) + c
+fitted parameters initialized with current variable values
+
+iter      chisq       delta/lim  lambda   a             b             c            
+   0 4.4109924977e+22   0.00e+00  9.88e+10    1.000000e+05  -1.000000e+00   1.000000e+00
+ 121 1.0609635753e+10  -1.31e-01  9.88e+03    7.402061e+04  -5.247106e+00   1.000022e+00
+
+After 121 iterations the fit converged.
+final sum of squares of residuals : 1.06096e+10
+rel. change during last iteration : -1.30786e-06
+
+degrees of freedom    (FIT_NDF)                        : 5
+rms of residuals      (FIT_STDFIT) = sqrt(WSSR/ndf)    : 46064.4
+variance of residuals (reduced chisquare) = WSSR/ndf   : 2.12193e+09
+
+Final set of parameters            Asymptotic Standard Error
+=======================            ==========================
+a               = 74020.6          +/- 2.602e+04    (35.15%)
+b               = -5.24711         +/- 0.1697       (3.235%)
+c               = 1.00002          +/- 2.239e+04    (2.239e+06%)
+
+correlation matrix of the fit parameters:
+                a      b      c      
+a               1.000 
+b              -1.000  1.000 
+c              -0.613  0.611  1.000 
+
+
+*******************************************************************************
+Wed Mar 24 17:14:11 2021
+
+
+FIT:    data read from 'grovers_time.dat' using 1:2
+        format = x:z
+        #datapoints = 8
+        residuals are weighted equally (unit weight)
+
+function used for fitting: f(x)
+	f(x) =  a*x**(x+b) + c
+fitted parameters initialized with current variable values
+
+iter      chisq       delta/lim  lambda   a             b             c            
+   0 4.4110616585e+22   0.00e+00  9.88e+10    1.000000e+05  -1.000000e+00   1.000000e+00
+ 147 5.6902321467e+10  -3.88e-01  9.88e+03    1.589771e+05  -5.650908e+00   1.000019e+00
+
+After 147 iterations the fit converged.
+final sum of squares of residuals : 5.69023e+10
+rel. change during last iteration : -3.88219e-06
+
+degrees of freedom    (FIT_NDF)                        : 5
+rms of residuals      (FIT_STDFIT) = sqrt(WSSR/ndf)    : 106679
+variance of residuals (reduced chisquare) = WSSR/ndf   : 1.13805e+10
+
+Final set of parameters            Asymptotic Standard Error
+=======================            ==========================
+a               = 158977           +/- 1.012e+05    (63.65%)
+b               = -5.65091         +/- 0.3073       (5.438%)
+c               = 1.00002          +/- 5.284e+04    (5.283e+06%)
+
+correlation matrix of the fit parameters:
+                a      b      c      
+a               1.000 
+b              -1.000  1.000 
+c              -0.631  0.628  1.000 
+
+
+*******************************************************************************
+Thu Mar 25 09:07:14 2021
+
+
+FIT:    data read from 'grovers_time.dat' using 1:2
+        format = x:z
+        #datapoints = 8
+        residuals are weighted equally (unit weight)
+
+function used for fitting: f(x)
+	f(x) =  a*x**(x+b) + c
+fitted parameters initialized with current variable values
+
+iter      chisq       delta/lim  lambda   a             b             c            
+   0 4.4112593558e+22   0.00e+00  9.88e+10    1.000000e+05  -1.000000e+00   1.000000e+00
+ 160 8.2928229583e+10  -1.19e-02  9.88e+04    1.645395e+05  -5.788523e+00   1.001048e+00
+
+After 160 iterations the fit converged.
+final sum of squares of residuals : 8.29282e+10
+rel. change during last iteration : -1.19026e-07
+
+degrees of freedom    (FIT_NDF)                        : 5
+rms of residuals      (FIT_STDFIT) = sqrt(WSSR/ndf)    : 128785
+variance of residuals (reduced chisquare) = WSSR/ndf   : 1.65856e+10
+
+Final set of parameters            Asymptotic Standard Error
+=======================            ==========================
+a               = 164539           +/- 1.335e+05    (81.13%)
+b               = -5.78852         +/- 0.3915       (6.764%)
+c               = 1.00105          +/- 6.28e+04     (6.274e+06%)
+
+correlation matrix of the fit parameters:
+                a      b      c      
+a               1.000 
+b              -1.000  1.000 
+c              -0.615  0.612  1.000 
+
+
+*******************************************************************************
+Thu Mar 25 09:16:27 2021
+
+
+FIT:    data read from 'grovers_time.dat' using 1:2
+        format = x:z
+        #datapoints = 8
+        residuals are weighted equally (unit weight)
+
+function used for fitting: f(x)
+	f(x) =  a*x**(x+b) + c
+fitted parameters initialized with current variable values
+
+iter      chisq       delta/lim  lambda   a             b             c            
+   0 4.4113033523e+22   0.00e+00  9.88e+10    1.000000e+05  -1.000000e+00   1.000000e+00
+ 153 1.8495889811e+11  -1.16e-03  9.88e+05    2.034128e+05  -5.922044e+00   1.001941e+00
+
+After 153 iterations the fit converged.
+final sum of squares of residuals : 1.84959e+11
+rel. change during last iteration : -1.16097e-08
+
+degrees of freedom    (FIT_NDF)                        : 5
+rms of residuals      (FIT_STDFIT) = sqrt(WSSR/ndf)    : 192332
+variance of residuals (reduced chisquare) = WSSR/ndf   : 3.69918e+10
+
+Final set of parameters            Asymptotic Standard Error
+=======================            ==========================
+a               = 203413           +/- 2.095e+05    (103%)
+b               = -5.92204         +/- 0.4969       (8.39%)
+c               = 1.00194          +/- 9.178e+04    (9.16e+06%)
+
+correlation matrix of the fit parameters:
+                a      b      c      
+a               1.000 
+b              -1.000  1.000 
+c              -0.592  0.588  1.000 
+
+
+*******************************************************************************
+Thu Mar 25 09:17:54 2021
+
+
+FIT:    data read from 'grovers_time.dat' using 1:2
+        format = x:z
+        #datapoints = 8
+        residuals are weighted equally (unit weight)
+
+function used for fitting: f(x)
+	f(x) =  a*x**(x+b) + c
+fitted parameters initialized with current variable values
+
+iter      chisq       delta/lim  lambda   a             b             c            
+   0 4.4111987027e+22   0.00e+00  9.88e+10    1.000000e+05  -1.000000e+00   1.000000e+00
+ 159 5.5765171024e+10  -2.17e-02  9.88e+04    1.494027e+05  -5.701619e+00   1.000695e+00
+
+After 159 iterations the fit converged.
+final sum of squares of residuals : 5.57652e+10
+rel. change during last iteration : -2.16731e-07
+
+degrees of freedom    (FIT_NDF)                        : 5
+rms of residuals      (FIT_STDFIT) = sqrt(WSSR/ndf)    : 105608
+variance of residuals (reduced chisquare) = WSSR/ndf   : 1.1153e+10
+
+Final set of parameters            Asymptotic Standard Error
+=======================            ==========================
+a               = 149403           +/- 1.04e+05     (69.63%)
+b               = -5.70162         +/- 0.3361       (5.895%)
+c               = 1.00069          +/- 5.207e+04    (5.203e+06%)
+
+correlation matrix of the fit parameters:
+                a      b      c      
+a               1.000 
+b              -1.000  1.000 
+c              -0.626  0.624  1.000 
+
+
+*******************************************************************************
+Thu Mar 25 09:21:18 2021
+
+
+FIT:    data read from 'grovers_time.dat' using 1:2
+        format = x:z
+        #datapoints = 8
+        residuals are weighted equally (unit weight)
+
+function used for fitting: f(x)
+	f(x) =  a*x**(x+b) + c
+fitted parameters initialized with current variable values
+
+iter      chisq       delta/lim  lambda   a             b             c            
+   0 4.4113070922e+22   0.00e+00  9.88e+10    1.000000e+05  -1.000000e+00   1.000000e+00
+ 152 1.6705944441e+11  -3.71e-01  9.88e+03    1.969146e+05  -5.909553e+00   1.000068e+00
+
+After 152 iterations the fit converged.
+final sum of squares of residuals : 1.67059e+11
+rel. change during last iteration : -3.70723e-06
+
+degrees of freedom    (FIT_NDF)                        : 5
+rms of residuals      (FIT_STDFIT) = sqrt(WSSR/ndf)    : 182789
+variance of residuals (reduced chisquare) = WSSR/ndf   : 3.34119e+10
+
+Final set of parameters            Asymptotic Standard Error
+=======================            ==========================
+a               = 196915           +/- 1.984e+05    (100.8%)
+b               = -5.90955         +/- 0.4861       (8.226%)
+c               = 1.00007          +/- 8.742e+04    (8.741e+06%)
+
+correlation matrix of the fit parameters:
+                a      b      c      
+a               1.000 
+b              -1.000  1.000 
+c              -0.595  0.590  1.000 
+
+
+*******************************************************************************
+Thu Mar 25 09:22:54 2021
+
+
+FIT:    data read from 'grovers_time.dat' using 1:2
+        format = x:z
+        #datapoints = 8
+        residuals are weighted equally (unit weight)
+
+function used for fitting: f(x)
+	f(x) =  a*x**(x+b) + c
+fitted parameters initialized with current variable values
+
+iter      chisq       delta/lim  lambda   a             b             c            
+   0 4.4113215801e+22   0.00e+00  9.88e+10    1.000000e+05  -1.000000e+00   1.000000e+00
+1193 2.6254686880e+11  -1.90e-02  9.88e+01    2.228426e+05  -5.979569e+00   1.293320e+00
+
+After 1193 iterations the fit converged.
+final sum of squares of residuals : 2.62547e+11
+rel. change during last iteration : -1.89988e-07
+
+degrees of freedom    (FIT_NDF)                        : 5
+rms of residuals      (FIT_STDFIT) = sqrt(WSSR/ndf)    : 229149
+variance of residuals (reduced chisquare) = WSSR/ndf   : 5.25094e+10
+
+Final set of parameters            Asymptotic Standard Error
+=======================            ==========================
+a               = 222843           +/- 2.529e+05    (113.5%)
+b               = -5.97957         +/- 0.5473       (9.153%)
+c               = 1.29332          +/- 1.083e+05    (8.37e+06%)
+
+correlation matrix of the fit parameters:
+                a      b      c      
+a               1.000 
+b              -1.000  1.000 
+c              -0.581  0.576  1.000 
+
+
+*******************************************************************************
+Thu Mar 25 09:24:40 2021
+
+
+FIT:    data read from 'grovers_time.dat' using 1:2
+        format = x:z
+        #datapoints = 8
+        residuals are weighted equally (unit weight)
+
+function used for fitting: f(x)
+	f(x) =  a*x**(x+b) + c
+fitted parameters initialized with current variable values
+
+iter      chisq       delta/lim  lambda   a             b             c            
+   0 4.4112771436e+22   0.00e+00  9.88e+10    1.000000e+05  -1.000000e+00   1.000000e+00
+ 156 1.0544931762e+11  -2.64e-01  9.88e+03    1.752240e+05  -5.831531e+00   1.000057e+00
+
+After 156 iterations the fit converged.
+final sum of squares of residuals : 1.05449e+11
+rel. change during last iteration : -2.6442e-06
+
+degrees of freedom    (FIT_NDF)                        : 5
+rms of residuals      (FIT_STDFIT) = sqrt(WSSR/ndf)    : 145223
+variance of residuals (reduced chisquare) = WSSR/ndf   : 2.10899e+10
+
+Final set of parameters            Asymptotic Standard Error
+=======================            ==========================
+a               = 175224           +/- 1.535e+05    (87.59%)
+b               = -5.83153         +/- 0.4227       (7.248%)
+c               = 1.00006          +/- 7.036e+04    (7.036e+06%)
+
+correlation matrix of the fit parameters:
+                a      b      c      
+a               1.000 
+b              -1.000  1.000 
+c              -0.609  0.605  1.000 
+
+
+*******************************************************************************
+Thu Mar 25 09:26:02 2021
+
+
+FIT:    data read from 'grovers_time.dat' using 1:2
+        format = x:z
+        #datapoints = 8
+        residuals are weighted equally (unit weight)
+
+function used for fitting: f(x)
+	f(x) =  a*x**(x+b) + c
+fitted parameters initialized with current variable values
+
+iter      chisq       delta/lim  lambda   a             b             c            
+   0 4.4112467709e+22   0.00e+00  9.88e+10    1.000000e+05  -1.000000e+00   1.000000e+00
+ 143 3.1702635775e+11  -4.35e-01  9.88e+03    2.461627e+05  -5.973627e+00   1.000093e+00
+
+After 143 iterations the fit converged.
+final sum of squares of residuals : 3.17026e+11
+rel. change during last iteration : -4.35353e-06
+
+degrees of freedom    (FIT_NDF)                        : 5
+rms of residuals      (FIT_STDFIT) = sqrt(WSSR/ndf)    : 251804
+variance of residuals (reduced chisquare) = WSSR/ndf   : 6.34053e+10
+
+Final set of parameters            Asymptotic Standard Error
+=======================            ==========================
+a               = 246163           +/- 2.776e+05    (112.8%)
+b               = -5.97363         +/- 0.5439       (9.104%)
+c               = 1.00009          +/- 1.191e+05    (1.191e+07%)
+
+correlation matrix of the fit parameters:
+                a      b      c      
+a               1.000 
+b              -1.000  1.000 
+c              -0.582  0.577  1.000 
+
+
+*******************************************************************************
+Thu Mar 25 09:27:26 2021
+
+
+FIT:    data read from 'grovers_time.dat' using 1:2
+        format = x:z
+        #datapoints = 8
+        residuals are weighted equally (unit weight)
+
+function used for fitting: f(x)
+	f(x) =  a*x**(x+b) + c
+fitted parameters initialized with current variable values
+
+iter      chisq       delta/lim  lambda   a             b             c            
+   0 4.4112875576e+22   0.00e+00  9.88e+10    1.000000e+05  -1.000000e+00   1.000000e+00
+ 815 7.9700039276e+11  -9.49e-01  9.88e+03    3.070304e+05  -6.108431e+00   1.000120e+00
+
+After 815 iterations the fit converged.
+final sum of squares of residuals : 7.97e+11
+rel. change during last iteration : -9.48588e-06
+
+degrees of freedom    (FIT_NDF)                        : 5
+rms of residuals      (FIT_STDFIT) = sqrt(WSSR/ndf)    : 399249
+variance of residuals (reduced chisquare) = WSSR/ndf   : 1.594e+11
+
+Final set of parameters            Asymptotic Standard Error
+=======================            ==========================
+a               = 307030           +/- 4.48e+05     (145.9%)
+b               = -6.10843         +/- 0.7034       (11.51%)
+c               = 1.00012          +/- 1.845e+05    (1.845e+07%)
+
+correlation matrix of the fit parameters:
+                a      b      c      
+a               1.000 
+b              -1.000  1.000 
+c              -0.554  0.548  1.000 
+
+
+*******************************************************************************
+Thu Mar 25 09:32:55 2021
+
+
+FIT:    data read from 'grovers_time.dat' using 1:2
+        format = x:z
+        x range restricted to [0.00000 : 9.00000]
+        #datapoints = 8
+        residuals are weighted equally (unit weight)
+
+function used for fitting: f(x)
+	f(x) =  a*x**(x+b) + c
+fitted parameters initialized with current variable values
+
+iter      chisq       delta/lim  lambda   a             b             c            
+   0 4.4113016324e+22   0.00e+00  9.88e+10    1.000000e+05  -1.000000e+00   1.000000e+00
+ 151 1.7647188214e+11  -1.74e-02  9.88e+03    2.012417e+05  -5.915932e+00   1.000076e+00
+
+After 151 iterations the fit converged.
+final sum of squares of residuals : 1.76472e+11
+rel. change during last iteration : -1.74433e-07
+
+degrees of freedom    (FIT_NDF)                        : 5
+rms of residuals      (FIT_STDFIT) = sqrt(WSSR/ndf)    : 187868
+variance of residuals (reduced chisquare) = WSSR/ndf   : 3.52944e+10
+
+Final set of parameters            Asymptotic Standard Error
+=======================            ==========================
+a               = 201242           +/- 2.043e+05    (101.5%)
+b               = -5.91593         +/- 0.4898       (8.279%)
+c               = 1.00008          +/- 8.975e+04    (8.974e+06%)
+
+correlation matrix of the fit parameters:
+                a      b      c      
+a               1.000 
+b              -1.000  1.000 
+c              -0.593  0.589  1.000 
+
+
+*******************************************************************************
+Thu Mar 25 09:35:04 2021
+
+
+FIT:    data read from 'grovers_time.dat' using 1:2
+        format = x:z
+        x range restricted to [1.00000 : 9.00000]
+        #datapoints = 8
+        residuals are weighted equally (unit weight)
+
+function used for fitting: f(x)
+	f(x) =  a*x**(x+b) + c
+fitted parameters initialized with current variable values
+
+iter      chisq       delta/lim  lambda   a             b             c            
+   0 4.4106514502e+22   0.00e+00  9.88e+10    1.000000e+05  -1.000000e+00   1.000000e+00
+  59 4.2618364865e+10  -9.55e-01  9.88e-02    1.229195e+02  -2.022314e+00   4.653619e+04
+
+After 59 iterations the fit converged.
+final sum of squares of residuals : 4.26184e+10
+rel. change during last iteration : -9.55009e-06
+
+degrees of freedom    (FIT_NDF)                        : 5
+rms of residuals      (FIT_STDFIT) = sqrt(WSSR/ndf)    : 92323.7
+variance of residuals (reduced chisquare) = WSSR/ndf   : 8.52367e+09
+
+Final set of parameters            Asymptotic Standard Error
+=======================            ==========================
+a               = 122.92           +/- 97.85        (79.61%)
+b               = -2.02231         +/- 0.3835       (18.96%)
+c               = 46536.2          +/- 3.898e+04    (83.76%)
+
+correlation matrix of the fit parameters:
+                a      b      c      
+a               1.000 
+b              -1.000  1.000 
+c              -0.428  0.427  1.000 
+
+
+*******************************************************************************
+Thu Mar 25 09:37:32 2021
+
+
+FIT:    data read from 'grovers_time.dat' using 1:2
+        format = x:z
+        x range restricted to [1.00000 : 10.0000]
+        #datapoints = 8
+        residuals are weighted equally (unit weight)
+
+function used for fitting: f(x)
+	f(x) =  a*x**(x+b) + c
+fitted parameters initialized with current variable values
+
+iter      chisq       delta/lim  lambda   a             b             c            
+   0 4.4108874728e+22   0.00e+00  9.88e+10    1.000000e+05  -1.000000e+00   1.000000e+00
+ 105 9.7365018649e+09  -5.64e-01  9.88e+03    6.713201e+04  -5.149977e+00   1.000020e+00
+
+After 105 iterations the fit converged.
+final sum of squares of residuals : 9.7365e+09
+rel. change during last iteration : -5.63757e-06
+
+degrees of freedom    (FIT_NDF)                        : 5
+rms of residuals      (FIT_STDFIT) = sqrt(WSSR/ndf)    : 44128.2
+variance of residuals (reduced chisquare) = WSSR/ndf   : 1.9473e+09
+
+Final set of parameters            Asymptotic Standard Error
+=======================            ==========================
+a               = 67132            +/- 2.105e+04    (31.35%)
+b               = -5.14998         +/- 0.1514       (2.94%)
+c               = 1.00002          +/- 2.116e+04    (2.115e+06%)
+
+correlation matrix of the fit parameters:
+                a      b      c      
+a               1.000 
+b              -1.000  1.000 
+c              -0.599  0.598  1.000 
+
+
+*******************************************************************************
+Thu Mar 25 09:39:28 2021
+
+
+FIT:    data read from 'grovers_time.dat' using 1:2
+        format = x:z
+        x range restricted to [1.00000 : 9.00000]
+        #datapoints = 8
+        residuals are weighted equally (unit weight)
+
+function used for fitting: f(x)
+	f(x) =  a*x**(x+b) + c
+fitted parameters initialized with current variable values
+
+iter      chisq       delta/lim  lambda   a             b             c            
+   0 4.4111644530e+22   0.00e+00  9.88e+10    1.000000e+05  -1.000000e+00   1.000000e+00
+ 127 1.3518243965e+12  -5.26e-01  9.88e+03    3.820193e+05  -6.131334e+00   1.000145e+00
+
+After 127 iterations the fit converged.
+final sum of squares of residuals : 1.35182e+12
+rel. change during last iteration : -5.26494e-06
+
+degrees of freedom    (FIT_NDF)                        : 5
+rms of residuals      (FIT_STDFIT) = sqrt(WSSR/ndf)    : 519966
+variance of residuals (reduced chisquare) = WSSR/ndf   : 2.70365e+11
+
+Final set of parameters            Asymptotic Standard Error
+=======================            ==========================
+a               = 382019           +/- 5.844e+05    (153%)
+b               = -6.13133         +/- 0.7373       (12.03%)
+c               = 1.00014          +/- 2.394e+05    (2.394e+07%)
+
+correlation matrix of the fit parameters:
+                a      b      c      
+a               1.000 
+b              -1.000  1.000 
+c              -0.549  0.543  1.000 
+
+
+*******************************************************************************
+Thu Mar 25 09:45:08 2021
+
+
+FIT:    data read from 'grovers_time.dat' using 1:2
+        format = x:z
+        x range restricted to [4.00000 : 9.00000]
+        #datapoints = 5
+        residuals are weighted equally (unit weight)
+
+function used for fitting: f(x)
+	f(x) =  a*x**(x+b) + c
+fitted parameters initialized with current variable values
+
+iter      chisq       delta/lim  lambda   a             b             c            
+   0 4.4109754168e+22   0.00e+00  1.25e+11    1.000000e+05  -1.000000e+00   1.000000e+00
+ 548 1.1228333298e+08  -2.80e-02  1.25e-04    2.760749e+05  -5.871764e+00  -3.393416e+03
+
+After 548 iterations the fit converged.
+final sum of squares of residuals : 1.12283e+08
+rel. change during last iteration : -2.80026e-07
+
+degrees of freedom    (FIT_NDF)                        : 2
+rms of residuals      (FIT_STDFIT) = sqrt(WSSR/ndf)    : 7492.77
+variance of residuals (reduced chisquare) = WSSR/ndf   : 5.61417e+07
+
+Final set of parameters            Asymptotic Standard Error
+=======================            ==========================
+a               = 276075           +/- 1.653e+04    (5.986%)
+b               = -5.87176         +/- 0.02891      (0.4923%)
+c               = -3393.42         +/- 5103         (150.4%)
+
+correlation matrix of the fit parameters:
+                a      b      c      
+a               1.000 
+b              -1.000  1.000 
+c              -0.654  0.652  1.000 
+
+
+*******************************************************************************
+Thu Mar 25 09:47:16 2021
+
+
+FIT:    data read from 'grovers_time.dat' using 1:2
+        format = x:z
+        x range restricted to [4.00000 : 10.0000]
+        #datapoints = 5
+        residuals are weighted equally (unit weight)
+
+function used for fitting: f(x)
+	f(x) =  a*x**(x+b) + c
+fitted parameters initialized with current variable values
+
+iter      chisq       delta/lim  lambda   a             b             c            
+   0 4.4110223330e+22   0.00e+00  1.25e+11    1.000000e+05  -1.000000e+00   1.000000e+00
+ 160 6.2269364006e+09  -9.64e-01  1.25e+05    2.404535e+04  -4.721440e+00   1.000024e+00
+
+After 160 iterations the fit converged.
+final sum of squares of residuals : 6.22694e+09
+rel. change during last iteration : -9.6434e-06
+
+degrees of freedom    (FIT_NDF)                        : 2
+rms of residuals      (FIT_STDFIT) = sqrt(WSSR/ndf)    : 55798.5
+variance of residuals (reduced chisquare) = WSSR/ndf   : 3.11347e+09
+
+Final set of parameters            Asymptotic Standard Error
+=======================            ==========================
+a               = 24045.3          +/- 1.281e+04    (53.28%)
+b               = -4.72144         +/- 0.2571       (5.445%)
+c               = 1.00002          +/- 3.643e+04    (3.643e+06%)
+
+correlation matrix of the fit parameters:
+                a      b      c      
+a               1.000 
+b              -1.000  1.000 
+c              -0.619  0.617  1.000 
+
+
+*******************************************************************************
+Thu Mar 25 09:48:35 2021
+
+
+FIT:    data read from 'grovers_time.dat' using 1:2
+        format = x:z
+        x range restricted to [4.00000 : 10.0000]
+        #datapoints = 5
+        residuals are weighted equally (unit weight)
+
+function used for fitting: f(x)
+	f(x) =  a*x**(x+b) + c
+fitted parameters initialized with current variable values
+
+iter      chisq       delta/lim  lambda   a             b             c            
+   0 4.4112354063e+22   0.00e+00  1.25e+11    1.000000e+05  -1.000000e+00   1.000000e+00
+1253 3.2760571726e+11  -2.88e-01  1.25e+01    3.178847e+08  -9.413052e+00  -8.879079e+01
+
+After 1253 iterations the fit converged.
+final sum of squares of residuals : 3.27606e+11
+rel. change during last iteration : -2.8797e-06
+
+degrees of freedom    (FIT_NDF)                        : 2
+rms of residuals      (FIT_STDFIT) = sqrt(WSSR/ndf)    : 404726
+variance of residuals (reduced chisquare) = WSSR/ndf   : 1.63803e+11
+
+Final set of parameters            Asymptotic Standard Error
+=======================            ==========================
+a               = 3.17885e+08      +/- 1.117e+09    (351.4%)
+b               = -9.41305         +/- 1.698        (18.04%)
+c               = -88.7908         +/- 4.125e+05    (4.646e+05%)
+
+correlation matrix of the fit parameters:
+                a      b      c      
+a               1.000 
+b              -1.000  1.000 
+c              -0.854  0.852  1.000 
+
+
+*******************************************************************************
+Thu Mar 25 09:50:07 2021
+
+
+FIT:    data read from 'grovers_time.dat' using 1:2
+        format = x:z
+        x range restricted to [4.00000 : 10.0000]
+        #datapoints = 5
+        residuals are weighted equally (unit weight)
+
+function used for fitting: f(x)
+	f(x) =  a*x**(x+b) + c
+fitted parameters initialized with current variable values
+
+iter      chisq       delta/lim  lambda   a             b             c            
+   0 4.4111507819e+22   0.00e+00  1.25e+11    1.000000e+05  -1.000000e+00   1.000000e+00
+ 983 4.7575993370e+09  -5.33e-01  1.25e+02    5.239390e+06  -7.383477e+00   9.229882e-01
+
+After 983 iterations the fit converged.
+final sum of squares of residuals : 4.7576e+09
+rel. change during last iteration : -5.32558e-06
+
+degrees of freedom    (FIT_NDF)                        : 2
+rms of residuals      (FIT_STDFIT) = sqrt(WSSR/ndf)    : 48772.9
+variance of residuals (reduced chisquare) = WSSR/ndf   : 2.3788e+09
+
+Final set of parameters            Asymptotic Standard Error
+=======================            ==========================
+a               = 5.23939e+06      +/- 2.154e+06    (41.1%)
+b               = -7.38348         +/- 0.1986       (2.69%)
+c               = 0.922988         +/- 3.652e+04    (3.957e+06%)
+
+correlation matrix of the fit parameters:
+                a      b      c      
+a               1.000 
+b              -1.000  1.000 
+c              -0.720  0.717  1.000 
+
+
+*******************************************************************************
+Thu Mar 25 09:53:02 2021
+
+
+FIT:    data read from 'grovers_time.dat' using 1:2
+        format = x:z
+        x range restricted to [4.00000 : 10.0000]
+        #datapoints = 5
+        residuals are weighted equally (unit weight)
+
+function used for fitting: f(x)
+	f(x) =  a*x**(x+b) + c
+fitted parameters initialized with current variable values
+
+iter      chisq       delta/lim  lambda   a             b             c            
+   0 4.4109343512e+22   0.00e+00  1.25e+11    1.000000e+05  -1.000000e+00   1.000000e+00
+ 389 2.1069592652e+09  -2.38e-04  1.25e-04    1.490331e+05  -5.555504e+00   6.513305e+03
+
+After 389 iterations the fit converged.
+final sum of squares of residuals : 2.10696e+09
+rel. change during last iteration : -2.37886e-09
+
+degrees of freedom    (FIT_NDF)                        : 2
+rms of residuals      (FIT_STDFIT) = sqrt(WSSR/ndf)    : 32457.4
+variance of residuals (reduced chisquare) = WSSR/ndf   : 1.05348e+09
+
+Final set of parameters            Asymptotic Standard Error
+=======================            ==========================
+a               = 149033           +/- 3.839e+04    (25.76%)
+b               = -5.5555          +/- 0.1244       (2.239%)
+c               = 6513.3           +/- 2.181e+04    (334.9%)
+
+correlation matrix of the fit parameters:
+                a      b      c      
+a               1.000 
+b              -1.000  1.000 
+c              -0.643  0.641  1.000 
+
+
+*******************************************************************************
+Thu Mar 25 09:54:45 2021
+
+
+FIT:    data read from 'grovers_time.dat' using 1:2
+        format = x:z
+        x range restricted to [4.00000 : 10.0000]
+        #datapoints = 5
+        residuals are weighted equally (unit weight)
+
+function used for fitting: f(x)
+	f(x) =  a*x**(x+b) + c
+fitted parameters initialized with current variable values
+
+iter      chisq       delta/lim  lambda   a             b             c            
+   0 4.4109963063e+22   0.00e+00  1.25e+11    1.000000e+05  -1.000000e+00   1.000000e+00
+2297 6.0267212605e+11  -9.74e-01  1.25e-01    1.661738e+11  -1.225172e+01  -1.516964e+06
+
+After 2297 iterations the fit converged.
+final sum of squares of residuals : 6.02672e+11
+rel. change during last iteration : -9.74441e-06
+
+degrees of freedom    (FIT_NDF)                        : 2
+rms of residuals      (FIT_STDFIT) = sqrt(WSSR/ndf)    : 548941
+variance of residuals (reduced chisquare) = WSSR/ndf   : 3.01336e+11
+
+Final set of parameters            Asymptotic Standard Error
+=======================            ==========================
+a               = 1.66174e+11      +/- 4.022e+11    (242.1%)
+b               = -12.2517         +/- 1.157        (9.448%)
+c               = -1.51696e+06     +/- 1.121e+06    (73.87%)
+
+correlation matrix of the fit parameters:
+                a      b      c      
+a               1.000 
+b              -1.000  1.000 
+c              -0.961  0.959  1.000 
+
+
+*******************************************************************************
+Thu Mar 25 09:57:07 2021
+
+
+FIT:    data read from 'grovers_time.dat' using 1:2
+        format = x:z
+        x range restricted to [3.00000 : 8.00000]
+        #datapoints = 6
+        residuals are weighted equally (unit weight)
+
+function used for fitting: f(x)
+	f(x) =  a*x**(x+b) + c
+fitted parameters initialized with current variable values
+
+iter      chisq       delta/lim  lambda   a             b             c            
+   0 4.4109245411e+22   0.00e+00  1.14e+11    1.000000e+05  -1.000000e+00   1.000000e+00
+ 656 1.5751515593e+10  -9.90e-01  1.14e+04    8.644007e+05  -6.396434e+00   1.000342e+00
+
+After 656 iterations the fit converged.
+final sum of squares of residuals : 1.57515e+10
+rel. change during last iteration : -9.89813e-06
+
+degrees of freedom    (FIT_NDF)                        : 3
+rms of residuals      (FIT_STDFIT) = sqrt(WSSR/ndf)    : 72460.4
+variance of residuals (reduced chisquare) = WSSR/ndf   : 5.25051e+09
+
+Final set of parameters            Asymptotic Standard Error
+=======================            ==========================
+a               = 864401           +/- 4.243e+05    (49.08%)
+b               = -6.39643         +/- 0.2372       (3.709%)
+c               = 1.00034          +/- 4.246e+04    (4.245e+06%)
+
+correlation matrix of the fit parameters:
+                a      b      c      
+a               1.000 
+b              -1.000  1.000 
+c              -0.621  0.619  1.000 
+
+
+*******************************************************************************
+Thu Mar 25 09:59:12 2021
+
+
+FIT:    data read from 'grovers_time.dat' using 1:2
+        format = x:z
+        x range restricted to [3.00000 : 8.00000]
+        #datapoints = 6
+        residuals are weighted equally (unit weight)
+
+function used for fitting: f(x)
+	f(x) =  a*x**(x+b) + c
+fitted parameters initialized with current variable values
+
+iter      chisq       delta/lim  lambda   a             b             c            
+   0 4.4111555702e+22   0.00e+00  1.14e+11    1.000000e+05  -1.000000e+00   1.000000e+00
+ 783 4.2471107410e+08  -7.28e-03  1.14e-04    9.352826e+05  -6.557002e+00  -1.276610e+04
+
+After 783 iterations the fit converged.
+final sum of squares of residuals : 4.24711e+08
+rel. change during last iteration : -7.27511e-08
+
+degrees of freedom    (FIT_NDF)                        : 3
+rms of residuals      (FIT_STDFIT) = sqrt(WSSR/ndf)    : 11898.3
+variance of residuals (reduced chisquare) = WSSR/ndf   : 1.4157e+08
+
+Final set of parameters            Asymptotic Standard Error
+=======================            ==========================
+a               = 935283           +/- 9.577e+04    (10.24%)
+b               = -6.557           +/- 0.04949      (0.7548%)
+c               = -12766.1         +/- 7042         (55.16%)
+
+correlation matrix of the fit parameters:
+                a      b      c      
+a               1.000 
+b              -1.000  1.000 
+c              -0.630  0.628  1.000 
+
+
+*******************************************************************************
+Thu Mar 25 10:00:33 2021
+
+
+FIT:    data read from 'grovers_time.dat' using 1:2
+        format = x:z
+        x range restricted to [3.00000 : 8.50000]
+        #datapoints = 6
+        residuals are weighted equally (unit weight)
+
+function used for fitting: f(x)
+	f(x) =  a*x**(x+b) + c
+fitted parameters initialized with current variable values
+
+iter      chisq       delta/lim  lambda   a             b             c            
+   0 4.4112611162e+22   0.00e+00  1.14e+11    1.000000e+05  -1.000000e+00   1.000000e+00
+ 985 1.4122910616e+10  -2.91e-01  1.14e+02    7.077190e+06  -7.599734e+00   7.808068e-01
+
+After 985 iterations the fit converged.
+final sum of squares of residuals : 1.41229e+10
+rel. change during last iteration : -2.91244e-06
+
+degrees of freedom    (FIT_NDF)                        : 3
+rms of residuals      (FIT_STDFIT) = sqrt(WSSR/ndf)    : 68612.2
+variance of residuals (reduced chisquare) = WSSR/ndf   : 4.70764e+09
+
+Final set of parameters            Asymptotic Standard Error
+=======================            ==========================
+a               = 7.07719e+06      +/- 4.454e+06    (62.94%)
+b               = -7.59973         +/- 0.3044       (4.005%)
+c               = 0.780807         +/- 4.478e+04    (5.735e+06%)
+
+correlation matrix of the fit parameters:
+                a      b      c      
+a               1.000 
+b              -1.000  1.000 
+c              -0.706  0.704  1.000 
+
+
+*******************************************************************************
+Thu Mar 25 11:22:27 2021
+
+
+FIT:    data read from 'grovers_time.dat' using 1:2
+        format = x:z
+        x range restricted to [3.00000 : 8.50000]
+        #datapoints = 6
+        residuals are weighted equally (unit weight)
+
+function used for fitting: f(x)
+	f(x) =  a*x**(x+b) + c
+fitted parameters initialized with current variable values
+
+iter      chisq       delta/lim  lambda   a             b             c            
+   0 4.4112912960e+22   0.00e+00  1.14e+11    1.000000e+05  -1.000000e+00   1.000000e+00
+1210 7.2244947501e+09  -1.26e-01  1.14e-01    1.415394e+07  -7.953980e+00  -2.853939e+04
+
+After 1210 iterations the fit converged.
+final sum of squares of residuals : 7.22449e+09
+rel. change during last iteration : -1.26115e-06
+
+degrees of freedom    (FIT_NDF)                        : 3
+rms of residuals      (FIT_STDFIT) = sqrt(WSSR/ndf)    : 49073.1
+variance of residuals (reduced chisquare) = WSSR/ndf   : 2.40816e+09
+
+Final set of parameters            Asymptotic Standard Error
+=======================            ==========================
+a               = 1.41539e+07      +/- 6.552e+06    (46.29%)
+b               = -7.95398         +/- 0.2239       (2.814%)
+c               = -28539.4         +/- 3.379e+04    (118.4%)
+
+correlation matrix of the fit parameters:
+                a      b      c      
+a               1.000 
+b              -1.000  1.000 
+c              -0.740  0.738  1.000 
+
+
+*******************************************************************************
+Thu Mar 25 11:37:50 2021
+
+
+FIT:    data read from 'grovers_time.dat' using 1:2
+        format = x:z
+        x range restricted to [3.00000 : 8.50000]
+        #datapoints = 6
+        residuals are weighted equally (unit weight)
+
+function used for fitting: f(x)
+	f(x) =  a*x**(x+b) + c
+fitted parameters initialized with current variable values
+
+iter      chisq       delta/lim  lambda   a             b             c            
+   0 4.4112030239e+22   0.00e+00  1.14e+11    1.000000e+05  -1.000000e+00   1.000000e+00
+ 911 2.9010276648e+07  -1.70e-01  1.14e-04    1.677019e+06  -6.867295e+00  -2.324962e+04
+
+After 911 iterations the fit converged.
+final sum of squares of residuals : 2.90103e+07
+rel. change during last iteration : -1.69516e-06
+
+degrees of freedom    (FIT_NDF)                        : 3
+rms of residuals      (FIT_STDFIT) = sqrt(WSSR/ndf)    : 3109.68
+variance of residuals (reduced chisquare) = WSSR/ndf   : 9.67009e+06
+
+Final set of parameters            Asymptotic Standard Error
+=======================            ==========================
+a               = 1.67702e+06      +/- 4.639e+04    (2.766%)
+b               = -6.8673          +/- 0.01337      (0.1947%)
+c               = -23249.6         +/- 1882         (8.094%)
+
+correlation matrix of the fit parameters:
+                a      b      c      
+a               1.000 
+b              -1.000  1.000 
+c              -0.650  0.647  1.000 

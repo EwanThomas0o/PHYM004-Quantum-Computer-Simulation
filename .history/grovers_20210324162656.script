@@ -1,0 +1,10 @@
+set xlabel "Number of qubits"
+set ylabel "Time $\mu$s"
+f(x) =  a*x(x+b) + c
+a = 100000
+b = -1
+c = 1
+
+fit f(x) 'grovers_time.dat' using 1:2 via a, b, c
+plot 'grovers_time.dat' u 1:2, f(x)
+pause -1

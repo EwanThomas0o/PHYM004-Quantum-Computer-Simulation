@@ -1,0 +1,15 @@
+set xlabel "Number of qubits" font ",12"
+set ylabel "Time (microseconds)" font ",12"
+set pointsize 2.0
+set title "Run Time of Grover's Algorithm with Increasing Qubits"
+set key font ",15"
+set tics font ", 10"
+set style line 1 lc "blue" lw 3  
+f(x) =  a*x**(x+b) + c
+a = 100000
+b = -1
+c = 1
+
+fit f(x) 'grovers_time.dat' using 1:2 via a, b, c
+plot 'grovers_time.dat' u 1:2, f(x) with linespoints ls 1
+pause -1
