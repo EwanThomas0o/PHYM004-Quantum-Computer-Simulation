@@ -1315,3 +1315,39 @@ primeFactors shors(gsl_vector_complex* wavefunction, int compositeNumber){
     }
     return factors;
 }
+
+
+// int main(){
+//     gsl_vector_complex* wavefunction = createRegister(7);
+// //     //Putting system into equal super position of superposition all 2^N basis'
+// // //     // wavefunction = cnotGate(wavefunction, 1,2 );
+// // //     // wavefunction = CphaseGate(wavefunction, 2, 1, M_PI_4);
+
+// // //     // for(int i = 0; i < floor(M_PI_4*sqrt(pow(2,N))); i++){ // Needs to be called "floor(pi/4*sqrt(2^N))"" times for optimum output roughly 2 in our case
+// // //     //     wavefunction = groversBlock(wavefunction, 7); //Second argument is the basis state you want to be "right" in this case its |110>
+// // //     // }
+//     wavefunction = initWavefunctionShors(wavefunction->size);
+//     // hadamardGate(wavefunction, 1);
+//     // hadamardGate(wavefunction, 2);
+//     // hadamardGate(wavefunction, 3);
+//     // amodcGate(3, 7, 15, wavefunction);
+//     // amodcGate(2, 7, 15, wavefunction);
+//     // amodcGate(1, 7, 15, wavefunction);
+
+// // // // // IQFT block
+// //     // wavefunction = hadamardGate(wavefunction, 1);
+// //     // wavefunction = CphaseGate(wavefunction, 1, 2, M_PI_2);
+// //     // wavefunction = CphaseGate(wavefunction, 1, 3, M_PI_4);
+// //     // wavefunction = hadamardGate(wavefunction, 2);
+// //     // wavefunction = CphaseGate(wavefunction, 2, 3, M_PI_2);
+// //     // wavefunction = hadamardGate(wavefunction, 3);
+
+// // //     // wavefunction = phaseShiftGate(wavefunction, 3,  3.14159);
+//     // shorsBlock(wavefunction, 7, 15);
+//     // hadamardGate(wavefunction, 1);
+
+//     shors(wavefunction, 15);
+// //     // readsXReg(wavefunction);
+//     measureRegisterGate(wavefunction);
+//     return 0;
+// }

@@ -10,33 +10,29 @@
 
 // Gate available in sandbox mode
 // ------------------------------
-// Hadamard Gate = hadamardGate()
-// Phase Gate = phaseShiftGate()
-// Oracle Gate = oracleGate()
-// Grovers Block = groversBlock()
-// Controlled not gate = cnotGate
-// Controlled phase gate = CphaseGate()
-// J gate = jGate()
+// Hadamard Gate
+// Phase Gate
+// Oracle Gate
+// Grovers Block
+// Controlled not gate
+// Controlled phase gate
+// J gate
 
 // Utility functions available
 // ---------------------------
 // print_wf
 // measureRegisterGate
-// Grovers Algorithm 
-// Shors algorithm
 
 // Getting Started
 // ---------------
-// declare your register as type "gsl_vector_complex*" and initialise with createRegister(#number of qubits)
+// declare your register as type "gsl_vector_complex*" and initialise with createRegister
 
 
 
 #include "quantcomp.h"
 #define GNUPLOT_EXE    "gnuplot"
-#define GNUPLOT_SCRIPT1 "grovers.script"
-#define GNUPLOT_DATA1   "grovers_time.dat"
-#define GNUPLOT_SCRIPT2 "sim_time.script"
-#define GNUPLOT_DATA2   "sim_time.dat"
+#define GNUPLOT_SCRIPT "grovers.script"
+#define GNUPLOT_DATA   "grovers_time.dat"
 #define USEC_IN_SEC 1000000
 #include <sys/time.h>
 
@@ -48,7 +44,7 @@ int main(){
     printf("Choose which mode you'd like to enter\n");
     printf("Mode 1 = Analysis of Grovers Algorithm\n");
     printf("Mode 2 = Shor's Algorithm using 7 Qubits for the number 15\n");
-    printf("Mode 3 = Sandbox mode which runs code from the sandbox area\n");
+    printf("Mode 3 = Sandbox mode which compiles code in the sandbox area\n");
     scanf("%d", &mode);
     
     if(mode == 1)
@@ -99,7 +95,7 @@ int main(){
         }
         fclose(fp);
 
-        snprintf(command, sizeof(command), "%s %s", GNUPLOT_EXE, GNUPLOT_SCRIPT1 );
+        snprintf(command, sizeof(command), "%s %s", GNUPLOT_EXE, GNUPLOT_SCRIPT );
         system( command );
     }
 
@@ -108,8 +104,6 @@ int main(){
         gsl_vector_complex* reg = createRegister(7);
         shors(reg,15);
     }
-
-//---------------------------- SANDBOX AREA ----------------------------
     if(mode == 3)
     {   
         // Example of grovers algorithm and printing probability amplitudes.

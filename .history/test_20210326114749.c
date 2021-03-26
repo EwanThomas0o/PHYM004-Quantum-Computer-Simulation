@@ -10,24 +10,22 @@
 
 // Gate available in sandbox mode
 // ------------------------------
-// Hadamard Gate = hadamardGate()
-// Phase Gate = phaseShiftGate()
-// Oracle Gate = oracleGate()
-// Grovers Block = groversBlock()
-// Controlled not gate = cnotGate
-// Controlled phase gate = CphaseGate()
-// J gate = jGate()
+// Hadamard Gate
+// Phase Gate
+// Oracle Gate
+// Grovers Block
+// Controlled not gate
+// Controlled phase gate
+// J gate
 
 // Utility functions available
 // ---------------------------
 // print_wf
 // measureRegisterGate
-// Grovers Algorithm 
-// Shors algorithm
 
 // Getting Started
 // ---------------
-// declare your register as type "gsl_vector_complex*" and initialise with createRegister(#number of qubits)
+// declare your register as type "gsl_vector_complex*" and initialise with createRegister
 
 
 
